@@ -87,12 +87,22 @@ def turnir(ime1, ime2, ime3, ime4):
     
     mesta = [0, 1, 2]
 
+    zmage = {i : 0 for i in igralci}
+    print(zmage)
+    print('')
+    
     for i in range(3):
         
         print(str(i+1) +  '. runda: \n')
         mesto = random.choice(mesta)
         mesta.remove(mesto)
         print(pairingi[mesto] + '\n')
+
+        zmage[str(input('Kdo je zmagal? '))] += 1
+        print('')
+        print(zmage)
+        print('')
+        
 
     print('Decki v 4. rundi:\n')
     
