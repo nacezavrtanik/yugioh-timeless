@@ -67,28 +67,31 @@ def turnir(ime1, ime2, ime3, ime4):
     
     matchup = random.choice(matchupi)
 
-    pairingi = [ igralci[0] + ' (' + str(decki[matchup[1][0]]) + ')   VS   '
+    pairingi = [ (igralci[0] + ' (' + str(decki[matchup[1][0]]) + ')   VS   '
                  + igralci[1] + ' (' + str(decki[matchup[1][1]]) + ')\n'
                  + igralci[2] + ' (' + str(decki[matchup[1][2]]) + ')   VS   '
                  + igralci[3] + ' (' + str(decki[matchup[1][3]]) + ')',
+                  0, 1, 2, 3),
 
-                 igralci[1] + ' (' + str(decki[matchup[2][1]]) + ')   VS   '
+                 (igralci[1] + ' (' + str(decki[matchup[2][1]]) + ')   VS   '
                  + igralci[3] + ' (' + str(decki[matchup[2][3]]) + ')\n'
                  + igralci[0] + ' (' + str(decki[matchup[2][0]]) + ')   VS   '
                  + igralci[2] + ' (' + str(decki[matchup[2][2]]) + ')',
+                  1, 3, 0, 2),
 
-                 igralci[3] + ' (' + str(decki[matchup[3][3]]) + ')   VS   '
+                 (igralci[3] + ' (' + str(decki[matchup[3][3]]) + ')   VS   '
                  + igralci[0] + ' (' + str(decki[matchup[3][0]]) + ')\n'
                  + igralci[1] + ' (' + str(decki[matchup[3][1]]) + ')   VS   '
-                 + igralci[2] + ' (' + str(decki[matchup[3][2]]) + ')'
+                 + igralci[2] + ' (' + str(decki[matchup[3][2]]) + ')',
+                  3, 0, 1, 2)
                  ]
 
     print('\n----------------------PAIRINGI----------------------\n')
     
     mesta = [0, 1, 2]
 
-    zmage = {i : 0 for i in igralci}
-    print(zmage)
+    zmage1 = {i : 0 for i in igralci}
+    print(zmage1)
     print('')
     
     for i in range(3):
@@ -96,25 +99,41 @@ def turnir(ime1, ime2, ime3, ime4):
         print(str(i+1) +  '. runda: \n')
         mesto = random.choice(mesta)
         mesta.remove(mesto)
-        print(pairingi[mesto] + '\n')
+        print(pairingi[mesto][0] + '\n')
 
-        zmage[str(input('Kdo je zmagal? '))] += 1
+        zmage1[str(input('Kdo je zmagal prvi match, ' + igralci[pairingi[mesto][1]] + ' ali ' + igralci[pairingi[mesto][2]] + '? '))] += 1
+        zmage1[str(input('Kdo je zmagal drugi match, ' + igralci[pairingi[mesto][3]] + ' ali ' + igralci[pairingi[mesto][4]] + '? '))] += 1
         print('')
-        print(zmage)
+        print(zmage1)
         print('')
-        
 
-    print('Decki v 4. rundi:\n')
-    
-    zadnja = {}
-    
-    for i in range(4):
-        zadnja[igralci[i]] = ' (' + str(decki[matchup[0][i]]) + ')'
+    zmage2a = [stev_zmag for stev_zmag in list(zmage1.values())]
+    print(zmage2a)
+    zmage2b = [igralec for igralec in list(zmage1.keys())]
+    print(zmage2b)
+    zmage2 = list(zip(zmage2a, zmage2b))
+    print(zmage2)
+
+
+    zmage3 = sorted(list(zmage1.values()), reverse = 1)
+    print(zmage3)
+
+##    if zmage3 == [3,2,1,0] or zmage3 == [2,2,1,1]:
+##        print('4. runda:\n\n')
+##        print(
+
+##    print('Decki v 4. rundi:\n')
+##    
+##    zadnja = {}
+##    
+##    for i in range(4):
+##        zadnja[igralci[i]] = ' (' + str(decki[matchup[0][i]]) + ')'
+##        
+##    for igr in igralcifix:
+##        print(igr + zadnja[igr])
+##        
+##    print('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
         
-    for igr in igralcifix:
-        print(igr + zadnja[igr])
-        
-    print('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
 
 turnir(igr1, igr2, igr3, igr4)
 
