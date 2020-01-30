@@ -86,7 +86,7 @@ def turnir(ime1, ime2, ime3, ime4):
              + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')   VS   '
              + igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')'
              ]
-
+    
     print('\n----------------------PAIRINGI----------------------')
     
     mesta = [0, 1, 2]
@@ -113,8 +113,36 @@ def turnir(ime1, ime2, ime3, ime4):
         print(zmage2[0][1] + ' (' + decki[igralci.index(zmage2[0][1])] + ')   VS   ' + zmage2[1][1] + ' (' + decki[igralci.index(zmage2[1][1])] + ')\n' +
               zmage2[2][1] + ' (' + decki[igralci.index(zmage2[2][1])] + ')   VS   ' + zmage2[3][1] + ' (' + decki[igralci.index(zmage2[3][1])] + ')')
 
-        zmage1[str(input('\nKdo je zmagal prvi match? '))] += 1
-        zmage1[str(input('Kdo je zmagal drugi match? '))] += 1
+        prvi = input('\nKdo je zmagal prvi match? ')
+        zmage1[prvi] += 1
+        tretji = input('Kdo je zmagal drugi match? ')
+        zmage1[tretji] += 1
+
+        print('----------------------------------------------------')
+
+        stand = [prvi]
+        
+        if prvi == zmage2[0][1]:
+            stand.append(zmage2[1][1])
+        else:
+            stand.append(zmage2[0][1])
+        stand.append(tretji)
+        if tretji == zmage2[2][1]:
+            stand.append(zmage2[3][1])
+        else:
+            stand.append(zmage2[2][1])
+
+        nagrade = [9, 6, 3, 0]
+        for i in range(4):
+            if zmage1[stand[i]] == 4 - i:
+                nagrade[i] += 1                
+
+        print('\n----------------------STANDINGI---------------------\n')
+
+        for i in range(4):
+            print(str(i+1) + '. mesto:     ' + stand[i] + '     (' + str(nagrade[i]) + '€)')
+                
+        
         
     else:
         print('\n4. runda:\n')
@@ -123,7 +151,6 @@ def turnir(ime1, ime2, ime3, ime4):
         zmage1[str(input('\nKdo je zmagal prvi match? '))] += 1
         zmage1[str(input('Kdo je zmagal drugi match? '))] += 1
         
-    print('----------------------------------------------------')
 ##    print('')
 ##    print(zmage1)
 
