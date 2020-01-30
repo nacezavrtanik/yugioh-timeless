@@ -105,8 +105,6 @@ def turnir(ime1, ime2, ime3, ime4):
         print('----------------------------------------------------')
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
-##    print(zmage2)
-##    print(zmage1)
 
     if [zmage2[0][0], zmage2[1][0], zmage2[2][0], zmage2[3][0]] == [3,2,1,0] or [zmage2[0][0], zmage2[1][0], zmage2[2][0], zmage2[3][0]] == [2,2,1,1]:
         print('\n4. runda:\n')
@@ -135,8 +133,9 @@ def turnir(ime1, ime2, ime3, ime4):
         nagrade = [9, 6, 3, 0]
         for i in range(4):
             if zmage1[stand[i]] == 4 - i:
-                nagrade[i] += 1                
-
+                nagrade[i] += 1
+                
+        print('\nČestitke vsem igralcem!')
         print('\n----------------------STANDINGI---------------------\n')
 
         for i in range(4):
@@ -154,39 +153,36 @@ def turnir(ime1, ime2, ime3, ime4):
         print('----------------------------------------------------')
 
         zmage3 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
-        print('')
-        print(zmage3)
+        print('\nČestitke vsem igralcem!')
+
+        razporedi = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
+        razpored = [x[0] for x in zmage3]
+        
+        if razporedi.index(razpored) == 0:
+            pozicija = [1, 2, 3, 3]
+            nagrade = [10, 6, 2, 2]
+        elif razporedi.index(razpored) == 1:
+            pozicija = [1, 1, 3, 4]
+            nagrade = [8, 8, 4, 0]
+        else:
+            pozicija = [1, 2, 2, 4]
+            nagrade = [9, 5, 5, 1]
 
         print('\n----------------------STANDINGI---------------------\n')
 
         for i in range(4):
-            print(str(i+1) + '. mesto:     ' + zmage3[i][1])
+            print(str(pozicija[i]) + '. mesto:     ' + zmage3[i][1] + '     (' + str(nagrade[i]) + '€)')
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-##    print('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
+    print('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
 
 turnir(igr1, igr2, igr3, igr4)
 
 input()
-input('POZOR! Si prepričan, da želiš zapreti okno?\n')
-input('Pa do naslednjič! :)\n')
+input('Pa do naslednjič!\n')
 
 
 
