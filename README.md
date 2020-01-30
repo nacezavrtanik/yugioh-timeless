@@ -1,4 +1,4 @@
-# TURNIR (custom format)
+# Turnir (custom format)
 
 Naloge:
 - nagrade za (3111), (2220)
