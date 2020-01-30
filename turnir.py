@@ -1,7 +1,9 @@
 import random
 
+
 print('================== *** IME LIGE *** ==================\n')
 print('*** OPIS FORMATOV ***\n')
+
 
 def deck(stevilka):
     decki1 = ['Normal', 'Dragon', 'Beast', 'Chaos']
@@ -13,6 +15,7 @@ def deck(stevilka):
     else:
         return(deck(input('\nUps, prišlo je do napake. Vnesi samo 1 ali 2 in pritisni ENTER.\nŠtevilka formata: ')))
 
+
 decki = deck(input('1 *** Prvi format *** \n2 *** Drugi format *** \n\nKaterega boste igrali? Številka formata: '))
 
 print('\n*** TEKST ***\n')
@@ -21,6 +24,7 @@ igr2 = input('2. igralec: ')
 igr3 = input('3. igralec: ')
 igr4 = input('4. igralec: ')
 print('\nVeliko zabave pri igranju!')
+
 
 def turnir(ime1, ime2, ime3, ime4):
 
@@ -142,7 +146,6 @@ def turnir(ime1, ime2, ime3, ime4):
             print(str(i+1) + '. mesto:     ' + stand[i] + '     (' + str(nagrade[i]) + '€)')
                 
         
-        
     else:
         print('\n4. runda:\n')
         print(random.choice(pairingi2))
@@ -153,7 +156,6 @@ def turnir(ime1, ime2, ime3, ime4):
         print('----------------------------------------------------')
 
         zmage3 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
-        print('\nČestitke vsem igralcem!')
 
         razporedi = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
         razpored = [x[0] for x in zmage3]
@@ -167,34 +169,17 @@ def turnir(ime1, ime2, ime3, ime4):
         else:
             pozicija = [1, 2, 2, 4]
             nagrade = [9, 5, 5, 1]
-
+            
+        print('\nČestitke vsem igralcem!')
         print('\n----------------------STANDINGI---------------------\n')
 
         for i in range(4):
             print(str(pozicija[i]) + '. mesto:     ' + zmage3[i][1] + '     (' + str(nagrade[i]) + '€)')
 
-
-
-
-
     print('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
+
 
 turnir(igr1, igr2, igr3, igr4)
 
 input()
 input('Pa do naslednjič!\n')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
