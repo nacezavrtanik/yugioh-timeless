@@ -151,8 +151,16 @@ def turnir(ime1, ime2, ime3, ime4):
         zmage1[str(input('\nKdo je zmagal prvi match? '))] += 1
         zmage1[str(input('Kdo je zmagal drugi match? '))] += 1
         
-##    print('')
-##    print(zmage1)
+        print('----------------------------------------------------')
+
+        zmage3 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
+        print('')
+        print(zmage3)
+
+        print('\n----------------------STANDINGI---------------------\n')
+
+        for i in range(4):
+            print(str(i+1) + '. mesto:     ' + zmage3[i][1])
 
 
 
