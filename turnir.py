@@ -59,35 +59,35 @@ def turnir(ime1, ime2, ime3, ime4):
     
     matchup = random.choice(matchupi)
 
-    pairingi = [ igralci[0] + ' (' + str(decki[matchup[1][0]]) + ')   VS   '
+    pairingi = [ igralci[0] + ' (' + str(decki[matchup[1][0]]) + ')\tVS\t'
                  + igralci[1] + ' (' + str(decki[matchup[1][1]]) + ')\n'
-                 + igralci[2] + ' (' + str(decki[matchup[1][2]]) + ')   VS   '
+                 + igralci[2] + ' (' + str(decki[matchup[1][2]]) + ')\tVS\t'
                  + igralci[3] + ' (' + str(decki[matchup[1][3]]) + ')',
 
-                 igralci[1] + ' (' + str(decki[matchup[2][1]]) + ')   VS   '
+                 igralci[1] + ' (' + str(decki[matchup[2][1]]) + ')\tVS\t'
                  + igralci[3] + ' (' + str(decki[matchup[2][3]]) + ')\n'
-                 + igralci[0] + ' (' + str(decki[matchup[2][0]]) + ')   VS   '
+                 + igralci[0] + ' (' + str(decki[matchup[2][0]]) + ')\tVS\t'
                  + igralci[2] + ' (' + str(decki[matchup[2][2]]) + ')',
 
-                 igralci[3] + ' (' + str(decki[matchup[3][3]]) + ')   VS   '
+                 igralci[3] + ' (' + str(decki[matchup[3][3]]) + ')\tVS\t'
                  + igralci[0] + ' (' + str(decki[matchup[3][0]]) + ')\n'
-                 + igralci[1] + ' (' + str(decki[matchup[3][1]]) + ')   VS   '
+                 + igralci[1] + ' (' + str(decki[matchup[3][1]]) + ')\tVS\t'
                  + igralci[2] + ' (' + str(decki[matchup[3][2]]) + ')'
                  ]
 
-    pairingi2 = [ igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')   VS   '
+    pairingi2 = [ igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')\tVS\t'
              + igralci[0] + ' (' + str(decki[matchup[0][0]]) + ')\n'
-             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')   VS   '
+             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')\tVS\t'
              + igralci[3] + ' (' + str(decki[matchup[0][3]]) + ')',
 
-             igralci[3] + ' (' + str(decki[matchup[0][3]]) + ')   VS   '
+             igralci[3] + ' (' + str(decki[matchup[0][3]]) + ')\tVS\t'
              + igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')\n'
-             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')   VS   '
+             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')\tVS\t'
              + igralci[0] + ' (' + str(decki[matchup[0][0]]) + ')',
 
-             igralci[3] + ' (' + str(decki[matchup[0][3]]) + ')   VS   '
+             igralci[3] + ' (' + str(decki[matchup[0][3]]) + ')\tVS\t'
              + igralci[0] + ' (' + str(decki[matchup[0][0]]) + ')\n'
-             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')   VS   '
+             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')\tVS\t'
              + igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')'
              ]
     
@@ -112,8 +112,8 @@ def turnir(ime1, ime2, ime3, ime4):
 
     if [zmage2[0][0], zmage2[1][0], zmage2[2][0], zmage2[3][0]] == [3,2,1,0] or [zmage2[0][0], zmage2[1][0], zmage2[2][0], zmage2[3][0]] == [2,2,1,1]:
         print('\n4. runda:\n')
-        print(zmage2[0][1] + ' (' + decki[igralci.index(zmage2[0][1])] + ')   VS   ' + zmage2[1][1] + ' (' + decki[igralci.index(zmage2[1][1])] + ')\n' +
-              zmage2[2][1] + ' (' + decki[igralci.index(zmage2[2][1])] + ')   VS   ' + zmage2[3][1] + ' (' + decki[igralci.index(zmage2[3][1])] + ')')
+        print(zmage2[0][1] + ' (' + decki[igralci.index(zmage2[0][1])] + ')\tVS\t' + zmage2[1][1] + ' (' + decki[igralci.index(zmage2[1][1])] + ')\n' +
+              zmage2[2][1] + ' (' + decki[igralci.index(zmage2[2][1])] + ')\tVS\t' + zmage2[3][1] + ' (' + decki[igralci.index(zmage2[3][1])] + ')')
 
         prvi = input('\nKdo je zmagal prvi match? ')
         zmage1[prvi] += 1
@@ -143,7 +143,7 @@ def turnir(ime1, ime2, ime3, ime4):
         print('\n----------------------STANDINGI---------------------\n')
 
         for i in range(4):
-            print(str(i+1) + '. mesto:     ' + stand[i] + '     (' + str(nagrade[i]) + '€)')
+            print(str(i+1) + '. mesto:\t' + stand[i] + '\t(' + str(nagrade[i]) + '€)')
                 
         
     else:
@@ -174,7 +174,7 @@ def turnir(ime1, ime2, ime3, ime4):
         print('\n----------------------STANDINGI---------------------\n')
 
         for i in range(4):
-            print(str(pozicija[i]) + '. mesto:     ' + zmage3[i][1] + '     (' + str(nagrade[i]) + '€)')
+            print(str(pozicija[i]) + '. mesto:\t' + zmage3[i][1] + '\t(' + str(nagrade[i]) + '€)')
 
     print('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
 
