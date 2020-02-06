@@ -1,4 +1,5 @@
 import random
+import string
 from tabulate import tabulate
 
 
@@ -23,10 +24,10 @@ def turnir():
 
     print('\n*** TEKST ***\n')
 
-    igr1 = input('1. igralec: ')
-    igr2 = input('2. igralec: ')
-    igr3 = input('3. igralec: ')
-    igr4 = input('4. igralec: ')
+    igr1 = string.capwords(input('1. igralec: ').lower())
+    igr2 = string.capwords(input('2. igralec: ').lower())
+    igr3 = string.capwords(input('3. igralec: ').lower())
+    igr4 = string.capwords(input('4. igralec: ').lower())
 
     igralci = [igr1, igr2, igr3, igr4]
 
