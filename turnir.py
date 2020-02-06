@@ -89,23 +89,28 @@ def turnir(ime1, ime2, ime3, ime4):
         
         print('\n' + str(i+1) +  '. runda: \n')
         print(tabulate(pairingi1[i], tablefmt='plain'))
-        print('')
 
-        zmage1[str(input('Kdo je zmagal prvi match? '))] += 1
-        zmage1[str(input('Kdo je zmagal drugi match? '))] += 1
+        A, B, C, D = [pairingi1[i][0][0].split(' (')[0], pairingi1[i][0][2].split(' (')[0], pairingi1[i][1][0].split(' (')[0], pairingi1[i][1][2].split(' (')[0]]
+        
+        zmage1[str(input('\nKdo je zmagal, {} ali {}? '.format(A,B)))] += 1
+        zmage1[str(input('Kdo je zmagal, {} ali {}? '.format(C,D)))] += 1
         print('----------------------------------------------------')
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
 
     if  [zmage2[i][0] for i in range(4)] == [3,2,1,0] or [zmage2[i][0] for i in range(4)] == [2,2,1,1]:
         print('\n4. runda:\n')
-        print(tabulate([[zmage2[0][1] + ' (' + decki[igralci.index(zmage2[0][1])] + ')', 'VS', zmage2[1][1] + ' (' + decki[igralci.index(zmage2[1][1])] + ')'],
-                        [zmage2[2][1] + ' (' + decki[igralci.index(zmage2[2][1])] + ')', 'VS', zmage2[3][1] + ' (' + decki[igralci.index(zmage2[3][1])] + ')']],
-                       tablefmt='plain'))
 
-        prvi = input('\nKdo je zmagal prvi match? ')
+        A, B, C, D = [zmage2[i][1] for i in range(4)]
+        
+        table = [[A + ' (' + decki[igralci.index(zmage2[0][1])] + ')', 'VS', B + ' (' + decki[igralci.index(zmage2[1][1])] + ')'],
+                [C + ' (' + decki[igralci.index(zmage2[2][1])] + ')', 'VS', D + ' (' + decki[igralci.index(zmage2[3][1])] + ')']]
+        
+        print(tabulate(table, tablefmt='plain'))
+
+        prvi = input('\nKdo je zmagal, {} ali {}? '.format(A,B))
         zmage1[prvi] += 1
-        tretji = input('Kdo je zmagal drugi match? ')
+        tretji = input('Kdo je zmagal, {} ali {}? '.format(C,D))
         zmage1[tretji] += 1
 
         print('----------------------------------------------------')
@@ -138,8 +143,10 @@ def turnir(ime1, ime2, ime3, ime4):
         print('\n4. runda:\n')
         print(tabulate(pairingi2[0], tablefmt='plain'))
 
-        zmage1[str(input('\nKdo je zmagal prvi match? '))] += 1
-        zmage1[str(input('Kdo je zmagal drugi match? '))] += 1
+        A, B, C, D = [pairingi2[0][0][0].split(' (')[0], pairingi2[0][0][2].split(' (')[0], pairingi2[0][1][0].split(' (')[0], pairingi2[0][1][2].split(' (')[0]]
+
+        zmage1[str(input('\nKdo je zmagal, {} ali {}? '.format(A,B)))] += 1
+        zmage1[str(input('Kdo je zmagal, {} ali {}? '.format(C,D)))] += 1
         
         print('----------------------------------------------------')
 
