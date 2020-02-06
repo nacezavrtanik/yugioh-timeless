@@ -59,21 +59,34 @@ def turnir(ime1, ime2, ime3, ime4):
     
     matchup = random.choice(matchupi)
 
-    pairingi = [ igralci[0] + ' (' + str(decki[matchup[1][0]]) + ')\tVS\t'
-                 + igralci[1] + ' (' + str(decki[matchup[1][1]]) + ')\n'
-                 + igralci[2] + ' (' + str(decki[matchup[1][2]]) + ')\tVS\t'
-                 + igralci[3] + ' (' + str(decki[matchup[1][3]]) + ')',
+    pairingi = []
 
-                 igralci[1] + ' (' + str(decki[matchup[2][1]]) + ')\tVS\t'
-                 + igralci[3] + ' (' + str(decki[matchup[2][3]]) + ')\n'
-                 + igralci[0] + ' (' + str(decki[matchup[2][0]]) + ')\tVS\t'
-                 + igralci[2] + ' (' + str(decki[matchup[2][2]]) + ')',
+    pairing = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
 
-                 igralci[3] + ' (' + str(decki[matchup[3][3]]) + ')\tVS\t'
-                 + igralci[0] + ' (' + str(decki[matchup[3][0]]) + ')\n'
-                 + igralci[1] + ' (' + str(decki[matchup[3][1]]) + ')\tVS\t'
-                 + igralci[2] + ' (' + str(decki[matchup[3][2]]) + ')'
-                 ]
+    for i in range(3):
+        sez = []
+        for j in [0, 2]:
+            sez.append([ igralci[pairing[i][j]] + ' (' + decki[matchup[j][j+1]] + ')', 'VS', igralci[pairing[i][j+1]] + ' (' + decki[matchup[j+1][j]] + ')'])
+        pairingi.append(sez)
+
+    random.shuffle(pairingi)
+
+
+##    pairingi = [ igralci[0] + ' (' + str(decki[matchup[1][0]]) + ')\tVS\t'
+##                 + igralci[1] + ' (' + str(decki[matchup[1][1]]) + ')\n'
+##                 + igralci[2] + ' (' + str(decki[matchup[1][2]]) + ')\tVS\t'
+##                 + igralci[3] + ' (' + str(decki[matchup[1][3]]) + ')',
+##
+##                 igralci[1] + ' (' + str(decki[matchup[2][1]]) + ')\tVS\t'
+##                 + igralci[3] + ' (' + str(decki[matchup[2][3]]) + ')\n'
+##                 + igralci[0] + ' (' + str(decki[matchup[2][0]]) + ')\tVS\t'
+##                 + igralci[2] + ' (' + str(decki[matchup[2][2]]) + ')',
+##
+##                 igralci[3] + ' (' + str(decki[matchup[3][3]]) + ')\tVS\t'
+##                 + igralci[0] + ' (' + str(decki[matchup[3][0]]) + ')\n'
+##                 + igralci[1] + ' (' + str(decki[matchup[3][1]]) + ')\tVS\t'
+##                 + igralci[2] + ' (' + str(decki[matchup[3][2]]) + ')'
+##                 ]
 
     pairingi2 = [ igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')\tVS\t'
              + igralci[0] + ' (' + str(decki[matchup[0][0]]) + ')\n'
@@ -92,17 +105,14 @@ def turnir(ime1, ime2, ime3, ime4):
              ]
     
     print('\n----------------------PAIRINGI----------------------')
-    
-    mesta = [0, 1, 2]
 
     zmage1 = {i : 0 for i in igralci}
     
     for i in range(3):
         
         print('\n' + str(i+1) +  '. runda: \n')
-        mesto = random.choice(mesta)
-        mesta.remove(mesto)
-        print(pairingi[mesto] + '\n')
+        print(tabulate(pairingi[i], tablefmt='plain'))
+        print('')
 
         zmage1[str(input('Kdo je zmagal prvi match? '))] += 1
         zmage1[str(input('Kdo je zmagal drugi match? '))] += 1
