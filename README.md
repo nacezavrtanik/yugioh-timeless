@@ -3,5 +3,5 @@
 Naloge:
 - vnos zmagovalcev (preverjanje, imena)
 - estetski popravki (tekst, ime formata)
-- optimizacija kode
+- berljivost kode (komentarji, imena spremenljivk)
 - razdelitev nagrad glede na vpisnino

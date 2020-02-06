@@ -165,10 +165,8 @@ def turnir(ime1, ime2, ime3, ime4):
         print(tabulate(table, headers=['Mesto', 'Igralec', 'Nagrada'], colalign=('center', 'left', 'center')))
 
     print('\n\nČestitke vsem igralcem!')
-    print('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
-    
+    input('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
+    input('\nPa do naslednjič!')
+
 
 turnir(igr1, igr2, igr3, igr4)
-
-input()
-input('Pa do naslednjič!\n')
