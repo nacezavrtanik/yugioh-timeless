@@ -1,5 +1,5 @@
 import random
-
+from tabulate import tabulate
 
 print('================== *** IME LIGE *** ==================\n')
 print('*** OPIS FORMATOV ***\n')
@@ -139,11 +139,11 @@ def turnir(ime1, ime2, ime3, ime4):
             if zmage1[stand[i]] == 4 - i:
                 nagrade[i] += 1
                 
-        print('\nČestitke vsem igralcem!')
+        print('\nTurnir je zaključen!')
         print('\n----------------------STANDINGI---------------------\n')
-
-        for i in range(4):
-            print(str(i+1) + '. mesto:\t' + stand[i] + '\t(' + str(nagrade[i]) + '€)')
+        
+        table = [[i+1, igralci[i], str(nagrade[i]) + '€'] for i in range(4)]
+        print(tabulate(table, headers=['Mesto', 'Igralec', 'Nagrada'], colalign=('center', 'left', 'center')))
                 
         
     else:
@@ -170,14 +170,15 @@ def turnir(ime1, ime2, ime3, ime4):
             pozicija = [1, 2, 2, 4]
             nagrade = [9, 5, 5, 1]
             
-        print('\nČestitke vsem igralcem!')
+        print('\nTurnir je zaključen!')
         print('\n----------------------STANDINGI---------------------\n')
 
-        for i in range(4):
-            print(str(pozicija[i]) + '. mesto:\t' + zmage3[i][1] + '\t(' + str(nagrade[i]) + '€)')
+        table = [[pozicija[i], zmage3[i][1], str(nagrade[i]) + '€'] for i in range(4)]
+        print(tabulate(table, headers=['Mesto', 'Igralec', 'Nagrada'], colalign=('center', 'left', 'center')))
 
+    print('\n\nČestitke vsem igralcem!')
     print('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
-
+    
 
 turnir(igr1, igr2, igr3, igr4)
 
