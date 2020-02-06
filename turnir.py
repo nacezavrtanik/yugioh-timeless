@@ -66,7 +66,7 @@ def turnir(ime1, ime2, ime3, ime4):
     for i in range(3):
         sez = []
         for j in [0, 2]:
-            sez.append([ igralci[pairing[i][j]] + ' (' + decki[matchup[j][j+1]] + ')', 'VS', igralci[pairing[i][j+1]] + ' (' + decki[matchup[j+1][j]] + ')'])
+            sez.append([ igralci[pairing[i][j]] + ' (' + decki[matchup[j][j+1]] + ')', 'VS', igralci[pairing[i][j+1]] + ' (' + decki[matchup[j+1][j]] + ')' ])
         pairingi.append(sez)
 
     random.shuffle(pairingi)
@@ -120,7 +120,9 @@ def turnir(ime1, ime2, ime3, ime4):
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
 
-    if [zmage2[0][0], zmage2[1][0], zmage2[2][0], zmage2[3][0]] == [3,2,1,0] or [zmage2[0][0], zmage2[1][0], zmage2[2][0], zmage2[3][0]] == [2,2,1,1]:
+    print(zmage1)
+
+    if  [zmage2[i][0] for i in range(4)] == [3,2,1,0] or [zmage2[i][0] for i in range(4)] == [2,2,1,1]:
         print('\n4. runda:\n')
         print(tabulate([[zmage2[0][1] + ' (' + decki[igralci.index(zmage2[0][1])] + ')', 'VS', zmage2[1][1] + ' (' + decki[igralci.index(zmage2[1][1])] + ')'],
                         [zmage2[2][1] + ' (' + decki[igralci.index(zmage2[2][1])] + ')', 'VS', zmage2[3][1] + ' (' + decki[igralci.index(zmage2[3][1])] + ')']],
@@ -132,7 +134,7 @@ def turnir(ime1, ime2, ime3, ime4):
         zmage1[tretji] += 1
 
         print('----------------------------------------------------')
-
+        print(zmage1)
         stand = [prvi]
         
         if prvi == zmage2[0][1]:
@@ -153,7 +155,7 @@ def turnir(ime1, ime2, ime3, ime4):
         print('\nTurnir je zaključen!')
         print('\n----------------------STANDINGI---------------------\n')
         
-        table = [[i+1, igralci[i], str(nagrade[i]) + '€'] for i in range(4)]
+        table = [[i+1, stand[i], str(nagrade[i]) + '€'] for i in range(4)]
         print(tabulate(table, headers=['Mesto', 'Igralec', 'Nagrada'], colalign=('center', 'left', 'center')))
                 
         
