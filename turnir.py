@@ -59,50 +59,27 @@ def turnir(ime1, ime2, ime3, ime4):
     
     matchup = random.choice(matchupi)
 
-    pairingi = []
+    pairingi1 = []
+    pairingi2 = []
 
-    pairing = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
+    pairing1 = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
+    pairing2 = [[1, 0, 2, 3], [3, 1, 2, 0], [3, 0, 2, 1]]
 
     for i in range(3):
-        sez = []
+        sez1 = []
+        sez2 = []
         for j in [0, 2]:
-            sez.append([ igralci[pairing[i][j]] + ' (' + decki[matchup[j][j+1]] + ')', 'VS', igralci[pairing[i][j+1]] + ' (' + decki[matchup[j+1][j]] + ')' ])
-        pairingi.append(sez)
+            a1 = pairing1[i][j]
+            b1 = pairing1[i][j+1]
+            a2 = pairing2[i][j]
+            b2 = pairing2[i][j+1] 
+            sez1.append([ igralci[a1] + ' (' + decki[matchup[a1][b1]] + ')', 'VS', igralci[b1] + ' (' + decki[matchup[b1][a1]] + ')' ])
+            sez2.append([ igralci[a2] + ' (' + decki[a2] + ')', 'VS', igralci[b2] + ' (' + decki[b2] + ')' ])
+        pairingi1.append(sez1)
+        pairingi2.append(sez2)
 
-    random.shuffle(pairingi)
-
-
-##    pairingi = [ igralci[0] + ' (' + str(decki[matchup[1][0]]) + ')\tVS\t'
-##                 + igralci[1] + ' (' + str(decki[matchup[1][1]]) + ')\n'
-##                 + igralci[2] + ' (' + str(decki[matchup[1][2]]) + ')\tVS\t'
-##                 + igralci[3] + ' (' + str(decki[matchup[1][3]]) + ')',
-##
-##                 igralci[1] + ' (' + str(decki[matchup[2][1]]) + ')\tVS\t'
-##                 + igralci[3] + ' (' + str(decki[matchup[2][3]]) + ')\n'
-##                 + igralci[0] + ' (' + str(decki[matchup[2][0]]) + ')\tVS\t'
-##                 + igralci[2] + ' (' + str(decki[matchup[2][2]]) + ')',
-##
-##                 igralci[3] + ' (' + str(decki[matchup[3][3]]) + ')\tVS\t'
-##                 + igralci[0] + ' (' + str(decki[matchup[3][0]]) + ')\n'
-##                 + igralci[1] + ' (' + str(decki[matchup[3][1]]) + ')\tVS\t'
-##                 + igralci[2] + ' (' + str(decki[matchup[3][2]]) + ')'
-##                 ]
-
-    pairingi2 = [ igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')\tVS\t'
-             + igralci[0] + ' (' + str(decki[matchup[0][0]]) + ')\n'
-             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')\tVS\t'
-             + igralci[3] + ' (' + str(decki[matchup[0][3]]) + ')',
-
-             igralci[3] + ' (' + str(decki[matchup[0][3]]) + ')\tVS\t'
-             + igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')\n'
-             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')\tVS\t'
-             + igralci[0] + ' (' + str(decki[matchup[0][0]]) + ')',
-
-             igralci[3] + ' (' + str(decki[matchup[0][3]]) + ')\tVS\t'
-             + igralci[0] + ' (' + str(decki[matchup[0][0]]) + ')\n'
-             + igralci[2] + ' (' + str(decki[matchup[0][2]]) + ')\tVS\t'
-             + igralci[1] + ' (' + str(decki[matchup[0][1]]) + ')'
-             ]
+    random.shuffle(pairingi1)
+    random.shuffle(pairingi2)
     
     print('\n----------------------PAIRINGI----------------------')
 
@@ -111,7 +88,7 @@ def turnir(ime1, ime2, ime3, ime4):
     for i in range(3):
         
         print('\n' + str(i+1) +  '. runda: \n')
-        print(tabulate(pairingi[i], tablefmt='plain'))
+        print(tabulate(pairingi1[i], tablefmt='plain'))
         print('')
 
         zmage1[str(input('Kdo je zmagal prvi match? '))] += 1
@@ -119,8 +96,6 @@ def turnir(ime1, ime2, ime3, ime4):
         print('----------------------------------------------------')
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
-
-    print(zmage1)
 
     if  [zmage2[i][0] for i in range(4)] == [3,2,1,0] or [zmage2[i][0] for i in range(4)] == [2,2,1,1]:
         print('\n4. runda:\n')
@@ -134,7 +109,7 @@ def turnir(ime1, ime2, ime3, ime4):
         zmage1[tretji] += 1
 
         print('----------------------------------------------------')
-        print(zmage1)
+
         stand = [prvi]
         
         if prvi == zmage2[0][1]:
@@ -161,7 +136,7 @@ def turnir(ime1, ime2, ime3, ime4):
         
     else:
         print('\n4. runda:\n')
-        print(random.choice(pairingi2))
+        print(tabulate(pairingi2[0], tablefmt='plain'))
 
         zmage1[str(input('\nKdo je zmagal prvi match? '))] += 1
         zmage1[str(input('Kdo je zmagal drugi match? '))] += 1

@@ -1,7 +1,6 @@
 # Turnir (custom format)
 
 Naloge:
-- popraviti kodo za 3111, 2220
 - vnos zmagovalcev (preverjanje, imena)
 - estetski popravki (tekst, ime formata)
 - optimizacija kode
