@@ -96,8 +96,8 @@ def turnir():
 
         A, B, C, D = [pairingi1[i][0][0].split(' (')[0], pairingi1[i][0][2].split(' (')[0], pairingi1[i][1][0].split(' (')[0], pairingi1[i][1][2].split(' (')[0]]
         
-        zmage1[str(preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B))] += 1
-        zmage1[str(preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D))] += 1
+        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)] += 1
+        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)] += 1
         print('----------------------------------------------------')
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
@@ -149,8 +149,8 @@ def turnir():
 
         A, B, C, D = [pairingi2[0][0][0].split(' (')[0], pairingi2[0][0][2].split(' (')[0], pairingi2[0][1][0].split(' (')[0], pairingi2[0][1][2].split(' (')[0]]
 
-        zmage1[str(preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B))] += 1
-        zmage1[str(preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D))] += 1
+        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)] += 1
+        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)] += 1
         
         print('----------------------------------------------------')
 
