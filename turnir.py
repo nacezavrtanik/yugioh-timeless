@@ -1,20 +1,6 @@
 import random
 from tabulate import tabulate
 
-print('================== *** IME LIGE *** ==================\n')
-print('*** OPIS FORMATOV ***\n')
-
-
-def deck(stevilka):
-    decki1 = ['Normal', 'Dragon', 'Beast', 'Chaos']
-    decki2 = ['Warrior', 'Flip', 'Plant', 'Zombie']
-    if stevilka == '1':
-        return decki1
-    elif stevilka == '2':
-        return decki2
-    else:
-        return(deck(input('\nUps, prišlo je do napake. Vnesi samo 1 ali 2 in pritisni ENTER.\nŠtevilka formata: ')))
-
 
 def napaka(op1, op2):
     return('Ups, prišlo je do napake. Vnesi le "{}" ali "{}": '.format(op1, op2))
@@ -25,21 +11,27 @@ def preveri(vnos, opcija1, opcija2):
         return vnos
     else:
         return(preveri(input(napaka(opcija1, opcija2)), opcija1, opcija2))
+
+
+def turnir():
+
+    print('================== *** IME LIGE *** ==================\n')
+    print('*** OPIS FORMATOV ***\n')
+
+    decki = [['Normal', 'Dragon', 'Beast', 'Chaos'], ['Warrior', 'Flip', 'Plant', 'Zombie']]
+    decki = decki[int(preveri(input('1 *** Prvi format *** \n2 *** Drugi format *** \n\nKaterega boste igrali? Številka formata: '), '1', '2')) - 1]
+
+    print('\n*** TEKST ***\n')
+
+    igr1 = input('1. igralec: ')
+    igr2 = input('2. igralec: ')
+    igr3 = input('3. igralec: ')
+    igr4 = input('4. igralec: ')
+
+    igralci = [igr1, igr2, igr3, igr4]
+
+    print('\nVeliko zabave pri igranju!')
     
-
-decki = deck(input('1 *** Prvi format *** \n2 *** Drugi format *** \n\nKaterega boste igrali? Številka formata: '))
-
-print('\n*** TEKST ***\n')
-igr1 = input('1. igralec: ')
-igr2 = input('2. igralec: ')
-igr3 = input('3. igralec: ')
-igr4 = input('4. igralec: ')
-print('\nVeliko zabave pri igranju!')
-
-
-def turnir(ime1, ime2, ime3, ime4):
-
-    igralci = [ime1, ime2, ime3, ime4]
     matchupi = [[[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]],
                 [[0, 1, 3, 2], [0, 1, 3, 2], [1, 0, 2, 3], [1, 0, 2, 3]],
                 [[0, 3, 1, 2], [2, 1, 3, 0], [3, 0, 2, 1], [1, 2, 0, 3]],
@@ -187,4 +179,4 @@ def turnir(ime1, ime2, ime3, ime4):
     input('\nPa do naslednjič!')
 
 
-turnir(igr1, igr2, igr3, igr4)
+turnir()
