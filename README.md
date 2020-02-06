@@ -1,7 +1,8 @@
 # Turnir (custom format)
 
 Naloge:
-- preverjanje inputa (igralci, zmagovalci)
+- napisati funkcijo 'deck' s funkcijo 'napaka'
+- preverjanje inputa (igralci)
 - estetski popravki (tekst, ime formata)
 - berljivost kode (komentarji, imena spremenljivk)
 - razdelitev nagrad glede na prijavnino

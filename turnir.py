@@ -16,6 +16,17 @@ def deck(stevilka):
         return(deck(input('\nUps, prišlo je do napake. Vnesi samo 1 ali 2 in pritisni ENTER.\nŠtevilka formata: ')))
 
 
+def napaka(op1, op2):
+    return('Ups, prišlo je do napake. Vnesi le "{}" ali "{}": '.format(op1, op2))
+
+
+def preveri(vnos, opcija1, opcija2):
+    if vnos == opcija1 or vnos == opcija2:
+        return vnos
+    else:
+        return(preveri(input(napaka(opcija1, opcija2)), opcija1, opcija2))
+    
+
 decki = deck(input('1 *** Prvi format *** \n2 *** Drugi format *** \n\nKaterega boste igrali? Številka formata: '))
 
 print('\n*** TEKST ***\n')
@@ -92,8 +103,8 @@ def turnir(ime1, ime2, ime3, ime4):
 
         A, B, C, D = [pairingi1[i][0][0].split(' (')[0], pairingi1[i][0][2].split(' (')[0], pairingi1[i][1][0].split(' (')[0], pairingi1[i][1][2].split(' (')[0]]
         
-        zmage1[str(input('\nKdo je zmagal, {} ali {}? '.format(A,B)))] += 1
-        zmage1[str(input('Kdo je zmagal, {} ali {}? '.format(C,D)))] += 1
+        zmage1[str(preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B))] += 1
+        zmage1[str(preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D))] += 1
         print('----------------------------------------------------')
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
@@ -108,9 +119,9 @@ def turnir(ime1, ime2, ime3, ime4):
         
         print(tabulate(table, tablefmt='plain'))
 
-        prvi = input('\nKdo je zmagal, {} ali {}? '.format(A,B))
+        prvi = preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)
         zmage1[prvi] += 1
-        tretji = input('Kdo je zmagal, {} ali {}? '.format(C,D))
+        tretji = preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)
         zmage1[tretji] += 1
 
         print('----------------------------------------------------')
@@ -145,8 +156,8 @@ def turnir(ime1, ime2, ime3, ime4):
 
         A, B, C, D = [pairingi2[0][0][0].split(' (')[0], pairingi2[0][0][2].split(' (')[0], pairingi2[0][1][0].split(' (')[0], pairingi2[0][1][2].split(' (')[0]]
 
-        zmage1[str(input('\nKdo je zmagal, {} ali {}? '.format(A,B)))] += 1
-        zmage1[str(input('Kdo je zmagal, {} ali {}? '.format(C,D)))] += 1
+        zmage1[str(preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B))] += 1
+        zmage1[str(preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D))] += 1
         
         print('----------------------------------------------------')
 
