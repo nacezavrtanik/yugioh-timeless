@@ -8,6 +8,7 @@ def napaka(op1, op2):
 
 
 def preveri(vnos, opcija1, opcija2):
+    vnos = string.capwords(vnos.lower())
     if vnos == opcija1 or vnos == opcija2:
         return vnos
     else:
@@ -96,8 +97,8 @@ def turnir():
 
         A, B, C, D = [pairingi1[i][0][0].split(' (')[0], pairingi1[i][0][2].split(' (')[0], pairingi1[i][1][0].split(' (')[0], pairingi1[i][1][2].split(' (')[0]]
         
-        zmage1[preveri(string.capwords(input('\nKdo je zmagal, {} ali {}? '.format(A,B)).lower()), A, B)] += 1
-        zmage1[preveri(string.capwords(input('Kdo je zmagal, {} ali {}? '.format(C,D)).lower()), C, D)] += 1
+        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)] += 1
+        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)] += 1
         print('----------------------------------------------------')
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
@@ -112,9 +113,9 @@ def turnir():
         
         print(tabulate(table, tablefmt='plain'))
 
-        prvi = preveri(string.capwords(input('\nKdo je zmagal, {} ali {}? '.format(A,B)).lower()), A, B)
+        prvi = preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)
         zmage1[prvi] += 1
-        tretji = preveri(string.capwords(input('Kdo je zmagal, {} ali {}? '.format(C,D)).lower()), C, D)
+        tretji = preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)
         zmage1[tretji] += 1
 
         print('----------------------------------------------------')
@@ -136,12 +137,8 @@ def turnir():
             if zmage1[stand[i]] == 4 - i:
                 nagrade[i] += 1
                 
-        print('\nTurnir je zaključen!')
-        print('\n----------------------STANDINGI---------------------\n')
-        
-        table = [[i+1, stand[i], str(nagrade[i]) + '€'] for i in range(4)]
-        print(tabulate(table, headers=['Mesto', 'Igralec', 'Nagrada'], colalign=('center', 'left', 'center')))
-                
+        table = [[i+1, stand[i], str(nagrade[i]) + '€'] for i in range(4)]                
+
         
     else:
         print('\n4. runda:\n')
@@ -149,8 +146,8 @@ def turnir():
 
         A, B, C, D = [pairingi2[0][0][0].split(' (')[0], pairingi2[0][0][2].split(' (')[0], pairingi2[0][1][0].split(' (')[0], pairingi2[0][1][2].split(' (')[0]]
 
-        zmage1[preveri(string.capwords(input('\nKdo je zmagal, {} ali {}? '.format(A,B)).lower()), A, B)] += 1
-        zmage1[preveri(string.capwords(input('Kdo je zmagal, {} ali {}? '.format(C,D)).lower()), C, D)] += 1
+        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)] += 1
+        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)] += 1
         
         print('----------------------------------------------------')
 
@@ -168,13 +165,12 @@ def turnir():
         else:
             pozicija = [1, 2, 2, 4]
             nagrade = [9, 5, 5, 1]
-            
-        print('\nTurnir je zaključen!')
-        print('\n----------------------STANDINGI---------------------\n')
 
         table = [[pozicija[i], zmage3[i][1], str(nagrade[i]) + '€'] for i in range(4)]
-        print(tabulate(table, headers=['Mesto', 'Igralec', 'Nagrada'], colalign=('center', 'left', 'center')))
 
+    print('\nTurnir je zaključen!')
+    print('\n----------------------STANDINGI---------------------\n')
+    print(tabulate(table, headers=['Mesto', 'Igralec', 'Nagrada'], colalign=('center', 'left', 'center')))
     print('\n\nČestitke vsem igralcem!')
     input('\n----------------------------------------------------\n(Za izhod pritisni ENTER.)')
     input('\nPa do naslednjič!')
