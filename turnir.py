@@ -157,11 +157,11 @@ def turnir():
 
         # Naključna izbira pairingov:
         pair2_num = [[1, 0, 2, 3], [3, 1, 2, 0], [3, 0, 2, 1]]
-        random.shuffle(pair2_num)
-        A, B, C, D = [igralci[pair2_num[0][i]] for i in range(4)]
+        pair2 = random.choice(pair2_num)
+        A, B, C, D = [igralci[pair2[i]] for i in range(4)]
         
-        runda4 = [[A + ' (' + decki[pair2_num[0][0]] + ')', 'VS', B + ' (' + decki[pair2_num[0][1]] + ')'],
-                  [C + ' (' + decki[pair2_num[0][2]] + ')', 'VS', D + ' (' + decki[pair2_num[0][3]] + ')']]
+        runda4 = [[A + ' (' + decki[pair2[0]] + ')', 'VS', B + ' (' + decki[pair2[1]] + ')'],
+                  [C + ' (' + decki[pair2[2]] + ')', 'VS', D + ' (' + decki[pair2[3]] + ')']]
         print(tabulate(runda4, tablefmt='plain'))
 
         # Zabeleži zmage:
