@@ -101,7 +101,7 @@ def turnir():
         print(tabulate(pair1_tab[i], tablefmt='plain'))
 
         # Prebere imena igralcev v posameznem matchu runde:
-        A, B, C, D = [igralci[pair1_num[i][0]], igralci[pair1_num[i][1]], igralci[pair1_num[i][2]], igralci[pair1_num[i][3]]]
+        A, B, C, D = [igralci[pair1_num[i][j]] for j in range(4)]
 
         # Zabeleži zmage:
         zmage[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), [A, B], napaka2, None)] += 1
@@ -171,18 +171,15 @@ def turnir():
         # Seznam parov (število zmag, igralec), urejen padajoče po zmagah (po štirih rundah):
         ur_pari = sorted(list(zip(zmage.values(), zmage.keys())), reverse = 1)
 
-        # Določi seznam mest in seznam nagrad, urejenih po mestih:
+        # Seznam mest in seznam nagrad, urejenih po mestih:
         mozne_porazdelitve = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
+        mozna_mesta = [[1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]]
+        mozne_nagrade = [[10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1]]
         porazdelitev = [x[0] for x in ur_pari]
-        if mozne_porazdelitve.index(porazdelitev) == 0:
-            mesta = [1, 2, 3, 3]
-            nagrade = [10, 6, 2, 2]
-        elif mozne_porazdelitve.index(porazdelitev) == 1:
-            mesta = [1, 1, 3, 4]
-            nagrade = [8, 8, 4, 0]
-        else:
-            mesta = [1, 2, 2, 4]
-            nagrade = [9, 5, 5, 1]
+        for i in range(3):
+            if porazdelitev == mozne_porazdelitve[i]:
+                mesta = mozna_mesta[i]
+                nagrade = mozne_nagrade[i]
 
         # Seznam igralcev, urejenih po mestih:
         imena = [igr[1] for igr in ur_pari]
