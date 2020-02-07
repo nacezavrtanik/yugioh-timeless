@@ -96,8 +96,8 @@ def turnir():
 
         A, B, C, D = [pairingi1[i][0][0].split(' (')[0], pairingi1[i][0][2].split(' (')[0], pairingi1[i][1][0].split(' (')[0], pairingi1[i][1][2].split(' (')[0]]
         
-        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)] += 1
-        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)] += 1
+        zmage1[preveri(string.capwords(input('\nKdo je zmagal, {} ali {}? '.format(A,B)).lower()), A, B)] += 1
+        zmage1[preveri(string.capwords(input('Kdo je zmagal, {} ali {}? '.format(C,D)).lower()), C, D)] += 1
         print('----------------------------------------------------')
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
@@ -112,9 +112,9 @@ def turnir():
         
         print(tabulate(table, tablefmt='plain'))
 
-        prvi = preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)
+        prvi = preveri(string.capwords(input('\nKdo je zmagal, {} ali {}? '.format(A,B)).lower()), A, B)
         zmage1[prvi] += 1
-        tretji = preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)
+        tretji = preveri(string.capwords(input('Kdo je zmagal, {} ali {}? '.format(C,D)).lower()), C, D)
         zmage1[tretji] += 1
 
         print('----------------------------------------------------')
@@ -149,8 +149,8 @@ def turnir():
 
         A, B, C, D = [pairingi2[0][0][0].split(' (')[0], pairingi2[0][0][2].split(' (')[0], pairingi2[0][1][0].split(' (')[0], pairingi2[0][1][2].split(' (')[0]]
 
-        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)] += 1
-        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)] += 1
+        zmage1[preveri(string.capwords(input('\nKdo je zmagal, {} ali {}? '.format(A,B)).lower()), A, B)] += 1
+        zmage1[preveri(string.capwords(input('Kdo je zmagal, {} ali {}? '.format(C,D)).lower()), C, D)] += 1
         
         print('----------------------------------------------------')
 
