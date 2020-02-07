@@ -3,16 +3,16 @@ import string
 from tabulate import tabulate
 
 
-def napaka(op1, op2):
-    return('Ups, prišlo je do napake. Vnesi le "{}" ali "{}": '.format(op1, op2))
+napaka1 = 'Ups, prišlo je do napake. Vnesi le 1 ali 2: '
+napaka2 = 'Ups, prišlo je do napake. Vnesi ime zmagovalca: '
 
 
-def preveri(vnos, opcija1, opcija2):
+def preveri(vnos, opcija1, opcija2, napaka):
     vnos = string.capwords(vnos.lower())
     if vnos == opcija1 or vnos == opcija2:
         return vnos
     else:
-        return(preveri(input(napaka(opcija1, opcija2)), opcija1, opcija2))
+        return(preveri(input(napaka), opcija1, opcija2, napaka))
 
 
 def turnir():
@@ -21,7 +21,7 @@ def turnir():
     print('*** OPIS FORMATOV ***\n')
 
     decki = [['Normal', 'Dragon', 'Beast', 'Chaos'], ['Warrior', 'Flip', 'Plant', 'Zombie']]
-    decki = decki[int(preveri(input('1 *** Prvi format *** \n2 *** Drugi format *** \n\nKaterega boste igrali? Številka formata: '), '1', '2')) - 1]
+    decki = decki[int(preveri(input('1 *** Prvi format *** \n2 *** Drugi format *** \n\nKaterega boste igrali? Številka formata: '), '1', '2', napaka1)) - 1]
 
     print('\n*** TEKST ***\n')
 
@@ -97,8 +97,8 @@ def turnir():
 
         A, B, C, D = [pairingi1[i][0][0].split(' (')[0], pairingi1[i][0][2].split(' (')[0], pairingi1[i][1][0].split(' (')[0], pairingi1[i][1][2].split(' (')[0]]
         
-        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)] += 1
-        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)] += 1
+        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B, napaka2)] += 1
+        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D, napaka2)] += 1
         print('----------------------------------------------------')
 
     zmage2 = sorted(list(zip(zmage1.values(), zmage1.keys())), reverse = 1)
@@ -113,9 +113,9 @@ def turnir():
         
         print(tabulate(table, tablefmt='plain'))
 
-        prvi = preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)
+        prvi = preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B, napaka2)
         zmage1[prvi] += 1
-        tretji = preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)
+        tretji = preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D, napaka2)
         zmage1[tretji] += 1
 
         print('----------------------------------------------------')
@@ -146,8 +146,8 @@ def turnir():
 
         A, B, C, D = [pairingi2[0][0][0].split(' (')[0], pairingi2[0][0][2].split(' (')[0], pairingi2[0][1][0].split(' (')[0], pairingi2[0][1][2].split(' (')[0]]
 
-        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B)] += 1
-        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D)] += 1
+        zmage1[preveri(input('\nKdo je zmagal, {} ali {}? '.format(A,B)), A, B, napaka2)] += 1
+        zmage1[preveri(input('Kdo je zmagal, {} ali {}? '.format(C,D)), C, D, napaka2)] += 1
         
         print('----------------------------------------------------')
 
