@@ -1,5 +1,5 @@
 # Turnir (custom format)
 
 Naloge:
-- razdelitev nagrad glede na prijavnino
+- nagradna sporoèila
 - estetski popravki

@@ -8,6 +8,7 @@ napaka1 = 'Ups, prišlo je do napake. Vnesi le 1 ali 2: '
 napaka2 = 'Ups, prišlo je do napake. Vnesi ime zmagovalca: '
 napaka3 = 'Ime naj vsebuje le črke in presledke.\n{}. igralec: '
 napaka4 = 'Ime naj bo krajše od 30 znakov.\n{}. igralec: '
+napaka5 = 'Ups, prišlo je do napake. Vnesi le 1, 2 ali 3: '
 
 
 # Zahteva določene vrednosti za 'input()':
@@ -43,17 +44,31 @@ da v štirih rundah vsak igralec igra z vsakim izmed
 štirih deckov natanko enkrat. Na voljo sta dva nabora
 deckov:
 
- 1  Timeless BASIC
- 2  Timeless EXTRA''')
-    
+ 1) BASIC
+ 2) EXTRA''')
+
     
     # Kateri decki se bodo igrali:
-    nabora = [('BASIC', [' (Normal)', ' (Dragon)', ' (Beast)', ' (Chaos)']), ('EXTRA', [' (Warrior)', ' (Flip)', ' (Plant)', ' (Zombie)'])]
+    nabori = [('BASIC', [' (Normal)', ' (Dragon)', ' (Beast)', ' (Chaos)']), ('EXTRA', [' (Warrior)', ' (Flip)', ' (Plant)', ' (Zombie)'])]
     izbira = int(preveri(input('\nS katerim želite igrati? Številka nabora: '), ['1', '2'], napaka1, None)) - 1
-    decki = nabora[izbira][1]
+    decki = nabori[izbira][1]
     random.shuffle(decki)
+
+
+    print('''
+Dobro, igral se bo Timeless {}. Kaj pa prijavnina?
+Ta gre v celoti v nagradni sklad in se na koncu glede
+na dosežke razdeli nazaj med igralce.
+
+ 1) 5 €
+ 2) 10 €
+ 3) brez'''.format(nabori[izbira][0]))
+
+
+    # Prijavnina:
+    prijavnina = int(preveri(input('\nŠtevilka opcije: '), ['1', '2', '3'], napaka5, None))
     
-    print('\nDobro. Kdo vse se bo udeležil turnirja?\n')
+    print('\nVnesi samo še imena igralcev in turnir se lahko začne.\n')
 
     # Kdo bo igral na turnirju:
     igralci = [preveri(input('{}. igralec: '.format(i+1)), None, [napaka3.format(i+1), napaka4.format(i+1)], 'ime') for i in range(4)]
@@ -94,15 +109,17 @@ deckov:
 
     # Beleži število zmag na igralca:
     zmage = {igr : 0 for igr in igralci}
-
-    print('\n*** PRIJAVNINA ***')
-
-
-    print('\nVeliko zabave pri igranju!') 
-    print('\n================== TIMELESS {} =================='.format(nabora[izbira][0]))
-    print('\n----------------------PAIRINGI----------------------')
     
-  
+
+    print('''
+Veliko zabave pri igranju!
+
+
+================== TIMELESS {} ==================
+
+----------------------PAIRINGI----------------------'''.format(nabori[izbira][0]))
+
+
     # Prikaz pairingov za prve tri runde (vsak z vsakim):
     for i in range(3):
         
@@ -159,10 +176,14 @@ deckov:
             imena.append(C)
 
         # Nagrade:
-        nagrade = [9, 6, 3, 0]
-        for i in range(4):
-            if zmage[imena[i]] == 4 - i:
-                nagrade[i] += 1          
+        if prijavnina == 3:
+            nagrade = ['Večna čast in slava.', 'sporočilo2', 'sporočilo3', 'sporočilo4']
+        else:
+            nagrade = [j * prijavnina for j in [9, 6, 3, 0]]
+            for i in range(4):
+                if zmage[imena[i]] == 4 - i:
+                    nagrade[i] += prijavnina
+            nagrade = [str(i) + ' €' for i in nagrade]
 
 
     # Pairingi za 4. rundo (v primerih 3111 in 2220):    
@@ -191,24 +212,35 @@ deckov:
         porazdelitev = [st_zmag[0] for st_zmag in ur_pari]
         mozne_porazdelitve = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
         mozna_mesta = [[1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]]
-        mozne_nagrade = [[10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1]]
+        mozne_nagrade1 = [[10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1]]
+        mozne_nagrade2 = [['Večna čast in slava.','sporocilo6','sporocilo7','sporocilo7'],
+                          ['sporocilo8','sporocilo8','sporocilo9','sporocilo10']
+                          ['Večna čast in slava.','sporocilo12','sporocilo12','sporocilo13']]
         for i in range(3):
             if porazdelitev == mozne_porazdelitve[i]:
                 mesta = mozna_mesta[i]
-                nagrade = mozne_nagrade[i]
+                if prijavnina == 3:
+                    nagrade = mozne_nagrade2[i]
+                else:
+                    nagrade = [str(j * prijavnina) + ' €' for j in mozne_nagrade1[i]]
 
         # Imena:
         imena = [igr[1] for igr in ur_pari]
 
 
     # Standingi v obliki za prikaz s 'tabulate':
-    standingi = [[mesta[i], imena[i], str(nagrade[i]) + '€'] for i in range(4)]
+    standingi = [[mesta[i], imena[i], nagrade[i]] for i in range(4)]
     
 
-    print('----------------------------------------------------')
-    print('\nTurnir je zaključen!')
-    print('\n----------------------STANDINGI---------------------\n')
+    print('''----------------------------------------------------
+
+Turnir je zaključen!
+
+----------------------STANDINGI---------------------
+''')
+
     print(tabulate(standingi, headers=['Mesto', 'Igralec', 'Nagrada'], colalign=('center', 'left', 'center')))
+
     print('\n\nČestitke vsem igralcem!')
     input('\n====================================================\n(Za izhod pritisni ENTER.)')
     input('\nPa do naslednjič!')
