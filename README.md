@@ -1,4 +1,4 @@
-# Turnir (custom format)
+# Timeless (custom turnirski format)
 
 Naloge:
 - nagradna sporoèila
