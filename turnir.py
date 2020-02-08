@@ -7,15 +7,18 @@ from tabulate import tabulate
 napaka1 = 'Ups, prišlo je do napake. Vnesi le 1 ali 2: '
 napaka2 = 'Ups, prišlo je do napake. Vnesi ime zmagovalca: '
 napaka3 = 'Ime naj vsebuje le črke in presledke.\n{}. igralec: '
+napaka4 = 'Ime naj bo krajše od 30 znakov.\n{}. igralec: '
 
 
 # Zahteva določene vrednosti za 'input()':
 def preveri(vnos, opcije, napaka, tip):
     if tip == 'ime':
-        if vnos.replace(' ','').isalpha():
+        if not vnos.replace(' ','').isalpha():
+            return(preveri(input(napaka[0]), None, napaka, 'ime'))
+        elif len(string.capwords(vnos)) < 30:
             return string.capwords(vnos)
         else:
-            return(preveri(input(napaka), None, napaka, 'ime'))      
+            return(preveri(input(napaka[1]), None, napaka, 'ime'))
     else:
         vnos = string.capwords(vnos)
         if vnos in opcije:
@@ -41,7 +44,7 @@ def turnir():
     # Kdo bo igral na turnirju:
     igralci = []
     for i in range(4):
-        igralci.append(preveri(input('{}. igralec: '.format(i+1)), None, napaka3.format(i+1), 'ime'))
+        igralci.append(preveri(input('{}. igralec: '.format(i+1)), None, [napaka3.format(i+1), napaka4.format(i+1)], 'ime'))
     random.shuffle(igralci)
 
     print('\nVeliko zabave pri igranju!')
@@ -92,7 +95,7 @@ def turnir():
     print('\n----------------------PAIRINGI----------------------')
 
     # Beleži število zmag na igralca:
-    zmage = {i : 0 for i in igralci}
+    zmage = {igr : 0 for igr in igralci}
     
 
     # Prikaz pairingov za prve tri runde (vsak z vsakim):
@@ -116,11 +119,11 @@ def turnir():
     if  [ur_pari[i][0] for i in range(4)] in [[3,2,1,0], [2,2,1,1]]:
         print('\n4. runda:\n')
 
-        # Prebere imena igralcev, urejenih padajoče po zmagah:
+        # Igralci, decki:
         A, B, C, D = [ur_pari[i][1] for i in range(4)]
+        dA, dB, dC, dD = [' (' + decki[igralci.index(ur_pari[i][1])] + ')' for i in range(4)]
 
-        runda4 = [[A + ' (' + decki[igralci.index(ur_pari[0][1])] + ')', 'VS', B + ' (' + decki[igralci.index(ur_pari[1][1])] + ')'],
-                  [C + ' (' + decki[igralci.index(ur_pari[2][1])] + ')', 'VS', D + ' (' + decki[igralci.index(ur_pari[3][1])] + ')']]        
+        runda4 = [[A + dA, 'VS', B + dB], [C + dC, 'VS', D + dD]]        
         print(tabulate(runda4, tablefmt='plain'))
 
         # Zabeleži zmage:
@@ -134,15 +137,15 @@ def turnir():
         
         # Seznam igralcev, urejen po mestih:
         imena = [prvi]
-        if prvi == ur_pari[0][1]:
-            imena.append(ur_pari[1][1])
+        if prvi == A:
+            imena.append(B)
         else:
-            imena.append(ur_pari[0][1])
+            imena.append(A)
         imena.append(tretji)
-        if tretji == ur_pari[2][1]:
-            imena.append(ur_pari[3][1])
+        if tretji == C:
+            imena.append(D)
         else:
-            imena.append(ur_pari[2][1])
+            imena.append(C)
 
         # Seznam nagrad, urejen po mestih:
         nagrade = [9, 6, 3, 0]
@@ -158,10 +161,12 @@ def turnir():
         # Naključna izbira pairingov:
         pair2_num = [[1, 0, 2, 3], [3, 1, 2, 0], [3, 0, 2, 1]]
         pair2 = random.choice(pair2_num)
-        A, B, C, D = [igralci[pair2[i]] for i in range(4)]
         
-        runda4 = [[A + ' (' + decki[pair2[0]] + ')', 'VS', B + ' (' + decki[pair2[1]] + ')'],
-                  [C + ' (' + decki[pair2[2]] + ')', 'VS', D + ' (' + decki[pair2[3]] + ')']]
+        # Igralci, decki:
+        A, B, C, D = [igralci[pair2[i]] for i in range(4)]
+        dA, dB, dC, dD = [' (' + decki[pair2[i]] + ')' for i in range(4)]
+        
+        runda4 = [[A + dA, 'VS', B + dB], [C + dC, 'VS', D + dD]]
         print(tabulate(runda4, tablefmt='plain'))
 
         # Zabeleži zmage:
@@ -172,10 +177,10 @@ def turnir():
         ur_pari = sorted(list(zip(zmage.values(), zmage.keys())), reverse = 1)
 
         # Seznam mest in seznam nagrad, urejenih po mestih:
+        porazdelitev = [st_zmag[0] for st_zmag in ur_pari]
         mozne_porazdelitve = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
         mozna_mesta = [[1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]]
         mozne_nagrade = [[10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1]]
-        porazdelitev = [x[0] for x in ur_pari]
         for i in range(3):
             if porazdelitev == mozne_porazdelitve[i]:
                 mesta = mozna_mesta[i]
