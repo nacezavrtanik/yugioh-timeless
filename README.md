@@ -1,5 +1,6 @@
 # Timeless (custom turnirski format)
 
 Naloge:
-- nagradna sporoèila
+- sporoèilo3
+- kratek opis naborov deckov
 - estetski popravki
