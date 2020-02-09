@@ -177,7 +177,7 @@ Veliko zabave pri igranju!
 
         # Nagrade:
         if prijavnina == 3:
-            nagrade = ['Večna čast in slava.', 'sporočilo2', 'sporočilo3', 'sporočilo4']
+            nagrade = ['Večna čast in slava.', 'sporočilo2', 'sporočilo3', 'Nič, noob.']
         else:
             nagrade = [j * prijavnina for j in [9, 6, 3, 0]]
             for i in range(4):
@@ -213,9 +213,9 @@ Veliko zabave pri igranju!
         mozne_porazdelitve = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
         mozna_mesta = [[1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]]
         mozne_nagrade1 = [[10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1]]
-        mozne_nagrade2 = [['Večna čast in slava.','sporocilo2','sporocilo5','sporocilo5'],
-                          ['sporocilo6','sporocilo6','sporocilo3','sporocilo4']
-                          ['Večna čast in slava.','sporocilo7','sporocilo7','sporocilo4']]
+        mozne_nagrade2 = [['Večna čast in slava.', 'sporocilo2', 'sporocilo5', 'sporocilo5'],
+                          ['sporocilo6', 'sporocilo6', 'sporocilo3', 'Nič, noob.'],
+                          ['Večna čast in slava.', 'sporocilo7', 'sporocilo7', 'Nič, noob.']]
         for i in range(3):
             if porazdelitev == mozne_porazdelitve[i]:
                 mesta = mozna_mesta[i]
