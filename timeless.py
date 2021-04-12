@@ -49,7 +49,7 @@ deckov:
 
     
     # Kateri decki se bodo igrali:
-    nabori = [('BASIC', [' (Spellcaster)', ' (Dragon)', ' (Beast)', ' (Chaos)']), ('EXTRA', [' (Warrior)', ' (Flip)', ' (Zombie)', ' (Beatdown)'])]
+    nabori = [('BASIC', [' (Spellcaster)', ' (Dragon)', ' (Beast)', ' (Chaos)']), ('EXTRA', [' (Warrior)', ' (Flip)', ' (Zombie)', ' (Dinosaur)'])]
     izbira = int(preveri(input('\nS katerim želite igrati? Številka nabora: '), ['1', '2'], napaka1, None)) - 1
     decki = nabori[izbira][1]
     random.shuffle(decki)
