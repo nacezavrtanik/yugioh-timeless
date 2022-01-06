@@ -9,17 +9,21 @@ napaka2 = 'Ups, prišlo je do napake. Ime zmagovalca: '
 napaka3 = 'Ime naj vsebuje le črke in presledke.\n{}. igralec: '
 napaka4 = 'Ime naj bo krajše od 30 znakov.\n{}. igralec: '
 napaka5 = 'Ups, prišlo je do napake. Vnesi le 1, 2 ali 3: '
+napaka6 = 'Igralec z imenom {} že obstaja.\n{}. igralec: '
 
 
 # Zahteva določene vrednosti za 'input()':
 def preveri(vnos, opcije, napaka, tip):
     if tip == 'ime':
         if not vnos.replace(' ','').isalpha():
-            return(preveri(input(napaka[0]), None, napaka, 'ime'))
-        elif len(string.capwords(vnos)) < 30:
-            return string.capwords(vnos)
+            return(preveri(input(napaka[0]), opcije, napaka, 'ime'))
+        elif len(string.capwords(vnos)) >= 30:
+            return(preveri(input(napaka[1]), opcije, napaka, 'ime'))
+        elif string.capwords(vnos) in opcije:
+            nova_napaka = napaka[2].format(string.capwords(vnos),'{}')
+            return(preveri(input(nova_napaka), opcije, napaka, 'ime'))
         else:
-            return(preveri(input(napaka[1]), None, napaka, 'ime'))
+            return(string.capwords(vnos))
     else:
         vnos = string.capwords(vnos)
         if vnos in opcije:
@@ -71,7 +75,9 @@ na dosežke razdeli nazaj med igralce.
     print('\nVnesi samo še imena igralcev in turnir se lahko začne.\n')
 
     # Kdo bo igral na turnirju:
-    igralci = [preveri(input('{}. igralec: '.format(i+1)), None, [napaka3.format(i+1), napaka4.format(i+1)], 'ime') for i in range(4)]
+    igralci = []
+    for i in range(4):
+        igralci.append(preveri(input('{}. igralec: '.format(i+1)), igralci, [napaka3.format(i+1), napaka4.format(i+1), napaka6.format('{}', i+1)], 'ime'))
     random.shuffle(igralci)
 
     # Kdo bo proti komu igral s katerim deckom (vse možnosti):
