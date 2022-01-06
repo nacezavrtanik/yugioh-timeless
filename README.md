@@ -7,4 +7,4 @@ omejena. Igra se z naborom štirih deckov, ki so med
 igralce razdeljeni nakljuèno. Po vsaki rundi se decki
 ponovno nakljuèno razdelijo med igralce, in sicer tako,
 da v štirih rundah vsak igralec igra z vsakim izmed
-štirih deckov natanko enkrat. 
+štirih deckov natanko enkrat.
