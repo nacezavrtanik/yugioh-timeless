@@ -1,3 +1,5 @@
+from string import capwords
+
 
 def supervised_input(prompt, conditions):
     """Require user input to satisfy specified conditions.
@@ -23,12 +25,16 @@ def supervised_input(prompt, conditions):
 
     condition_checks = {
         '1_or_2': lambda input_string: input_string in ['1', '2'],
-        '1_2_or_3': lambda input_string: input_string in ['1', '2', '3']
+        '1_2_or_3': lambda input_string: input_string in ['1', '2', '3'],
+        'alphabetical': lambda input_string: input_string.replace(' ', '').isalpha(),
+        'less_than_30_characters': lambda input_string: len(capwords(input_string)) < 30
     }
 
     input_tips = {
         '1_or_2': 'Enter either 1 or 2.',
-        '1_2_or_3': 'Enter either 1, 2, or 3.'
+        '1_2_or_3': 'Enter either 1, 2, or 3.',
+        'alphabetical': 'A name should contain only letters and spaces.',
+        'less_than_30_characters': 'A name should contain less than 30 characters.'
     }
 
     if isinstance(conditions, str):
@@ -50,3 +56,14 @@ def supervised_input(prompt, conditions):
 
         if check:
             return user_input
+
+
+class Duelist:
+
+    wins = 0
+
+    def __init__(self):
+        self.name = capwords(supervised_input('Name of duelist: ', ['alphabetical', 'less_than_30_characters']))
+
+    def increase_win_count(self):
+        self.wins += 1
