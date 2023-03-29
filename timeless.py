@@ -1,3 +1,4 @@
+
 from string import capwords
 
 
@@ -21,6 +22,21 @@ def supervised_input(prompt, conditions):
     -------
     str
         User input, satisfying all conditions in `conditions`.
+
+    Examples
+    --------
+
+    Ask the user to provide their name. Insist for the name to contain only
+    letters and whitespaces, and be shorter than 30 characters.
+
+    >>> supervised_input('Your name: ',
+    ...                  ['alphabetical', 'less_than_30_characters'])
+    Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart 1756
+    TIP: A name should only contain letters and whitespaces.
+    Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart
+    TIP: A name should contain less than 30 characters.
+    Your name: >? Amadeus
+    'Amadeus'
     """
 
     condition_checks = {
@@ -33,7 +49,7 @@ def supervised_input(prompt, conditions):
     input_tips = {
         '1_or_2': 'Enter either 1 or 2.',
         '1_2_or_3': 'Enter either 1, 2, or 3.',
-        'alphabetical': 'A name should contain only letters and spaces.',
+        'alphabetical': 'A name should only contain letters and whitespaces.',
         'less_than_30_characters': 'A name should contain less than 30 characters.'
     }
 
