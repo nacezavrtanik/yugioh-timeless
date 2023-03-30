@@ -27,31 +27,44 @@ def supervised_input(prompt, conditions):
 
     Examples
     --------
-    Ask the user to provide their name. Insist for the name to contain only
-    letters and whitespaces, and be shorter than 30 characters.
+    >>> supervised_input('Your age: ', 'integer')
+    Your age: >? ninety
+    TIP: Enter an integer.
+    Your age: >? 90
+    '90'
 
     >>> supervised_input('Your name: ',
     ...                  ['alphabetical', 'less_than_30_characters'])
     Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart 1756
-    TIP: A name should only contain letters and whitespaces.
+    TIP: Use only letters and whitespaces.
     Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart
-    TIP: A name should contain less than 30 characters.
+    TIP: Use less than 30 characters.
     Your name: >? Amadeus
     'Amadeus'
     """
 
+    def _is_whole_number(input_string):
+        try:
+            int(input_string)
+        except ValueError:
+            return False
+        else:
+            return True
+
     condition_checks = {
-        '1_or_2': lambda input_string: input_string in ['1', '2'],
-        '1_2_or_3': lambda input_string: input_string in ['1', '2', '3'],
         'alphabetical': lambda input_string: input_string.replace(' ', '').isalpha(),
-        'less_than_30_characters': lambda input_string: len(capwords(input_string)) < 30
+        'less_than_30_characters': lambda input_string: len(capwords(input_string)) < 30,
+        'BASIC_or_EXTRA': lambda input_string: input_string.upper() in ['BASIC', 'EXTRA'],
+        'integer': lambda input_string: _is_whole_number(input_string),
+        'multiple_of_5': lambda input_string: int(input_string) % 5 == 0 and int(input_string) >= 0
     }
 
     input_tips = {
-        '1_or_2': 'Enter either 1 or 2.',
-        '1_2_or_3': 'Enter either 1, 2, or 3.',
-        'alphabetical': 'A name should only contain letters and whitespaces.',
-        'less_than_30_characters': 'A name should contain less than 30 characters.'
+        'alphabetical': 'Use only letters and whitespaces.',
+        'less_than_30_characters': 'Use less than 30 characters.',
+        'BASIC_or_EXTRA': 'Enter either BASIC or EXTRA.',
+        'integer': 'Enter an integer.',
+        'multiple_of_5': 'Pick a non-negative multiple of 5.'
     }
 
     if isinstance(conditions, str):
@@ -85,18 +98,19 @@ def random_timeless_square():
 
     Notes
     -----
-    Timeless squares are used to model matchups in the Yugioh Timeless
-    tournament format.
+    Timeless squares are 4x4 arrays that are isomorphic to Latin squares.
+    They are used to model matchups in the Yugioh Timeless tournament format.
+
+    Note that results are not repeatable, as fixing a random seed would result
+    in the initial random square being created over and over, creating a loop.
 
     Examples
     --------
-    Create a random timeless square. Note that results are not repeatable.
-
     >>> random_timeless_square()
-    array([[0, 1, 2, 3],
-           [2, 3, 0, 1],
-           [3, 2, 1, 0],
-           [1, 0, 3, 2]])
+    array([[2, 0, 1, 3],
+           [3, 1, 2, 0],
+           [2, 0, 3, 1],
+           [1, 3, 2, 0]])
     """
 
     while True:
@@ -114,7 +128,7 @@ def random_timeless_square():
 
 
 class Duelist:
-    """Class for tracking participants and scores in a Yugioh Timeless tournament.
+    """Class for tracking duelists and scores in a Yugioh Timeless tournament.
 
     Parameters
     ----------
@@ -137,12 +151,9 @@ class Duelist:
     Wins: 3
     """
 
-    wins = 0
-
-    def __init__(self, name, wins=None):
+    def __init__(self, name, wins=0):
         self.name = capwords(name)
-        if wins:
-            self.wins = wins
+        self.wins = wins
 
     def __repr__(self):
         return f'Duelist(\'{self.name}\', wins={self.wins})'
@@ -153,3 +164,68 @@ class Duelist:
     def increase_win_count(self, n=1):
         """Increase value of `wins` attribute by `n`."""
         self.wins += n
+
+    @staticmethod
+    def enter_unique_duelists():
+        """Return list of `Duelist` instances with unique `name` attributes.
+
+        The user is asked to provide four duelist names. The user is prompted
+        to keep repeating the process until there are no duplicate entries.
+
+        Returns
+        -------
+        list
+            List of four `Duelist` instances with unique `name` attributes.
+
+        Examples
+        --------
+        >>> Duelist.enter_unique_duelists()
+        Duelist 1: >? Johann
+        Duelist 2: >? Johann
+        Duelist 3: >? Amadeus
+        Duelist 4: >? Amadeus
+        You've entered some duplicate names: Amadeus, Johann.
+        Please try again.
+        Duelist 1: >? Johann
+        Duelist 2: >? Johann C
+        Duelist 3: >? Amadeus
+        Duelist 4: >? Falco
+        [Duelist('Johann', wins=0), Duelist('Johann C', wins=0), Duelist('Amadeus', wins=0), Duelist('Falco', wins=0)]
+        """
+
+        while True:
+
+            duelist_candidates = [
+                Duelist(supervised_input(f'Duelist {i + 1}: ', ['alphabetical', 'less_than_30_characters']))
+                for i in range(4)]
+            candidate_names = [duelist_candidates[i].name for i in range(4)]
+
+            duplicate_names = {name for name in candidate_names if candidate_names.count(name) > 1}
+
+            if duplicate_names:
+                duplicate_names_string = duplicate_names.__str__()[1: -1].replace('\'', '')
+                print(f'You\'ve entered some duplicate names: {duplicate_names_string}.\nPlease try again.')
+                continue
+
+            return duelist_candidates
+
+
+class Timeless:
+
+    deck_sets = {'BASIC': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
+                 'EXTRA': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']}
+    pairings = np.array([[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]])
+
+    def __init__(self):
+
+        self.format = supervised_input('Choose format: ', 'BASIC_or_EXTRA').upper()
+        self.decks = Timeless.deck_sets.get(self.format)
+        self.entry_fee = supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters'])
+        self.duelists = np.random.permutation(Duelist.enter_unique_duelists())
+        self.matchup = random_timeless_square()
+        self.round = 0
+
+
+if __name__ == '__main__':
+
+    timeless = Timeless()
