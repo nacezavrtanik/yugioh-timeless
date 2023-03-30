@@ -1,4 +1,5 @@
 
+import numpy as np
 from string import capwords
 
 
@@ -74,7 +75,49 @@ def supervised_input(prompt, conditions):
             return user_input
 
 
+def random_timeless_square():
+    """Randomly generate a timeless square.
+
+    Returns
+    -------
+    numpy.ndarray
+        Timeless square.
+
+    Notes
+    -----
+    Timeless squares are used to model matchups in the Yugioh Timeless
+    tournament format.
+
+    Examples
+    --------
+
+    Create a random timeless square. Note that results are not repeatable.
+
+    >>> random_timeless_square()
+    array([[0, 1, 2, 3],
+           [2, 3, 0, 1],
+           [3, 2, 1, 0],
+           [1, 0, 3, 2]])
+    """
+
+    while True:
+
+        random_square = np.array([np.random.permutation(4) for _ in range(4)])
+
+        unique_diagonal = len(set(random_square.diagonal())) == 4
+        unique_antidiagonal = len(set(np.fliplr(random_square).diagonal())) == 4
+        unique_loop = len({random_square[0, 1], random_square[1, 0], random_square[2, 3], random_square[3, 2]}) == 4
+
+        is_timeless = unique_diagonal and unique_antidiagonal and unique_loop
+
+        if is_timeless:
+            return random_square
+
+
 class Duelist:
+    """
+
+    """
 
     wins = 0
 
