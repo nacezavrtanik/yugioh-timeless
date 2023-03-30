@@ -1,3 +1,4 @@
+"""Module for running the Yugioh Timeless tournament format."""
 
 import numpy as np
 from string import capwords
@@ -26,7 +27,6 @@ def supervised_input(prompt, conditions):
 
     Examples
     --------
-
     Ask the user to provide their name. Insist for the name to contain only
     letters and whitespaces, and be shorter than 30 characters.
 
@@ -90,7 +90,6 @@ def random_timeless_square():
 
     Examples
     --------
-
     Create a random timeless square. Note that results are not repeatable.
 
     >>> random_timeless_square()
@@ -115,14 +114,42 @@ def random_timeless_square():
 
 
 class Duelist:
-    """
+    """Class for tracking participants and scores in a Yugioh Timeless tournament.
 
+    Parameters
+    ----------
+    name : str
+        Name of duelist.
+    wins : int, optional
+        Number of wins.
+        (defaults to 0)
+
+    Attributes
+    ----------
+    wins : int
+        Number of duels won.
+
+    Examples
+    --------
+    >>> duelist = Duelist('Amadeus', wins=3)
+    >>> print(duelist)
+    Duelist: Amadeus
+    Wins: 3
     """
 
     wins = 0
 
-    def __init__(self):
-        self.name = capwords(supervised_input('Name of duelist: ', ['alphabetical', 'less_than_30_characters']))
+    def __init__(self, name, wins=None):
+        self.name = capwords(name)
+        if wins:
+            self.wins = wins
 
-    def increase_win_count(self):
-        self.wins += 1
+    def __repr__(self):
+        return f'Duelist(\'{self.name}\', wins={self.wins})'
+
+    def __str__(self):
+        return f'Duelist: {self.name}\nWins: {self.wins}'
+
+    def increase_win_count(self, n=1):
+        """Increase value of `wins` attribute by `n`."""
+        self.wins += n
