@@ -217,13 +217,23 @@ class Timeless:
     pairings = np.array([[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]])
 
     def __init__(self):
-
         self.format = supervised_input('Choose format: ', 'BASIC_or_EXTRA').upper()
         self.decks = Timeless.deck_sets.get(self.format)
         self.entry_fee = supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters'])
         self.duelists = np.random.permutation(Duelist.enter_unique_duelists())
         self.matchup = random_timeless_square()
         self.round = 0
+
+    def __repr__(self):
+        return 'Timeless()'
+
+    def __str__(self):
+        description = f'Timeless {self.format}, round {self.round + 1}\n'
+        description += f'Entry fee: {self.entry_fee}\n'
+        description += '\nWINS PER PLAYER\n---------------\n'
+        for i in range(4):
+            description += f'{self.duelists[i].name}: {self.duelists[i].wins}\n'
+        return description
 
 
 if __name__ == '__main__':
