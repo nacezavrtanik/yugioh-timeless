@@ -2,6 +2,7 @@
 
 import numpy as np
 from string import capwords
+from tabulate import tabulate
 
 
 def supervised_input(prompt, conditions, options=None):
@@ -263,6 +264,36 @@ class Timeless:
         for i in range(4):
             description += f'{self.duelists[i].name}: {self.duelists[i].wins}\n'
         return description
+
+    def preliminaries(self):
+
+        while self.round < 3:
+
+            print(f'Pairings for round {self.round + 1}:\n')
+
+            x, y, z, w = self.pairings[self.round]
+            duelist_x, duelist_y, duelist_z, duelist_w = [self.duelists[i].name for i in [x, y, z, w]]
+            deck_xy, deck_yx, deck_zw, deck_wz = [self.decks[self.matchup[x, y]], self.decks[self.matchup[y, x]],
+                                                  self.decks[self.matchup[z, w]], self.decks[self.matchup[w, z]]]
+
+            pairing = [[f'{duelist_x} ({deck_xy})', 'VS', f'{duelist_y} ({deck_yx})'],
+                       [f'{duelist_z} ({deck_zw})', 'VS', f'{duelist_w} ({deck_wz})']]
+
+            print(tabulate(pairing, tablefmt='plain'))
+            print('')
+
+            winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
+                                         'choose_from', options=[duelist_x, duelist_y])
+            winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
+                                         'choose_from', options=[duelist_z, duelist_w])
+
+            print('')
+
+            for i in [x, y, z, w]:
+                if self.duelists[i].name in [winner_xy, winner_zw]:
+                    self.duelists[i].increase_win_count()
+
+            self.round += 1
 
 
 if __name__ == '__main__':
