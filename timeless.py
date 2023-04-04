@@ -4,7 +4,7 @@ import numpy as np
 from string import capwords
 
 
-def supervised_input(prompt, conditions):
+def supervised_input(prompt, conditions, options=None):
     """Require user input to satisfy specified conditions.
 
     The user is asked to provide an input value. If the provided value violates
@@ -19,19 +19,41 @@ def supervised_input(prompt, conditions):
     conditions: str, list of str
         Names of conditions. A string can be passed if only one condition is
         specified, otherwise a list of strings.
+    options: list of str, optional
+        Valid input options if argument `conditions` is set to 'choose_from'.
+        If `conditions` does not include 'choose_from', this argument is not
+        relevant.
+
+        As user input is passed to the string.capwords function first, option
+        strings should ahdere to that format as well.
+        (defaults to None)
 
     Returns
     -------
     str
-        User input, satisfying all conditions in `conditions`.
+        User input, satisfying all conditions in `conditions`. Words are
+        capitalised, consecutive whitespaces are replaced by a single
+        whitespace, and leading and trailing whitespaces are removed.
+
+    Notes
+    -----
+    User input is immediately passed to the string.capwords function, which
+    capitalises words, strips leading and trailing whitespaces, and replaces
+    consecutive whitespaces by a single whitespace. There are two reasons for
+    this.
+
+    (1) It is more convenient for the user. As all the checks will aplly to
+    the modified string, user input will not be sensitive to choice of case
+    nor to consecutive whitespaces.
+    (2) It looks cleaner.
 
     Examples
     --------
-    >>> supervised_input('Your age: ', 'integer')
-    Your age: >? ninety
+    >>> supervised_input('Favourite integer: ', 'integer')
+    Favourite integer: >? 3.14
     TIP: Enter an integer.
-    Your age: >? 90
-    '90'
+    Favourite integer: >? 3
+    '3'
 
     >>> supervised_input('Your name: ',
     ...                  ['alphabetical', 'less_than_30_characters'])
@@ -41,6 +63,13 @@ def supervised_input(prompt, conditions):
     TIP: Use less than 30 characters.
     Your name: >? Amadeus
     'Amadeus'
+
+    >>>supervised_input('Do you like yes or no questions?',
+    ...                 'choose_from', options=['Yes', 'No'])
+    Do you like yes or no questions?>? I'm not sure
+    TIP: Enter one of these: Yes, No.
+    Do you like yes or no questions?>? No
+    'No'
     """
 
     def _is_whole_number(input_string):
@@ -52,17 +81,17 @@ def supervised_input(prompt, conditions):
             return True
 
     condition_checks = {
+        'choose_from': lambda input_string: input_string in options,
         'alphabetical': lambda input_string: input_string.replace(' ', '').isalpha(),
-        'less_than_30_characters': lambda input_string: len(capwords(input_string)) < 30,
-        'BASIC_or_EXTRA': lambda input_string: input_string.upper() in ['BASIC', 'EXTRA'],
+        'less_than_30_characters': lambda input_string: len(input_string) < 30,
         'integer': lambda input_string: _is_whole_number(input_string),
         'multiple_of_5': lambda input_string: int(input_string) % 5 == 0 and int(input_string) >= 0
     }
 
     input_tips = {
+        'choose_from': f'''Enter one of these: {options.__str__()[1: -1].replace("'", "")}.''',
         'alphabetical': 'Use only letters and whitespaces.',
         'less_than_30_characters': 'Use less than 30 characters.',
-        'BASIC_or_EXTRA': 'Enter either BASIC or EXTRA.',
         'integer': 'Enter an integer.',
         'multiple_of_5': 'Pick a non-negative multiple of 5.'
     }
@@ -72,7 +101,7 @@ def supervised_input(prompt, conditions):
 
     while True:
 
-        user_input = input(prompt)
+        user_input = capwords(input(prompt))
         check = True
 
         for condition in conditions:
@@ -217,7 +246,7 @@ class Timeless:
     pairings = np.array([[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]])
 
     def __init__(self):
-        self.format = supervised_input('Choose format: ', 'BASIC_or_EXTRA').upper()
+        self.format = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
         self.decks = Timeless.deck_sets.get(self.format)
         self.entry_fee = supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters'])
         self.duelists = np.random.permutation(Duelist.enter_unique_duelists())
