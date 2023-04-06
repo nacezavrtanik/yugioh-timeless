@@ -206,22 +206,16 @@ class Duelist:
         return f'{self.name} ({self.deck})'
 
     def __lt__(self, other):
+
         if isinstance(other, Duelist):
             return self.wins < other.wins
+
         elif isinstance(other, int) or isinstance(other, float):
             return self.wins < other
+
         elif isinstance(other, str):
             return self.name < other
-        else:
-            raise NotImplemented('Intance of Duelist class only comparable to instances of: Duelist, int, float, str.')
 
-    def __eq__(self, other):
-        if isinstance(other, Duelist):
-            return self.wins == other.wins
-        elif isinstance(other, int) or isinstance(other, float):
-            return self.wins == other
-        elif isinstance(other, str):
-            return self.name == other
         else:
             raise NotImplemented('Intance of Duelist class only comparable to instances of: Duelist, int, float, str.')
 
