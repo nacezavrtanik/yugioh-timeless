@@ -191,9 +191,24 @@ class Duelist:
     def __str__(self):
         return f'Duelist: {self.name}\nWins: {self.wins}'
 
-    def increase_win_count(self, n=1):
-        """Increase value of `wins` attribute by `n`."""
-        self.wins += n
+    def __lt__(self, other):
+        if isinstance(other, Duelist):
+            return self.wins < other.wins
+        elif isinstance(other, int) or isinstance(other, float):
+            return self.wins < other
+        elif isinstance(other, str):
+            return self.name < other
+        else:
+            raise NotImplemented('Intance of Duelist class only comparable to instances of: Duelist, int, float, str.')
+
+    def __eq__(self, other):
+        if isinstance(other, Duelist):
+            return self.wins == other.wins
+        elif isinstance(other, int) or isinstance(other, float):
+            return self.wins == other
+
+        else:
+            raise NotImplemented('Intance of Duelist class only comparable to instances of: Duelist, int, float, str.')
 
     @staticmethod
     def enter_unique_duelists():
