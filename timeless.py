@@ -160,36 +160,50 @@ def random_timeless_square():
 class Duelist:
     """Class for tracking duelists and scores in a Yugioh Timeless tournament.
 
-    Parameters
-    ----------
-    name : str
-        Name of duelist.
-    wins : int, optional
-        Number of wins.
-        (defaults to 0)
-
     Attributes
     ----------
+    name : str
+        Name of the duelist.
+    deck : str
+        Name of the deck played by the duelist.
     wins : int
         Number of duels won.
 
-    Examples
-    --------
-    >>> duelist = Duelist('Amadeus', wins=3)
-    >>> print(duelist)
-    Duelist: Amadeus
-    Wins: 3
+    Methods
+    -------
+    enter_unique_duelists()
+        Return list of `Duelist` instances with unique `name` attributes.
     """
 
-    def __init__(self, name, wins=0):
+    def __init__(self, name, deck=None, wins=0):
+        """Create instance of Duelist class.
+
+        Parameters
+        ----------
+        name : str
+            Name of duelist.
+        deck : str
+            Name of deck played by the duelist.
+        wins : int, optional
+            Number of wins.
+            (defaults to 0)
+
+        Examples
+        --------
+        >>> duelist = Duelist('Amadeus', deck='Melodious', wins=3)
+        >>> print(duelist)
+        Amadeus (Melodious)
+        """
+
         self.name = capwords(name)
+        self.deck = capwords(deck) if deck else None
         self.wins = wins
 
     def __repr__(self):
-        return f'Duelist(\'{self.name}\', wins={self.wins})'
+        return f'Duelist(\'{self.name}\', deck={self.deck}, wins={self.wins})'
 
     def __str__(self):
-        return f'Duelist: {self.name}\nWins: {self.wins}'
+        return f'{self.name} ({self.deck})'
 
     def __lt__(self, other):
         if isinstance(other, Duelist):
@@ -206,7 +220,8 @@ class Duelist:
             return self.wins == other.wins
         elif isinstance(other, int) or isinstance(other, float):
             return self.wins == other
-
+        elif isinstance(other, str):
+            return self.name == other
         else:
             raise NotImplemented('Intance of Duelist class only comparable to instances of: Duelist, int, float, str.')
 
@@ -306,7 +321,7 @@ class Timeless:
 
             for i in [x, y, z, w]:
                 if self.duelists[i].name in [winner_xy, winner_zw]:
-                    self.duelists[i].increase_win_count()
+                    self.duelists[i].wins += 1
 
             self.round += 1
 
@@ -341,7 +356,7 @@ class Timeless:
 
             for i in [x, y, z, w]:
                 if self.duelists[i].name in [winner_xy, winner_zw]:
-                    self.duelists[i].increase_win_count()
+                    self.duelists[i].wins += 1
 
 
 if __name__ == '__main__':
