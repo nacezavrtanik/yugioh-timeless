@@ -295,7 +295,42 @@ class Timeless:
 
             self.round += 1
 
+    def playoffs(self):
+
+        wins_before_final_round = sorted([self.duelists[i].wins for i in range(4)], reverse=True)
+
+        print(f'Pairings for round {self.round + 1}:\n')
+
+        if wins_before_final_round in [[3, 2, 1, 0], [2, 2, 1, 1]]:
+            print('variant 1')
+
+        elif wins_before_final_round in [[3, 1, 1, 1], [2, 2, 2, 0]]:
+
+            x, y, z, w = self.pairings[np.random.randint(3)]
+            duelist_x, duelist_y, duelist_z, duelist_w = [self.duelists[i].name for i in [x, y, z, w]]
+            deck_x, deck_y, deck_z, deck_w = [self.decks[self.matchup[x, x]], self.decks[self.matchup[y, y]],
+                                              self.decks[self.matchup[z, z]], self.decks[self.matchup[w, w]]]
+
+            pairing = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
+                       [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
+
+            print(tabulate(pairing, tablefmt='plain'))
+            print('')
+
+            winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
+                                         'choose_from', options=[duelist_x, duelist_y])
+            winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
+                                         'choose_from', options=[duelist_z, duelist_w])
+
+            print('')
+
+            for i in [x, y, z, w]:
+                if self.duelists[i].name in [winner_xy, winner_zw]:
+                    self.duelists[i].increase_win_count()
+
 
 if __name__ == '__main__':
 
     timeless = Timeless()
+    timeless.preliminaries()
+    timeless.playoffs()
