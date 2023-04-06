@@ -289,57 +289,40 @@ class Timeless:
             description += f'{self.duelists[i].name}: {self.duelists[i].wins}\n'
         return description
 
-    def preliminaries(self):
+    def start_round(self):
 
-        while self.round < 3:
-
-            print(f'Pairings for round {self.round + 1}:\n')
+        if self.round in [0, 1, 2]:
 
             x, y, z, w = self.pairings[self.round]
-            duelist_x, duelist_y, duelist_z, duelist_w = [self.duelists[i].name for i in [x, y, z, w]]
-            deck_xy, deck_yx, deck_zw, deck_wz = [self.decks[self.matchup[x, y]], self.decks[self.matchup[y, x]],
-                                                  self.decks[self.matchup[z, w]], self.decks[self.matchup[w, z]]]
+            deck_x, deck_y, deck_z, deck_w = [self.decks[self.matchup[x, y]], self.decks[self.matchup[y, x]],
+                                              self.decks[self.matchup[z, w]], self.decks[self.matchup[w, z]]]
 
-            pairing = [[f'{duelist_x} ({deck_xy})', 'VS', f'{duelist_y} ({deck_yx})'],
-                       [f'{duelist_z} ({deck_zw})', 'VS', f'{duelist_w} ({deck_wz})']]
+        elif self.round == 3:
 
-            print(tabulate(pairing, tablefmt='plain'))
-            print('')
+            duelists_sorted = sorted(self.duelists, reverse=True)
+            wins_before_final_round = [duelist.wins for duelist in duelists_sorted]
 
-            winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
-                                         'choose_from', options=[duelist_x, duelist_y])
-            winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
-                                         'choose_from', options=[duelist_z, duelist_w])
+            if wins_before_final_round in [[3, 2, 1, 0], [2, 2, 1, 1]]:
+                x, y, z, w = [duelists_sorted.index(duelist) for duelist in self.duelists]
 
-            print('')
+            elif wins_before_final_round in [[3, 1, 1, 1], [2, 2, 2, 0]]:
+                x, y, z, w = self.pairings[np.random.randint(3)]
 
-            for i in [x, y, z, w]:
-                if self.duelists[i].name in [winner_xy, winner_zw]:
-                    self.duelists[i].wins += 1
+            else:
+                raise RuntimeError(f'Invalid win count before Timeless playoffs: {wins_before_final_round}')
 
-            self.round += 1
+            deck_x, deck_y, deck_z, deck_w = [self.decks[self.matchup[x, x]], self.decks[self.matchup[y, y]],
+                                              self.decks[self.matchup[z, z]], self.decks[self.matchup[w, w]]]
 
-    def playoffs(self):
-
-        duelists_sorted = sorted(self.duelists, reverse=True)
-        wins_before_final_round = [duelist.wins for duelist in duelists_sorted]
-
-        if wins_before_final_round in [[3, 2, 1, 0], [2, 2, 1, 1]]:
-            x, y, z, w = [duelists_sorted.index(duelist) for duelist in self.duelists]
-        elif wins_before_final_round in [[3, 1, 1, 1], [2, 2, 2, 0]]:
-            x, y, z, w = self.pairings[np.random.randint(3)]
         else:
-            raise RuntimeError(f'Invalid win count before Timeless playoffs: {wins_before_final_round}')
-
-        print(f'Pairings for round {self.round + 1}:\n')
+            raise RuntimeError(f'Invalid number of rounds for a Timeless tournament: {self.round}')
 
         duelist_x, duelist_y, duelist_z, duelist_w = [self.duelists[i].name for i in [x, y, z, w]]
-        deck_x, deck_y, deck_z, deck_w = [self.decks[self.matchup[x, x]], self.decks[self.matchup[y, y]],
-                                          self.decks[self.matchup[z, z]], self.decks[self.matchup[w, w]]]
 
         pairing = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
                    [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
 
+        print(f'Pairings for round {self.round + 1}:\n')
         print(tabulate(pairing, tablefmt='plain'))
         print('')
 
@@ -354,9 +337,11 @@ class Timeless:
             if self.duelists[i].name in [winner_xy, winner_zw]:
                 self.duelists[i].wins += 1
 
+        self.round += 1
+
 
 if __name__ == '__main__':
 
     timeless = Timeless()
-    timeless.preliminaries()
-    timeless.playoffs()
+    for _ in range(4):
+        timeless.start_round()
