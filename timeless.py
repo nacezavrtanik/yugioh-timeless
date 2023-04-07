@@ -164,8 +164,6 @@ class Duelist:
     ----------
     name : str
         Name of the duelist.
-    deck : str
-        Name of the deck played by the duelist.
     wins : int
         Number of duels won.
 
@@ -175,49 +173,45 @@ class Duelist:
         Return list of `Duelist` instances with unique `name` attributes.
     """
 
-    def __init__(self, name, deck=None, wins=0):
+    def __init__(self, name, wins=0):
         """Create instance of Duelist class.
 
         Parameters
         ----------
         name : str
             Name of duelist.
-        deck : str
-            Name of deck played by the duelist.
         wins : int, optional
             Number of wins.
             (defaults to 0)
 
         Examples
         --------
-        >>> duelist = Duelist('Amadeus', deck='Melodious', wins=3)
+        >>> duelist = Duelist('Amadeus', wins=1)
         >>> print(duelist)
-        Amadeus (Melodious)
+        Duelist Amadeus, with 1 win(s).
         """
-
         self.name = capwords(name)
-        self.deck = capwords(deck) if deck else None
         self.wins = wins
 
     def __repr__(self):
-        return f'Duelist(\'{self.name}\', deck={self.deck}, wins={self.wins})'
+        return f'Duelist(\'{self.name}\', wins={self.wins})'
 
     def __str__(self):
-        return f'{self.name} ({self.deck})'
+        return f'Duelist {self.name}, with {self.wins} win(s).'
 
     def __lt__(self, other):
-
         if isinstance(other, Duelist):
             return self.wins < other.wins
-
-        elif isinstance(other, int) or isinstance(other, float):
-            return self.wins < other
-
-        elif isinstance(other, str):
-            return self.name < other
-
         else:
-            raise NotImplemented('Intance of Duelist class only comparable to instances of: Duelist, int, float, str.')
+            raise NotImplemented('Method Duelist.__lt__ only supported for instances of: Duelist.')
+
+    def __eq__(self, other):
+        if isinstance(other, Duelist):
+            return id(self) == id(other)
+        elif isinstance(other, int):
+            return self.wins == other
+        else:
+            raise NotImplemented('Method Duelist.__eq__ only supported for instances of: Duelist, int.')
 
     @staticmethod
     def enter_unique_duelists():
@@ -299,17 +293,16 @@ class Timeless:
 
         elif self.round == 3:
 
-            duelists_sorted = sorted(self.duelists, reverse=True)
-            wins_before_final_round = [duelist.wins for duelist in duelists_sorted]
+            duelists_by_win_count = sorted(self.duelists, reverse=True)
 
-            if wins_before_final_round in [[3, 2, 1, 0], [2, 2, 1, 1]]:
-                x, y, z, w = [duelists_sorted.index(duelist) for duelist in self.duelists]
+            if duelists_by_win_count in [[3, 2, 1, 0], [2, 2, 1, 1]]:
+                x, y, z, w = [duelists_by_win_count.index(duelist) for duelist in self.duelists]
 
-            elif wins_before_final_round in [[3, 1, 1, 1], [2, 2, 2, 0]]:
+            elif duelists_by_win_count in [[3, 1, 1, 1], [2, 2, 2, 0]]:
                 x, y, z, w = self.pairings[np.random.randint(3)]
 
             else:
-                raise RuntimeError(f'Invalid win count before Timeless playoffs: {wins_before_final_round}')
+                raise RuntimeError(f'Invalid win count before Timeless playoffs: {duelists_by_win_count}')
 
             deck_x, deck_y, deck_z, deck_w = [self.decks[self.matchup[x, x]], self.decks[self.matchup[y, y]],
                                               self.decks[self.matchup[z, z]], self.decks[self.matchup[w, w]]]
@@ -338,6 +331,8 @@ class Timeless:
                 self.duelists[i].wins += 1
 
         self.round += 1
+
+        # TODO Timeless.standings
 
 
 if __name__ == '__main__':
