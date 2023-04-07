@@ -121,6 +121,8 @@ def supervised_input(prompt, conditions, options=None):
 def random_timeless_square():
     """Randomly generate a timeless square.
 
+    Keeps randomly generating squares until a Timeless sqaure is generated.
+
     Returns
     -------
     numpy.ndarray
@@ -258,85 +260,68 @@ class Duelist:
             return duelist_candidates
 
 
-class Timeless:
+def enter_tournament_information():
 
     deck_sets = {'BASIC': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
                  'EXTRA': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']}
-    pairings = np.array([[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]])
 
-    def __init__(self):
-        self.format = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
-        self.decks = Timeless.deck_sets.get(self.format)
-        self.entry_fee = supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters'])
-        self.duelists = np.random.permutation(Duelist.enter_unique_duelists())
-        self.matchup = random_timeless_square()
-        self.round = 0
+    _format = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
+    decks = deck_sets.get(_format)
 
-    def __repr__(self):
-        return 'Timeless()'
+    entry_fee = supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters'])
 
-    def __str__(self):
-        description = f'Timeless {self.format}, round {self.round + 1}\n'
-        description += f'Entry fee: {self.entry_fee}\n'
-        description += '\nWINS PER PLAYER\n---------------\n'
-        for i in range(4):
-            description += f'{self.duelists[i].name}: {self.duelists[i].wins}\n'
-        return description
+    duelists = np.random.permutation(Duelist.enter_unique_duelists())
 
-    def start_round(self):
+    tournament_information = {'decks': decks, 'entry_fee': entry_fee, 'duelists': duelists}
 
-        if self.round in [0, 1, 2]:
+    return tournament_information
 
-            x, y, z, w = self.pairings[self.round]
-            deck_x, deck_y, deck_z, deck_w = [self.decks[self.matchup[x, y]], self.decks[self.matchup[y, x]],
-                                              self.decks[self.matchup[z, w]], self.decks[self.matchup[w, z]]]
 
-        elif self.round == 3:
+def timeless(duelists, decks, entry_fee):
 
-            duelists_by_win_count = sorted(self.duelists, reverse=True)
+    final_round = 3
+    tied_win_configurations = [[3, 1, 1, 1], [2, 2, 2, 0]]
+    pairing_configurations = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
 
-            if duelists_by_win_count in [[3, 2, 1, 0], [2, 2, 1, 1]]:
-                x, y, z, w = [duelists_by_win_count.index(duelist) for duelist in self.duelists]
+    matchup = random_timeless_square()
 
-            elif duelists_by_win_count in [[3, 1, 1, 1], [2, 2, 2, 0]]:
-                x, y, z, w = self.pairings[np.random.randint(3)]
+    for _round in range(4):
 
+        if _round == final_round:
+
+            duelists_by_wins = sorted(duelists, reverse=True)
+            is_tied = True if duelists_by_wins in tied_win_configurations else False
+
+            if is_tied:
+                x, y, z, w = pairing_configurations[np.random.randint(3)]
             else:
-                raise RuntimeError(f'Invalid win count before Timeless playoffs: {duelists_by_win_count}')
-
-            deck_x, deck_y, deck_z, deck_w = [self.decks[self.matchup[x, x]], self.decks[self.matchup[y, y]],
-                                              self.decks[self.matchup[z, z]], self.decks[self.matchup[w, w]]]
+                x, y, z, w = [duelists_by_wins.index(duelist) for duelist in duelists]
+            deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
+                                              decks[matchup[z, z]], decks[matchup[w, w]]]
 
         else:
-            raise RuntimeError(f'Invalid number of rounds for a Timeless tournament: {self.round}')
 
-        duelist_x, duelist_y, duelist_z, duelist_w = [self.duelists[i].name for i in [x, y, z, w]]
+            x, y, z, w = pairing_configurations[_round]
+            deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
+                                              decks[matchup[z, w]], decks[matchup[w, z]]]
 
-        pairing = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
-                   [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
+        duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i].name for i in [x, y, z, w]]
 
-        print(f'Pairings for round {self.round + 1}:\n')
-        print(tabulate(pairing, tablefmt='plain'))
-        print('')
+        pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
+                    [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
+
+        print(f'\nPairings for round {_round + 1}:\n')
+        print(tabulate(pairings, tablefmt='plain'), '\n')
 
         winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
                                      'choose_from', options=[duelist_x, duelist_y])
         winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
                                      'choose_from', options=[duelist_z, duelist_w])
 
-        print('')
-
         for i in [x, y, z, w]:
-            if self.duelists[i].name in [winner_xy, winner_zw]:
-                self.duelists[i].wins += 1
-
-        self.round += 1
-
-        # TODO Timeless.standings
+            if duelists[i].name in [winner_xy, winner_zw]:
+                duelists[i].wins += 1
 
 
 if __name__ == '__main__':
-
-    timeless = Timeless()
-    for _ in range(4):
-        timeless.start_round()
+    timeless(**enter_tournament_information())
