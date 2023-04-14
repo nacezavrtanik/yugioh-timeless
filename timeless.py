@@ -5,6 +5,18 @@ from string import capwords
 from tabulate import tabulate
 
 
+def _is_string_of_integer(input_string):
+    """Check if a string represents an integer.
+
+    Helper function for `supervised_input`.
+    """
+    try:
+        int(input_string)
+    except ValueError:
+        return False
+    return True
+
+
 def supervised_input(prompt, conditions, options=None):
     """Require user input to satisfy specified conditions.
 
@@ -73,20 +85,12 @@ def supervised_input(prompt, conditions, options=None):
     'No'
     """
 
-    def _is_whole_number(input_string):
-        try:
-            int(input_string)
-        except ValueError:
-            return False
-        else:
-            return True
-
     condition_checks = {
         'choose_from': lambda input_string: input_string in options,
         'alphabetical': lambda input_string: input_string.replace(' ', '').isalpha(),
         'less_than_30_characters': lambda input_string: len(input_string) < 30,
-        'integer': lambda input_string: _is_whole_number(input_string),
-        'multiple_of_5': lambda input_string: int(input_string) % 5 == 0 and int(input_string) >= 0
+        'integer': lambda input_string: _is_string_of_integer(input_string),
+        'multiple_of_5': lambda input_string: int(input_string) % 5 == 0 and int(input_string) >= 0,
     }
 
     input_tips = {
@@ -94,7 +98,7 @@ def supervised_input(prompt, conditions, options=None):
         'alphabetical': 'Use only letters and whitespaces.',
         'less_than_30_characters': 'Use less than 30 characters.',
         'integer': 'Enter an integer.',
-        'multiple_of_5': 'Pick a non-negative multiple of 5.'
+        'multiple_of_5': 'Pick a non-negative multiple of 5.',
     }
 
     if isinstance(conditions, str):
@@ -151,9 +155,10 @@ def random_timeless_square():
 
         unique_diagonal = len(set(random_square.diagonal())) == 4
         unique_antidiagonal = len(set(np.fliplr(random_square).diagonal())) == 4
-        unique_loop = len({random_square[0, 1], random_square[1, 0], random_square[2, 3], random_square[3, 2]}) == 4
+        unique_offdiagonal = len({random_square[0, 1], random_square[1, 0],
+                                  random_square[2, 3], random_square[3, 2]}) == 4
 
-        is_timeless = unique_diagonal and unique_antidiagonal and unique_loop
+        is_timeless = unique_diagonal and unique_antidiagonal and unique_offdiagonal
 
         if is_timeless:
             return random_square
@@ -196,24 +201,28 @@ class Duelist:
         self.wins = wins
 
     def __repr__(self):
+        """Return repr(self)."""
         return f'Duelist(\'{self.name}\', wins={self.wins})'
 
     def __str__(self):
+        """Return str(self)."""
         return f'Duelist {self.name}, with {self.wins} win(s).'
 
     def __lt__(self, other):
+        """Return self<value."""
         if isinstance(other, Duelist):
             return self.wins < other.wins
         else:
-            raise NotImplemented('Method Duelist.__lt__ only supported for instances of: Duelist.')
+            return NotImplemented
 
     def __eq__(self, other):
+        """Return self==value."""
         if isinstance(other, Duelist):
-            return id(self) == id(other)
+            return self is other
         elif isinstance(other, int):
             return self.wins == other
         else:
-            raise NotImplemented('Method Duelist.__eq__ only supported for instances of: Duelist, int.')
+            return NotImplemented
 
     @staticmethod
     def enter_unique_duelists():
@@ -265,8 +274,8 @@ def enter_tournament_information():
     deck_sets = {'BASIC': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
                  'EXTRA': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']}
 
-    _format = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
-    decks = deck_sets.get(_format)
+    format_ = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
+    decks = deck_sets.get(format_)
 
     entry_fee = supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters'])
 
@@ -285,9 +294,9 @@ def timeless(duelists, decks, entry_fee):
 
     matchup = random_timeless_square()
 
-    for _round in range(4):
+    for round_ in range(4):
 
-        if _round == final_round:
+        if round_ == final_round:
 
             duelists_by_wins = sorted(duelists, reverse=True)
             is_tied = True if duelists_by_wins in tied_win_configurations else False
@@ -301,7 +310,7 @@ def timeless(duelists, decks, entry_fee):
 
         else:
 
-            x, y, z, w = pairing_configurations[_round]
+            x, y, z, w = pairing_configurations[round_]
             deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
                                               decks[matchup[z, w]], decks[matchup[w, z]]]
 
@@ -310,7 +319,7 @@ def timeless(duelists, decks, entry_fee):
         pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
                     [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
 
-        print(f'\nPairings for round {_round + 1}:\n')
+        print(f'\nPairings for round {round_ + 1}:\n')
         print(tabulate(pairings, tablefmt='plain'), '\n')
 
         winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
