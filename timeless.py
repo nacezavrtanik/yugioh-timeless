@@ -209,14 +209,14 @@ class Duelist:
         return self.name
 
     def __lt__(self, other):
-        """Return self<value."""
+        """Return self < other."""
         if isinstance(other, Duelist):
             return self.wins < other.wins
         else:
             return NotImplemented
 
     def __eq__(self, other):
-        """Return self==value."""
+        """Return self == other."""
         if isinstance(other, Duelist):
             return self is other
         elif isinstance(other, int):
@@ -306,10 +306,15 @@ def calculate_prizes(duelists, entry_fee):
 
 def timeless(duelists, decks, entry_fee):
 
-    final_round = 3
-    is_tied = None
-    tied_win_configurations = [[3, 1, 1, 1], [2, 2, 2, 0]]
     pairing_configurations = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
+
+    final_round = 3
+
+    is_tied = None
+    tied_win_configurations_before_final_round = [[3, 1, 1, 1], [2, 2, 2, 0]]
+    tied_win_configurations_after_final_round = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
+    tied_place_configurations = [[1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]]
+    tied_prize_configuration = [[10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1]]
 
     matchup = random_timeless_square()
 
@@ -324,7 +329,7 @@ def timeless(duelists, decks, entry_fee):
         else:
 
             duelists_by_wins = sorted(duelists, reverse=True)
-            is_tied = True if duelists_by_wins in tied_win_configurations else False
+            is_tied = True if duelists_by_wins in tied_win_configurations_before_final_round else False
 
             if is_tied:
                 x, y, z, w = pairing_configurations[np.random.randint(3)]
@@ -353,7 +358,11 @@ def timeless(duelists, decks, entry_fee):
         if round_ == final_round:
 
             if is_tied:
-                raise NotImplementedError('')
+                duelists_by_wins = sorted(duelists, reverse=True)
+                i = tied_win_configurations_after_final_round.index(duelists_by_wins)
+                prizes = [entry_fee / 5 * tied_prize_configuration[i][j] for j in range(4)]
+                standings = [[tied_place_configurations[i][j], duelists_by_wins[j], prizes[j]]
+                             for j in range(4)]
 
             else:
                 duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
