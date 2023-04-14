@@ -315,7 +315,13 @@ def timeless(duelists, decks, entry_fee):
 
     for round_ in range(4):
 
-        if round_ == final_round:
+        if round_ != final_round:
+
+            x, y, z, w = pairing_configurations[round_]
+            deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
+                                              decks[matchup[z, w]], decks[matchup[w, z]]]
+
+        else:
 
             duelists_by_wins = sorted(duelists, reverse=True)
             is_tied = True if duelists_by_wins in tied_win_configurations else False
@@ -326,12 +332,6 @@ def timeless(duelists, decks, entry_fee):
                 x, y, z, w = np.flip(np.argsort(duelists))
             deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
                                               decks[matchup[z, z]], decks[matchup[w, w]]]
-
-        else:
-
-            x, y, z, w = pairing_configurations[round_]
-            deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
-                                              decks[matchup[z, w]], decks[matchup[w, z]]]
 
         duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
 
@@ -349,7 +349,6 @@ def timeless(duelists, decks, entry_fee):
         for i in [x, y, z, w]:
             if duelists[i] in [winner_xy, winner_zw]:
                 duelists[i].wins += 1
-            print(duelists[i], duelists[i].wins)
 
         if round_ == final_round:
 
