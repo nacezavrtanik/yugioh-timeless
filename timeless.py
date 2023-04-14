@@ -307,6 +307,7 @@ def calculate_prizes(duelists, entry_fee):
 def timeless(duelists, decks, entry_fee):
 
     final_round = 3
+    is_tied = None
     tied_win_configurations = [[3, 1, 1, 1], [2, 2, 2, 0]]
     pairing_configurations = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
 
@@ -348,6 +349,24 @@ def timeless(duelists, decks, entry_fee):
         for i in [x, y, z, w]:
             if duelists[i] in [winner_xy, winner_zw]:
                 duelists[i].wins += 1
+            print(duelists[i], duelists[i].wins)
+
+        if round_ == final_round:
+
+            if is_tied:
+                raise NotImplementedError('')
+
+            else:
+                duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
+                duelist_2nd = duelist_x if duelist_x != winner_xy else duelist_y
+                duelist_3rd = duelist_z if duelist_z == winner_zw else duelist_w
+                duelist_4th = duelist_z if duelist_z != winner_zw else duelist_w
+
+                standings = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
+                prizes = calculate_prizes(standings, entry_fee)
+                standings = [[i+1, standings[i], prizes[i]] for i in range(4)]
+
+            print(tabulate(standings, headers=['Place', 'Duelist', 'Prize'], colalign=('center', 'left', 'center')))
 
 
 if __name__ == '__main__':
