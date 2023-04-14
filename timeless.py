@@ -322,7 +322,7 @@ def timeless(duelists, decks, entry_fee):
             if is_tied:
                 x, y, z, w = pairing_configurations[np.random.randint(3)]
             else:
-                x, y, z, w = [duelists_by_wins.index(duelist) for duelist in duelists]  # TODO fix this!
+                x, y, z, w = np.flip(np.argsort(duelists))
             deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
                                               decks[matchup[z, z]], decks[matchup[w, w]]]
 
