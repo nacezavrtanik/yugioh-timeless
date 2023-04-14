@@ -206,7 +206,7 @@ class Duelist:
 
     def __str__(self):
         """Return str(self)."""
-        return f'Duelist {self.name}, with {self.wins} win(s).'
+        return self.name
 
     def __lt__(self, other):
         """Return self<value."""
@@ -221,6 +221,8 @@ class Duelist:
             return self is other
         elif isinstance(other, int):
             return self.wins == other
+        elif isinstance(other, str):
+            return self.name == other
         else:
             return NotImplemented
 
@@ -277,13 +279,29 @@ def enter_tournament_information():
     format_ = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
     decks = deck_sets.get(format_)
 
-    entry_fee = supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters'])
+    entry_fee = int(supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters']))
 
     duelists = np.random.permutation(Duelist.enter_unique_duelists())
 
     tournament_information = {'decks': decks, 'entry_fee': entry_fee, 'duelists': duelists}
 
     return tournament_information
+
+
+def calculate_prizes(duelists, entry_fee):
+
+    base_fee = entry_fee / 5
+
+    prizes_base = [9, 6, 3, 0]
+    prizes_scaled = [n * base_fee for n in prizes_base]
+
+    win_bonus = [0, 0, 0, 0]
+    for i in range(4):
+        if duelists[i] == 4 - i:
+            win_bonus[i] = base_fee
+
+    prizes = [prizes_scaled[i] + win_bonus[i] for i in range(4)]
+    return prizes
 
 
 def timeless(duelists, decks, entry_fee):
@@ -304,7 +322,7 @@ def timeless(duelists, decks, entry_fee):
             if is_tied:
                 x, y, z, w = pairing_configurations[np.random.randint(3)]
             else:
-                x, y, z, w = [duelists_by_wins.index(duelist) for duelist in duelists]
+                x, y, z, w = [duelists_by_wins.index(duelist) for duelist in duelists]  # TODO fix this!
             deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
                                               decks[matchup[z, z]], decks[matchup[w, w]]]
 
@@ -314,7 +332,7 @@ def timeless(duelists, decks, entry_fee):
             deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
                                               decks[matchup[z, w]], decks[matchup[w, z]]]
 
-        duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i].name for i in [x, y, z, w]]
+        duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
 
         pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
                     [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
@@ -323,12 +341,12 @@ def timeless(duelists, decks, entry_fee):
         print(tabulate(pairings, tablefmt='plain'), '\n')
 
         winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
-                                     'choose_from', options=[duelist_x, duelist_y])
+                                     'choose_from', options=[duelist_x.name, duelist_y.name])
         winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
-                                     'choose_from', options=[duelist_z, duelist_w])
+                                     'choose_from', options=[duelist_z.name, duelist_w.name])
 
         for i in [x, y, z, w]:
-            if duelists[i].name in [winner_xy, winner_zw]:
+            if duelists[i] in [winner_xy, winner_zw]:
                 duelists[i].wins += 1
 
 
