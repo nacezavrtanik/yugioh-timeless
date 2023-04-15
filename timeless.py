@@ -304,77 +304,106 @@ def calculate_prizes(duelists, entry_fee):
     return prizes
 
 
-def timeless(duelists, decks, entry_fee):
+def preliminary_round(duelists, decks, matchup, round_):
 
     pairing_configurations = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
 
-    final_round = 3
+    x, y, z, w = pairing_configurations[round_]
+    deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
+                                      decks[matchup[z, w]], decks[matchup[w, z]]]
+    duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
 
-    is_tied = None
+    pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
+                [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
+
+    print(f'\nPairings for round {round_ + 1}:\n')
+    print(tabulate(pairings, tablefmt='plain'), '\n')
+
+    winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
+                                 'choose_from', options=[duelist_x.name, duelist_y.name])
+    winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
+                                 'choose_from', options=[duelist_z.name, duelist_w.name])
+
+    for i in [x, y, z, w]:
+        if duelists[i] in [winner_xy, winner_zw]:
+            duelists[i].wins += 1
+
+    duelists_by_wins = sorted(duelists, reverse=True)
+    standings = [['dummy', duelists_by_wins[i], duelists_by_wins[i].wins] for i in range(4)]
+
+    print(f'\nStandings after round {round_ + 1}\n-----------------------\n')
+    print(tabulate(standings,
+                   headers=['Place', 'Duelist', 'Wins'],
+                   colalign=('center', 'left', 'center')))
+
+
+def final_round(duelists, decks, matchup, entry_fee):
+
+    pairing_configurations = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
+
     tied_win_configurations_before_final_round = [[3, 1, 1, 1], [2, 2, 2, 0]]
     tied_win_configurations_after_final_round = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
     tied_place_configurations = [[1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]]
     tied_prize_configuration = [[10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1]]
 
+    duelists_by_wins = sorted(duelists, reverse=True)
+    is_tied = True if duelists_by_wins in tied_win_configurations_before_final_round else False
+
+    if is_tied:
+        x, y, z, w = pairing_configurations[np.random.randint(3)]
+    else:
+        x, y, z, w = np.flip(np.argsort(duelists))
+
+    deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
+                                      decks[matchup[z, z]], decks[matchup[w, w]]]
+    duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
+
+    pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
+                [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
+
+    print(f'\nPairings for final round:\n')
+    print(tabulate(pairings, tablefmt='plain'), '\n')
+
+    winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
+                                 'choose_from', options=[duelist_x.name, duelist_y.name])
+    winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
+                                 'choose_from', options=[duelist_z.name, duelist_w.name])
+
+    for i in [x, y, z, w]:
+        if duelists[i] in [winner_xy, winner_zw]:
+            duelists[i].wins += 1
+
+    if is_tied:
+        duelists_by_wins = sorted(duelists, reverse=True)
+        i = tied_win_configurations_after_final_round.index(duelists_by_wins)
+        prizes = [entry_fee / 5 * tied_prize_configuration[i][j] for j in range(4)]
+        standings = [[tied_place_configurations[i][j], duelists_by_wins[j], duelists_by_wins[j].wins, prizes[j]]
+                     for j in range(4)]
+
+    else:
+        duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
+        duelist_2nd = duelist_x if duelist_x != winner_xy else duelist_y
+        duelist_3rd = duelist_z if duelist_z == winner_zw else duelist_w
+        duelist_4th = duelist_z if duelist_z != winner_zw else duelist_w
+
+        standings = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
+        prizes = calculate_prizes(standings, entry_fee)
+        standings = [[i + 1, standings[i], standings[i].wins, prizes[i]] for i in range(4)]
+
+    print('\nFINAL STANDINGS\n---------------\n')
+    print(tabulate(standings,
+                   headers=['Place', 'Duelist', 'Wins', 'Prize'],
+                   colalign=('center', 'left', 'center', 'center')))
+
+
+def timeless(duelists, decks, entry_fee):
+
     matchup = random_timeless_square()
 
-    for round_ in range(4):
-
-        if round_ != final_round:
-
-            x, y, z, w = pairing_configurations[round_]
-            deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
-                                              decks[matchup[z, w]], decks[matchup[w, z]]]
-
-        else:
-
-            duelists_by_wins = sorted(duelists, reverse=True)
-            is_tied = True if duelists_by_wins in tied_win_configurations_before_final_round else False
-
-            if is_tied:
-                x, y, z, w = pairing_configurations[np.random.randint(3)]
-            else:
-                x, y, z, w = np.flip(np.argsort(duelists))
-            deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
-                                              decks[matchup[z, z]], decks[matchup[w, w]]]
-
-        duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
-
-        pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
-                    [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
-
-        print(f'\nPairings for round {round_ + 1}:\n')
-        print(tabulate(pairings, tablefmt='plain'), '\n')
-
-        winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
-                                     'choose_from', options=[duelist_x.name, duelist_y.name])
-        winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
-                                     'choose_from', options=[duelist_z.name, duelist_w.name])
-
-        for i in [x, y, z, w]:
-            if duelists[i] in [winner_xy, winner_zw]:
-                duelists[i].wins += 1
-
-        if round_ == final_round:
-
-            if is_tied:
-                duelists_by_wins = sorted(duelists, reverse=True)
-                i = tied_win_configurations_after_final_round.index(duelists_by_wins)
-                prizes = [entry_fee / 5 * tied_prize_configuration[i][j] for j in range(4)]
-                standings = [[tied_place_configurations[i][j], duelists_by_wins[j], prizes[j]]
-                             for j in range(4)]
-
-            else:
-                duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
-                duelist_2nd = duelist_x if duelist_x != winner_xy else duelist_y
-                duelist_3rd = duelist_z if duelist_z == winner_zw else duelist_w
-                duelist_4th = duelist_z if duelist_z != winner_zw else duelist_w
-
-                standings = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
-                prizes = calculate_prizes(standings, entry_fee)
-                standings = [[i+1, standings[i], prizes[i]] for i in range(4)]
-
-            print(tabulate(standings, headers=['Place', 'Duelist', 'Prize'], colalign=('center', 'left', 'center')))
+    preliminary_round(duelists, decks, matchup, 0)
+    preliminary_round(duelists, decks, matchup, 1)
+    preliminary_round(duelists, decks, matchup, 2)
+    final_round(duelists, decks, matchup, entry_fee)
 
 
 if __name__ == '__main__':
