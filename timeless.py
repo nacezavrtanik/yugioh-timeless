@@ -322,18 +322,57 @@ STANDING_CONFIGURATIONS = {
     }
 }
 TIE_CONFIGURATIONS_AFTER_PRELIMINARIES = ([3, 1, 1, 1], [2, 2, 2, 0])
+IS_TIED_AFTER_PRELIMINARIES = None
 
 
-def check_if_tie_after_preliminaries(duelists):
+def check_if_tied_after_preliminaries(duelists):
     duelists_by_wins = sorted(duelists, reverse=True)
-    is_tie = duelists_by_wins in TIE_CONFIGURATIONS_AFTER_PRELIMINARIES
-    return is_tie
+    global IS_TIED_AFTER_PRELIMINARIES
+    IS_TIED_AFTER_PRELIMINARIES = duelists_by_wins in TIE_CONFIGURATIONS_AFTER_PRELIMINARIES
+
+
+def generate_pairings(duelists, decks, matchup, round_):
+
+    if round_ in PRELIMINARY_ROUNDS:
+        x, y, z, w = PAIRING_CONFIGURATIONS[round_]
+        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
+                                          decks[matchup[z, w]], decks[matchup[w, z]]]
+    elif round_ == FINAL_ROUND and IS_TIED_AFTER_PRELIMINARIES:
+        x, y, z, w = PAIRING_CONFIGURATIONS[np.random.randint(3)]
+        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
+                                          decks[matchup[z, z]], decks[matchup[w, w]]]
+    else:
+        x, y, z, w = np.flip(np.argsort(duelists))
+        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
+                                          decks[matchup[z, z]], decks[matchup[w, w]]]
+
+    duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
+
+    pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
+                [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
+    print(f'\nPairings for round {round_ + 1}:\n')
+    print(tabulate(pairings, tablefmt='plain'), '\n')
+
+    return duelist_x, duelist_y, duelist_z, duelist_w
+
+
+def register_wins(duelist_x, duelist_y, duelist_z, duelist_w):
+
+    winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
+                                 'choose_from', options=[duelist_x.name, duelist_y.name])
+    winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
+                                 'choose_from', options=[duelist_z.name, duelist_w.name])
+    for duelist in [duelist_x, duelist_y, duelist_z, duelist_w]:
+        if duelist in [winner_xy, winner_zw]:
+            duelist.wins += 1
+
+    return winner_xy, winner_zw
 
 
 def display_standings(duelists_by_place, round_):
 
     if round_ == FINAL_ROUND:
-        round_ += check_if_tie_after_preliminaries(duelists_by_place)
+        round_ += IS_TIED_AFTER_PRELIMINARIES
 
     config = STANDING_CONFIGURATIONS.get(round_).get(WINS).index(duelists_by_place)
 
@@ -343,63 +382,30 @@ def display_standings(duelists_by_place, round_):
         WINS: STANDING_CONFIGURATIONS.get(round_).get(WINS)[config],
         POINTS: STANDING_CONFIGURATIONS.get(round_).get(POINTS)[config]
     }
-
     print(f'\nStandings after round {round_ + 1}\n')
     print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center', 'center')))
 
 
 def preliminary_round(duelists, decks, matchup, round_):
 
-    # Display pairings
-    x, y, z, w = PAIRING_CONFIGURATIONS[round_]
-    deck_xy, deck_yx, deck_zw, deck_wz = [decks[matchup[x, y]], decks[matchup[y, x]],
-                                          decks[matchup[z, w]], decks[matchup[w, z]]]
-    duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
-    pairings = [[f'{duelist_x} ({deck_xy})', 'VS', f'{duelist_y} ({deck_yx})'],
-                [f'{duelist_z} ({deck_zw})', 'VS', f'{duelist_w} ({deck_wz})']]
-    print(f'\nPairings for round {round_ + 1}:\n')
-    print(tabulate(pairings, tablefmt='plain'), '\n')
+    pairings = generate_pairings(duelists, decks, matchup, round_)
 
-    # Register wins
-    winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
-                                 'choose_from', options=[duelist_x.name, duelist_y.name])
-    winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
-                                 'choose_from', options=[duelist_z.name, duelist_w.name])
-    for i in [x, y, z, w]:
-        if duelists[i] in [winner_xy, winner_zw]:
-            duelists[i].wins += 1
+    register_wins(*pairings)
 
-    # Display standings
     duelists_by_wins = sorted(duelists, reverse=True)
     display_standings(duelists_by_wins, round_)
 
 
-def final_round(duelists, decks, matchup, tie_after_preliminaries):
+def final_round(duelists, decks, matchup):
 
-    # Display pairings
-    if tie_after_preliminaries:
-        x, y, z, w = PAIRING_CONFIGURATIONS[np.random.randint(3)]
-    else:
-        x, y, z, w = np.flip(np.argsort(duelists))
-    deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
-                                      decks[matchup[z, z]], decks[matchup[w, w]]]
-    duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
-    pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
-                [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
-    print(f'\nPairings for final round:\n')
-    print(tabulate(pairings, tablefmt='plain'), '\n')
+    check_if_tied_after_preliminaries(duelists)
 
-    # Register wins
-    winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
-                                 'choose_from', options=[duelist_x.name, duelist_y.name])
-    winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
-                                 'choose_from', options=[duelist_z.name, duelist_w.name])
-    for i in [x, y, z, w]:
-        if duelists[i] in [winner_xy, winner_zw]:
-            duelists[i].wins += 1
+    pairings = generate_pairings(duelists, decks, matchup, FINAL_ROUND)
+    duelist_x, duelist_y, duelist_z, duelist_w = pairings
 
-    # Display standings
-    if tie_after_preliminaries:
+    winner_xy, winner_zw = register_wins(*pairings)
+
+    if IS_TIED_AFTER_PRELIMINARIES:
         duelists_by_place = sorted(duelists, reverse=True)
     else:
         duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
@@ -417,8 +423,7 @@ def timeless(duelists, decks):
     preliminary_round(duelists, decks, matchup, 0)
     preliminary_round(duelists, decks, matchup, 1)
     preliminary_round(duelists, decks, matchup, 2)
-    tie_after_preliminaries = check_if_tie_after_preliminaries(duelists)
-    final_round(duelists, decks, matchup, tie_after_preliminaries)
+    final_round(duelists, decks, matchup)
 
 
 if __name__ == '__main__':
