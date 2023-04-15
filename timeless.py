@@ -304,12 +304,12 @@ STANDING_CONFIGURATIONS = {
         'places': ([1, 2, 3, 4], [1, 2, 2, 2], [1, 1, 1, 4], [1, 1, 3, 3])
     },
     3: {
-        'tied': {
+        True: {
             'wins': ([4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]),
             'places': ([1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]),
             'prizes': ([10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1])
         },
-        'not_tied': {
+        False: {
             'wins': ([4, 2, 2, 0], [4, 2, 1, 1], [3, 3, 2, 0], [3, 3, 1, 1], [3, 2, 2, 1]),
             'places': ([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]),
             'prizes': ([10, 6, 4, 0], [10, 6, 3, 1], [9, 7, 4, 0], [9, 7, 3, 1], [9, 6, 4, 1])
@@ -349,12 +349,13 @@ def preliminary_round(duelists, decks, matchup, round_):
     # Display standings
     duelists_by_wins = sorted(duelists, reverse=True)
     config = STANDING_CONFIGURATIONS.get(round_).get('wins').index(duelists_by_wins)
-    standings = [[STANDING_CONFIGURATIONS.get(round_).get('places')[config][i],
-                  duelists_by_wins[i],
-                  STANDING_CONFIGURATIONS.get(round_).get('wins')[config][i]]
-                 for i in range(4)]
+    standings = {
+        'Place': STANDING_CONFIGURATIONS.get(round_).get('places')[config],
+        'Duelist': duelists_by_wins,
+        'Wins': [duelist.wins for duelist in duelists_by_wins]
+    }
     print(f'\nStandings after round {round_ + 1}\n')
-    print(tabulate(standings, headers=['Place', 'Duelist', 'Wins'], colalign=('center', 'left', 'center')))
+    print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center')))
 
 
 def final_round(duelists, decks, matchup, tie_after_preliminaries, entry_fee):
@@ -384,38 +385,22 @@ def final_round(duelists, decks, matchup, tie_after_preliminaries, entry_fee):
     # Display standings
     if tie_after_preliminaries:
         duelists_by_places = sorted(duelists, reverse=True)
-        config = STANDING_CONFIGURATIONS.get(FINAL_ROUND).get('tied').get('wins').index(duelists_by_places)
-        standings = [[STANDING_CONFIGURATIONS.get(FINAL_ROUND).get('tied').get('places')[config][i],
-                      duelists_by_places[i],
-                      duelists_by_places[i].wins,
-                      STANDING_CONFIGURATIONS.get(FINAL_ROUND).get('tied').get('prizes')[config][i]]
-                     for i in range(4)]
-
-        # i = STANDING_CONFIGURATIONS.get(3).get('wins').index(duelists_by_places)
-        # prizes = [entry_fee / 5 * STANDING_CONFIGURATIONS.get(3).get('prizes')[i][j] for j in range(4)]
-        # standings = [[STANDING_CONFIGURATIONS.get(3).get('places')[i][j],
-        #               duelists_by_places[j],
-        #               duelists_by_places[j].wins,
-        #               prizes[j]]
-        #              for j in range(4)]
-
     else:
         duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
         duelist_2nd = duelist_x if duelist_x != winner_xy else duelist_y
         duelist_3rd = duelist_z if duelist_z == winner_zw else duelist_w
         duelist_4th = duelist_z if duelist_z != winner_zw else duelist_w
         duelists_by_places = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
-        config = STANDING_CONFIGURATIONS.get(FINAL_ROUND).get('not_tied').get('wins').index(duelists_by_places)
-        standings = [[i + 1,
-                      duelists_by_places[i],
-                      duelists_by_places[i].wins,
-                      STANDING_CONFIGURATIONS.get(FINAL_ROUND).get('not_tied').get('prizes')[config][i]]
-                     for i in range(4)]
 
+    config = STANDING_CONFIGURATIONS.get(FINAL_ROUND).get(tie_after_preliminaries).get('wins').index(duelists_by_places)
+    standings = {
+        'Place': STANDING_CONFIGURATIONS.get(FINAL_ROUND).get(tie_after_preliminaries).get('places')[config],
+        'Duelist': duelists_by_places,
+        'Wins': [duelist.wins for duelist in duelists_by_places],
+        'Prize': STANDING_CONFIGURATIONS.get(FINAL_ROUND).get(tie_after_preliminaries).get('prizes')[config]
+        }
     print('\nFINAL STANDINGS\n---------------\n')
-    print(tabulate(standings,
-                   headers=['Place', 'Duelist', 'Wins', 'Prize'],
-                   colalign=('center', 'left', 'center', 'center')))
+    print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center', 'center')))
 
 
 def timeless(duelists, decks, entry_fee):
