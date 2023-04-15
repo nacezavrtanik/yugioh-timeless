@@ -304,11 +304,31 @@ def calculate_prizes(duelists, entry_fee):
     return prizes
 
 
+PAIRING_CONFIGURATIONS = ((0, 1, 2, 3), (1, 3, 0, 2), (3, 0, 1, 2))
+TIE_CONFIGURATIONS = {
+    0: {
+        'wins': ((1, 1, 0, 0), ),
+        'places': ((1, 1, 3, 3), )
+    },
+    1: {
+        'wins': ((2, 2, 0, 0), (2, 1, 1, 0), (1, 1, 1, 1)),
+        'places': ((1, 1, 3, 3), (1, 2, 2, 4), (1, 1, 1, 1))
+    },
+    2: {
+        'wins': ((3, 1, 1, 1), (2, 2, 2, 0)),
+        'places': ((1, 2, 2, 2), (1, 1, 1, 4))
+    },
+    3: {
+        'wins': ((4, 2, 1, 1), (3, 3, 2, 0), (3, 2, 2, 1)),
+        'places': ((1, 2, 3, 3), (1, 1, 3, 4), (1, 2, 2, 4)),
+        'prizes': ((10, 6, 2, 2), (8, 8, 4, 0), (9, 5, 5, 1))
+    }
+}
+
+
 def preliminary_round(duelists, decks, matchup, round_):
 
-    pairing_configurations = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
-
-    x, y, z, w = pairing_configurations[round_]
+    x, y, z, w = PAIRING_CONFIGURATIONS[round_]
     deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
                                       decks[matchup[z, w]], decks[matchup[w, z]]]
     duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
@@ -339,18 +359,11 @@ def preliminary_round(duelists, decks, matchup, round_):
 
 def final_round(duelists, decks, matchup, entry_fee):
 
-    pairing_configurations = [[0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2]]
-
-    tied_win_configurations_before_final_round = [[3, 1, 1, 1], [2, 2, 2, 0]]
-    tied_win_configurations_after_final_round = [[4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]]
-    tied_place_configurations = [[1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]]
-    tied_prize_configuration = [[10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1]]
-
     duelists_by_wins = sorted(duelists, reverse=True)
-    is_tied = True if duelists_by_wins in tied_win_configurations_before_final_round else False
+    is_tied = True if duelists_by_wins in TIE_CONFIGURATIONS.get(2).get('wins') else False
 
     if is_tied:
-        x, y, z, w = pairing_configurations[np.random.randint(3)]
+        x, y, z, w = PAIRING_CONFIGURATIONS[np.random.randint(3)]
     else:
         x, y, z, w = np.flip(np.argsort(duelists))
 
@@ -375,10 +388,11 @@ def final_round(duelists, decks, matchup, entry_fee):
 
     if is_tied:
         duelists_by_wins = sorted(duelists, reverse=True)
-        i = tied_win_configurations_after_final_round.index(duelists_by_wins)
-        prizes = [entry_fee / 5 * tied_prize_configuration[i][j] for j in range(4)]
-        standings = [[tied_place_configurations[i][j], duelists_by_wins[j], duelists_by_wins[j].wins, prizes[j]]
-                     for j in range(4)]
+        i = TIE_CONFIGURATIONS.get(3).get('wins').index(duelists_by_wins)
+        prizes = [entry_fee / 5 * TIE_CONFIGURATIONS.get(3).get('prizes')[i][j] for j in range(4)]
+        standings = [
+            [TIE_CONFIGURATIONS.get(3).get('places')[i][j], duelists_by_wins[j], duelists_by_wins[j].wins, prizes[j]]
+            for j in range(4)]
 
     else:
         duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
