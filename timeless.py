@@ -386,44 +386,29 @@ def display_standings(duelists_by_place, round_):
     print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center', 'center')))
 
 
-def preliminary_round(duelists, decks, matchup, round_):
-
-    pairings = generate_pairings(duelists, decks, matchup, round_)
-
-    register_wins(*pairings)
-
-    duelists_by_wins = sorted(duelists, reverse=True)
-    display_standings(duelists_by_wins, round_)
-
-
-def final_round(duelists, decks, matchup):
-
-    check_if_tied_after_preliminaries(duelists)
-
-    pairings = generate_pairings(duelists, decks, matchup, FINAL_ROUND)
-    duelist_x, duelist_y, duelist_z, duelist_w = pairings
-
-    winner_xy, winner_zw = register_wins(*pairings)
-
-    if IS_TIED_AFTER_PRELIMINARIES:
-        duelists_by_place = sorted(duelists, reverse=True)
-    else:
-        duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
-        duelist_2nd = duelist_x if duelist_x != winner_xy else duelist_y
-        duelist_3rd = duelist_z if duelist_z == winner_zw else duelist_w
-        duelist_4th = duelist_z if duelist_z != winner_zw else duelist_w
-        duelists_by_place = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
-    display_standings(duelists_by_place, FINAL_ROUND)
-
-
 def timeless(duelists, decks):
 
     matchup = random_timeless_square()
 
-    preliminary_round(duelists, decks, matchup, 0)
-    preliminary_round(duelists, decks, matchup, 1)
-    preliminary_round(duelists, decks, matchup, 2)
-    final_round(duelists, decks, matchup)
+    for round_ in range(4):
+
+        if round_ == FINAL_ROUND:
+            check_if_tied_after_preliminaries(duelists)
+
+        pairings = generate_pairings(duelists, decks, matchup, round_)
+        duelist_x, duelist_y, duelist_z, duelist_w = pairings
+
+        winner_xy, winner_zw = register_wins(*pairings)
+
+        if round_ in PRELIMINARY_ROUNDS or IS_TIED_AFTER_PRELIMINARIES:
+            duelists_by_place = sorted(duelists, reverse=True)
+        else:
+            duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
+            duelist_2nd = duelist_x if duelist_x != winner_xy else duelist_y
+            duelist_3rd = duelist_z if duelist_z == winner_zw else duelist_w
+            duelist_4th = duelist_z if duelist_z != winner_zw else duelist_w
+            duelists_by_place = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
+        display_standings(duelists_by_place, round_)
 
 
 if __name__ == '__main__':
