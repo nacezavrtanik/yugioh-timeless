@@ -278,42 +278,47 @@ def enter_tournament_information():
 
     format_ = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
     decks = deck_sets.get(format_)
-
-    entry_fee = int(supervised_input('Set entry fee: ', ['integer', 'multiple_of_5', 'less_than_30_characters']))
-
     duelists = np.random.permutation(Duelist.enter_unique_duelists())
 
-    tournament_information = {'decks': decks, 'entry_fee': entry_fee, 'duelists': duelists}
+    tournament_information = {'decks': decks, 'duelists': duelists}
 
     return tournament_information
 
 
+WINS = 'Wins'
+DUELIST = 'Duelist'
+PLACE = 'Place'
+POINTS = 'Points'
+
+PRELIMINARY_ROUNDS = (0, 1, 2)
 FINAL_ROUND = 3
 PAIRING_CONFIGURATIONS = ([0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2])
 STANDING_CONFIGURATIONS = {
     0: {
-        'wins': ([1, 1, 0, 0], ),
-        'places': ([1, 1, 3, 3], )
+        WINS: ([1, 1, 0, 0], ),
+        PLACE: ([1, 1, 3, 3], ),
+        POINTS: ([1, 1, 0, 0], )
     },
     1: {
-        'wins': ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1]),
-        'places': ([1, 1, 3, 3], [1, 2, 2, 4], [1, 1, 1, 1])
+        WINS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1]),
+        PLACE: ([1, 1, 3, 3], [1, 2, 2, 4], [1, 1, 1, 1]),
+        POINTS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1])
     },
     2: {
-        'wins': ([3, 2, 1, 0], [3, 1, 1, 1], [2, 2, 2, 0], [2, 2, 1, 1]),
-        'places': ([1, 2, 3, 4], [1, 2, 2, 2], [1, 1, 1, 4], [1, 1, 3, 3])
+        WINS: ([3, 2, 1, 0], [2, 2, 1, 1], [3, 1, 1, 1], [2, 2, 2, 0]),
+        PLACE: ([1, 2, 3, 4], [1, 1, 3, 3], [1, 2, 2, 2], [1, 1, 1, 4]),
+        POINTS: (['3 + 6!', '2 + 4!', '1 + 2!', '0'], ['2 + x!', '2 + x!', '1 + x!', '1'],
+                 [3, 1, 1, 1], [2, 2, 2, 0])  # TODO points system! scale to 100?
     },
-    3: {
-        True: {
-            'wins': ([4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]),
-            'places': ([1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]),
-            'prizes': ([10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1])
-        },
-        False: {
-            'wins': ([4, 2, 2, 0], [4, 2, 1, 1], [3, 3, 2, 0], [3, 3, 1, 1], [3, 2, 2, 1]),
-            'places': ([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]),
-            'prizes': ([10, 6, 4, 0], [10, 6, 3, 1], [9, 7, 4, 0], [9, 7, 3, 1], [9, 6, 4, 1])
-        }
+    3: {  # final round if NO TIE after preliminaries
+        WINS: ([4, 2, 2, 0], [4, 2, 1, 1], [3, 3, 2, 0], [3, 3, 1, 1], [3, 2, 2, 1]),
+        PLACE: ([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]),
+        POINTS: ([10, 6, 4, 0], [10, 6, 3, 1], [9, 7, 4, 0], [9, 7, 3, 1], [9, 6, 4, 1])
+    },
+    4: {  # final round IF TIE after preliminaries
+        WINS: ([4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]),
+        PLACE: ([1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]),
+        POINTS: ([10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1])
     }
 }
 TIE_CONFIGURATIONS_AFTER_PRELIMINARIES = ([3, 1, 1, 1], [2, 2, 2, 0])
@@ -321,8 +326,26 @@ TIE_CONFIGURATIONS_AFTER_PRELIMINARIES = ([3, 1, 1, 1], [2, 2, 2, 0])
 
 def check_if_tie_after_preliminaries(duelists):
     duelists_by_wins = sorted(duelists, reverse=True)
-    tie = duelists_by_wins in TIE_CONFIGURATIONS_AFTER_PRELIMINARIES
-    return tie
+    is_tie = duelists_by_wins in TIE_CONFIGURATIONS_AFTER_PRELIMINARIES
+    return is_tie
+
+
+def display_standings(duelists_by_place, round_):
+
+    if round_ == FINAL_ROUND:
+        round_ += check_if_tie_after_preliminaries(duelists_by_place)
+
+    config = STANDING_CONFIGURATIONS.get(round_).get(WINS).index(duelists_by_place)
+
+    standings = {
+        PLACE: STANDING_CONFIGURATIONS.get(round_).get(PLACE)[config],
+        DUELIST: duelists_by_place,
+        WINS: STANDING_CONFIGURATIONS.get(round_).get(WINS)[config],
+        POINTS: STANDING_CONFIGURATIONS.get(round_).get(POINTS)[config]
+    }
+
+    print(f'\nStandings after round {round_ + 1}\n')
+    print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center', 'center')))
 
 
 def preliminary_round(duelists, decks, matchup, round_):
@@ -348,17 +371,10 @@ def preliminary_round(duelists, decks, matchup, round_):
 
     # Display standings
     duelists_by_wins = sorted(duelists, reverse=True)
-    config = STANDING_CONFIGURATIONS.get(round_).get('wins').index(duelists_by_wins)
-    standings = {
-        'Place': STANDING_CONFIGURATIONS.get(round_).get('places')[config],
-        'Duelist': duelists_by_wins,
-        'Wins': [duelist.wins for duelist in duelists_by_wins]
-    }
-    print(f'\nStandings after round {round_ + 1}\n')
-    print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center')))
+    display_standings(duelists_by_wins, round_)
 
 
-def final_round(duelists, decks, matchup, tie_after_preliminaries, entry_fee):
+def final_round(duelists, decks, matchup, tie_after_preliminaries):
 
     # Display pairings
     if tie_after_preliminaries:
@@ -384,26 +400,17 @@ def final_round(duelists, decks, matchup, tie_after_preliminaries, entry_fee):
 
     # Display standings
     if tie_after_preliminaries:
-        duelists_by_places = sorted(duelists, reverse=True)
+        duelists_by_place = sorted(duelists, reverse=True)
     else:
         duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
         duelist_2nd = duelist_x if duelist_x != winner_xy else duelist_y
         duelist_3rd = duelist_z if duelist_z == winner_zw else duelist_w
         duelist_4th = duelist_z if duelist_z != winner_zw else duelist_w
-        duelists_by_places = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
-
-    config = STANDING_CONFIGURATIONS.get(FINAL_ROUND).get(tie_after_preliminaries).get('wins').index(duelists_by_places)
-    standings = {
-        'Place': STANDING_CONFIGURATIONS.get(FINAL_ROUND).get(tie_after_preliminaries).get('places')[config],
-        'Duelist': duelists_by_places,
-        'Wins': [duelist.wins for duelist in duelists_by_places],
-        'Prize': STANDING_CONFIGURATIONS.get(FINAL_ROUND).get(tie_after_preliminaries).get('prizes')[config]
-        }
-    print('\nFINAL STANDINGS\n---------------\n')
-    print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center', 'center')))
+        duelists_by_place = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
+    display_standings(duelists_by_place, FINAL_ROUND)
 
 
-def timeless(duelists, decks, entry_fee):
+def timeless(duelists, decks):
 
     matchup = random_timeless_square()
 
@@ -411,7 +418,7 @@ def timeless(duelists, decks, entry_fee):
     preliminary_round(duelists, decks, matchup, 1)
     preliminary_round(duelists, decks, matchup, 2)
     tie_after_preliminaries = check_if_tie_after_preliminaries(duelists)
-    final_round(duelists, decks, matchup, tie_after_preliminaries, entry_fee)
+    final_round(duelists, decks, matchup, tie_after_preliminaries)
 
 
 if __name__ == '__main__':
