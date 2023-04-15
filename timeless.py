@@ -305,7 +305,7 @@ def calculate_prizes(duelists, entry_fee):
 
 
 PAIRING_CONFIGURATIONS = ((0, 1, 2, 3), (1, 3, 0, 2), (3, 0, 1, 2))
-TIE_CONFIGURATIONS = {
+STANDING_CONFIGURATIONS = {
     0: {
         'wins': ((1, 1, 0, 0), ),
         'places': ((1, 1, 3, 3), )
@@ -315,8 +315,8 @@ TIE_CONFIGURATIONS = {
         'places': ((1, 1, 3, 3), (1, 2, 2, 4), (1, 1, 1, 1))
     },
     2: {
-        'wins': ((3, 1, 1, 1), (2, 2, 2, 0)),
-        'places': ((1, 2, 2, 2), (1, 1, 1, 4))
+        'wins': ((3, 2, 1, 0), (3, 1, 1, 1), (2, 2, 2, 0), (2, 2, 1, 1)),
+        'places': ((1, 2, 3, 4), (1, 2, 2, 2), (1, 1, 1, 4), (1, 1, 3, 3))
     },
     3: {
         'wins': ((4, 2, 1, 1), (3, 3, 2, 0), (3, 2, 2, 1)),
@@ -328,39 +328,40 @@ TIE_CONFIGURATIONS = {
 
 def preliminary_round(duelists, decks, matchup, round_):
 
+    # Display pairings
     x, y, z, w = PAIRING_CONFIGURATIONS[round_]
-    deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
-                                      decks[matchup[z, w]], decks[matchup[w, z]]]
+    deck_xy, deck_yx, deck_zw, deck_wz = [decks[matchup[x, y]], decks[matchup[y, x]],
+                                          decks[matchup[z, w]], decks[matchup[w, z]]]
     duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
-
-    pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
-                [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
-
+    pairings = [[f'{duelist_x} ({deck_xy})', 'VS', f'{duelist_y} ({deck_yx})'],
+                [f'{duelist_z} ({deck_zw})', 'VS', f'{duelist_w} ({deck_wz})']]
     print(f'\nPairings for round {round_ + 1}:\n')
     print(tabulate(pairings, tablefmt='plain'), '\n')
 
+    # Register wins
     winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
                                  'choose_from', options=[duelist_x.name, duelist_y.name])
     winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
                                  'choose_from', options=[duelist_z.name, duelist_w.name])
-
     for i in [x, y, z, w]:
         if duelists[i] in [winner_xy, winner_zw]:
             duelists[i].wins += 1
 
+    # Display standings
     duelists_by_wins = sorted(duelists, reverse=True)
-    standings = [['dummy', duelists_by_wins[i], duelists_by_wins[i].wins] for i in range(4)]
-
-    print(f'\nStandings after round {round_ + 1}\n-----------------------\n')
-    print(tabulate(standings,
-                   headers=['Place', 'Duelist', 'Wins'],
-                   colalign=('center', 'left', 'center')))
+    config = STANDING_CONFIGURATIONS.get(round_).get('wins').index(tuple(duelists_by_wins))
+    standings = [[STANDING_CONFIGURATIONS.get(round_).get('places')[config][i],
+                  duelists_by_wins[i],
+                  STANDING_CONFIGURATIONS.get(round_).get('wins')[config][i]]
+                 for i in range(4)]
+    print(f'\nStandings after round {round_ + 1}\n')
+    print(tabulate(standings, headers=['Place', 'Duelist', 'Wins'], colalign=('center', 'left', 'center')))
 
 
 def final_round(duelists, decks, matchup, entry_fee):
 
     duelists_by_wins = sorted(duelists, reverse=True)
-    is_tied = True if duelists_by_wins in TIE_CONFIGURATIONS.get(2).get('wins') else False
+    is_tied = True if duelists_by_wins in STANDING_CONFIGURATIONS.get(2).get('wins') else False
 
     if is_tied:
         x, y, z, w = PAIRING_CONFIGURATIONS[np.random.randint(3)]
@@ -388,11 +389,13 @@ def final_round(duelists, decks, matchup, entry_fee):
 
     if is_tied:
         duelists_by_wins = sorted(duelists, reverse=True)
-        i = TIE_CONFIGURATIONS.get(3).get('wins').index(duelists_by_wins)
-        prizes = [entry_fee / 5 * TIE_CONFIGURATIONS.get(3).get('prizes')[i][j] for j in range(4)]
-        standings = [
-            [TIE_CONFIGURATIONS.get(3).get('places')[i][j], duelists_by_wins[j], duelists_by_wins[j].wins, prizes[j]]
-            for j in range(4)]
+        i = STANDING_CONFIGURATIONS.get(3).get('wins').index(duelists_by_wins)
+        prizes = [entry_fee / 5 * STANDING_CONFIGURATIONS.get(3).get('prizes')[i][j] for j in range(4)]
+        standings = [[STANDING_CONFIGURATIONS.get(3).get('places')[i][j],
+                      duelists_by_wins[j],
+                      duelists_by_wins[j].wins,
+                      prizes[j]]
+                     for j in range(4)]
 
     else:
         duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
