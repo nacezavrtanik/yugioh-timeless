@@ -1,15 +1,54 @@
 """Module for running the Yugioh Timeless tournament format."""
 
-import numpy as np
 from string import capwords
+
+import numpy as np
 from tabulate import tabulate
 
 
-def _is_string_of_integer(input_string):
-    """Check if a string represents an integer.
+WINS = 'Wins'
+DUELIST = 'Duelist'
+PLACE = 'Place'
+POINTS = 'Points'
 
-    Helper function for `supervised_input`.
-    """
+ROUNDS = (0, 1, 2, 3)
+PRELIMINARY_ROUNDS = (0, 1, 2)
+FINAL_ROUND = 3
+PAIRING_CONFIGURATIONS = ([0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2])
+STANDING_CONFIGURATIONS = {
+    0: {
+        WINS: ([1, 1, 0, 0], ),
+        PLACE: ([1, 1, 3, 3], ),
+        POINTS: ([1, 1, 0, 0], )
+    },
+    1: {
+        WINS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1]),
+        PLACE: ([1, 1, 3, 3], [1, 2, 2, 4], [1, 1, 1, 1]),
+        POINTS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1])
+    },
+    2: {
+        WINS: ([3, 2, 1, 0], [2, 2, 1, 1], [3, 1, 1, 1], [2, 2, 2, 0]),
+        PLACE: ([1, 2, 3, 4], [1, 1, 3, 3], [1, 2, 2, 2], [1, 1, 1, 4]),
+        POINTS: (['3 + 6!', '2 + 4!', '1 + 2!', '0'], ['2 + x!', '2 + x!', '1 + x!', '1'],
+                 [3, 1, 1, 1], [2, 2, 2, 0])  # TODO points system! scale to 100?
+    },
+    3: {  # final round if NO TIE after preliminaries
+        WINS: ([4, 2, 2, 0], [4, 2, 1, 1], [3, 3, 2, 0], [3, 3, 1, 1], [3, 2, 2, 1]),
+        PLACE: ([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]),
+        POINTS: ([10, 6, 4, 0], [10, 6, 3, 1], [9, 7, 4, 0], [9, 7, 3, 1], [9, 6, 4, 1])
+    },
+    4: {  # final round IF TIE after preliminaries
+        WINS: ([4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]),
+        PLACE: ([1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]),
+        POINTS: ([10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1])
+    }
+}
+TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES = ([3, 1, 1, 1], [2, 2, 2, 0])
+IS_TIED_AFTER_PRELIMINARIES = None
+
+
+def is_string_of_integer(input_string):
+    """Check if a string represents an integer."""
     try:
         int(input_string)
     except ValueError:
@@ -37,8 +76,8 @@ def supervised_input(prompt, conditions, options=None):
         If `conditions` does not include 'choose_from', this argument is not
         relevant.
 
-        As user input is passed to the string.capwords function first, option
-        strings should ahdere to that format as well.
+        As user input first is passed to the `string.capwords` function,
+        strings in `options` should adhere to that same format as well.
         (defaults to None)
 
     Returns
@@ -50,7 +89,7 @@ def supervised_input(prompt, conditions, options=None):
 
     Notes
     -----
-    User input is immediately passed to the string.capwords function, which
+    User input is immediately passed to the `string.capwords` function, which
     capitalises words, strips leading and trailing whitespaces, and replaces
     consecutive whitespaces by a single whitespace. There are two reasons for
     this.
@@ -77,7 +116,7 @@ def supervised_input(prompt, conditions, options=None):
     Your name: >? Amadeus
     'Amadeus'
 
-    >>>supervised_input('Do you like yes or no questions?',
+    >>> supervised_input('Do you like yes or no questions?',
     ...                 'choose_from', options=['Yes', 'No'])
     Do you like yes or no questions?>? I'm not sure
     TIP: Enter one of these: Yes, No.
@@ -89,7 +128,7 @@ def supervised_input(prompt, conditions, options=None):
         'choose_from': lambda input_string: input_string in options,
         'alphabetical': lambda input_string: input_string.replace(' ', '').isalpha(),
         'less_than_30_characters': lambda input_string: len(input_string) < 30,
-        'integer': lambda input_string: _is_string_of_integer(input_string),
+        'integer': lambda input_string: is_string_of_integer(input_string),
         'multiple_of_5': lambda input_string: int(input_string) % 5 == 0 and int(input_string) >= 0,
     }
 
@@ -122,48 +161,6 @@ def supervised_input(prompt, conditions, options=None):
             return user_input
 
 
-def random_timeless_square():
-    """Randomly generate a timeless square.
-
-    Keeps randomly generating squares until a Timeless sqaure is generated.
-
-    Returns
-    -------
-    numpy.ndarray
-        Timeless square.
-
-    Notes
-    -----
-    Timeless squares are 4x4 arrays that are isomorphic to Latin squares.
-    They are used to model matchups in the Yugioh Timeless tournament format.
-
-    Note that results are not repeatable, as fixing a random seed would result
-    in the initial random square being created over and over, creating a loop.
-
-    Examples
-    --------
-    >>> random_timeless_square()
-    array([[2, 0, 1, 3],
-           [3, 1, 2, 0],
-           [2, 0, 3, 1],
-           [1, 3, 2, 0]])
-    """
-
-    while True:
-
-        random_square = np.array([np.random.permutation(4) for _ in range(4)])
-
-        unique_diagonal = len(set(random_square.diagonal())) == 4
-        unique_antidiagonal = len(set(np.fliplr(random_square).diagonal())) == 4
-        unique_offdiagonal = len({random_square[0, 1], random_square[1, 0],
-                                  random_square[2, 3], random_square[3, 2]}) == 4
-
-        is_timeless = unique_diagonal and unique_antidiagonal and unique_offdiagonal
-
-        if is_timeless:
-            return random_square
-
-
 class Duelist:
     """Class for tracking duelists and scores in a Yugioh Timeless tournament.
 
@@ -173,11 +170,6 @@ class Duelist:
         Name of the duelist.
     wins : int
         Number of duels won.
-
-    Methods
-    -------
-    enter_unique_duelists()
-        Return list of `Duelist` instances with unique `name` attributes.
     """
 
     def __init__(self, name, wins=0):
@@ -226,49 +218,49 @@ class Duelist:
         else:
             return NotImplemented
 
-    @staticmethod
-    def enter_unique_duelists():
-        """Return list of `Duelist` instances with unique `name` attributes.
 
-        The user is asked to provide four duelist names. The user is prompted
-        to keep repeating the process until there are no duplicate entries.
+def enter_unique_duelists():
+    """Return list of `Duelist` instances with unique `name` attributes.
 
-        Returns
-        -------
-        list
-            List of four `Duelist` instances with unique `name` attributes.
+    The user is asked to provide four duelist names. The user is prompted
+    to keep repeating the process until there are no duplicate entries.
 
-        Examples
-        --------
-        >>> Duelist.enter_unique_duelists()
-        Duelist 1: >? Johann
-        Duelist 2: >? Johann
-        Duelist 3: >? Amadeus
-        Duelist 4: >? Amadeus
-        You've entered some duplicate names: Amadeus, Johann.
-        Please try again.
-        Duelist 1: >? Johann
-        Duelist 2: >? Johann C
-        Duelist 3: >? Amadeus
-        Duelist 4: >? Falco
-        [Duelist('Johann', wins=0), Duelist('Johann C', wins=0), Duelist('Amadeus', wins=0), Duelist('Falco', wins=0)]
-        """
+    Returns
+    -------
+    list
+        List of four `Duelist` instances with unique `name` attributes.
 
-        while True:
+    Examples
+    --------
+    >>> enter_unique_duelists()
+    Duelist 1: >? Johann
+    Duelist 2: >? Johann
+    Duelist 3: >? Amadeus
+    Duelist 4: >? Amadeus
+    You've entered some duplicate names: Johann, Amadeus.
+    Please try again.
+    Duelist 1: >? Johann S
+    Duelist 2: >? Johann C
+    Duelist 3: >? Amadeus
+    Duelist 4: >? Falco
+    [Duelist('Johann S', wins=0), Duelist('Johann C', wins=0), Duelist('Amadeus', wins=0), Duelist('Falco', wins=0)]
+    """
 
-            duelist_candidates = [
-                Duelist(supervised_input(f'Duelist {i + 1}: ', ['alphabetical', 'less_than_30_characters']))
-                for i in range(4)]
-            candidate_names = [duelist_candidates[i].name for i in range(4)]
+    while True:
 
-            duplicate_names = {name for name in candidate_names if candidate_names.count(name) > 1}
+        duelist_candidates = [
+            Duelist(supervised_input(f'Duelist {i + 1}: ', ['alphabetical', 'less_than_30_characters']))
+            for i in range(4)]
+        candidate_names = [duelist_candidates[i].name for i in range(4)]
 
-            if duplicate_names:
-                duplicate_names_string = duplicate_names.__str__()[1: -1].replace('\'', '')
-                print(f'You\'ve entered some duplicate names: {duplicate_names_string}.\nPlease try again.')
-                continue
+        duplicate_names = {name for name in candidate_names if candidate_names.count(name) > 1}
 
-            return duelist_candidates
+        if duplicate_names:
+            duplicate_names_string = duplicate_names.__str__()[1: -1].replace('\'', '')
+            print(f'You\'ve entered some duplicate names: {duplicate_names_string}.\nPlease try again.')
+            continue
+
+        return duelist_candidates
 
 
 def enter_tournament_information():
@@ -278,67 +270,73 @@ def enter_tournament_information():
 
     format_ = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
     decks = deck_sets.get(format_)
-    duelists = np.random.permutation(Duelist.enter_unique_duelists())
+    duelists = np.random.permutation(enter_unique_duelists())
 
     tournament_information = {'decks': decks, 'duelists': duelists}
 
     return tournament_information
 
 
-WINS = 'Wins'
-DUELIST = 'Duelist'
-PLACE = 'Place'
-POINTS = 'Points'
+def random_timeless_square():
+    """Randomly generate a timeless square.
 
-PRELIMINARY_ROUNDS = (0, 1, 2)
-FINAL_ROUND = 3
-PAIRING_CONFIGURATIONS = ([0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2])
-STANDING_CONFIGURATIONS = {
-    0: {
-        WINS: ([1, 1, 0, 0], ),
-        PLACE: ([1, 1, 3, 3], ),
-        POINTS: ([1, 1, 0, 0], )
-    },
-    1: {
-        WINS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1]),
-        PLACE: ([1, 1, 3, 3], [1, 2, 2, 4], [1, 1, 1, 1]),
-        POINTS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1])
-    },
-    2: {
-        WINS: ([3, 2, 1, 0], [2, 2, 1, 1], [3, 1, 1, 1], [2, 2, 2, 0]),
-        PLACE: ([1, 2, 3, 4], [1, 1, 3, 3], [1, 2, 2, 2], [1, 1, 1, 4]),
-        POINTS: (['3 + 6!', '2 + 4!', '1 + 2!', '0'], ['2 + x!', '2 + x!', '1 + x!', '1'],
-                 [3, 1, 1, 1], [2, 2, 2, 0])  # TODO points system! scale to 100?
-    },
-    3: {  # final round if NO TIE after preliminaries
-        WINS: ([4, 2, 2, 0], [4, 2, 1, 1], [3, 3, 2, 0], [3, 3, 1, 1], [3, 2, 2, 1]),
-        PLACE: ([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]),
-        POINTS: ([10, 6, 4, 0], [10, 6, 3, 1], [9, 7, 4, 0], [9, 7, 3, 1], [9, 6, 4, 1])
-    },
-    4: {  # final round IF TIE after preliminaries
-        WINS: ([4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]),
-        PLACE: ([1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]),
-        POINTS: ([10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1])
-    }
-}
-TIE_CONFIGURATIONS_AFTER_PRELIMINARIES = ([3, 1, 1, 1], [2, 2, 2, 0])
-IS_TIED_AFTER_PRELIMINARIES = None
+    Keeps randomly generating squares until a Timeless sqaure is generated.
+
+    Returns
+    -------
+    numpy.ndarray
+        Timeless square.
+
+    Notes
+    -----
+    Timeless squares are 4x4 arrays that are isomorphic to Latin squares.
+    They are used to model matchups in the Yugioh Timeless tournament format.
+
+    Note that results are not repeatable, as fixing a random seed would result
+    in the initial random square being created over and over, creating a loop.
+
+    Examples
+    --------
+    >>> random_timeless_square()
+    array([[2, 0, 1, 3],
+           [3, 1, 2, 0],
+           [2, 0, 3, 1],
+           [1, 3, 2, 0]])
+    """
+
+    while True:
+
+        random_square = np.array([np.random.permutation(4) for _ in range(4)])
+
+        unique_diagonal = len(set(random_square.diagonal())) == 4
+        unique_antidiagonal = len(set(np.fliplr(random_square).diagonal())) == 4
+        unique_offdiagonal = len({random_square[0, 1], random_square[1, 0],
+                                  random_square[2, 3], random_square[3, 2]}) == 4
+
+        is_timeless = unique_diagonal and unique_antidiagonal and unique_offdiagonal
+
+        if is_timeless:
+            return random_square
 
 
 def check_if_tied_after_preliminaries(duelists):
+    """Set global constant `IS_TIED_AFTER_PRELIMINARIES`."""
     duelists_by_wins = sorted(duelists, reverse=True)
     global IS_TIED_AFTER_PRELIMINARIES
-    IS_TIED_AFTER_PRELIMINARIES = duelists_by_wins in TIE_CONFIGURATIONS_AFTER_PRELIMINARIES
+    IS_TIED_AFTER_PRELIMINARIES = duelists_by_wins in TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
 
 def generate_pairings(duelists, decks, matchup, round_):
+
+    if round_ == FINAL_ROUND:
+        check_if_tied_after_preliminaries(duelists)
 
     if round_ in PRELIMINARY_ROUNDS:
         x, y, z, w = PAIRING_CONFIGURATIONS[round_]
         deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
                                           decks[matchup[z, w]], decks[matchup[w, z]]]
     elif round_ == FINAL_ROUND and IS_TIED_AFTER_PRELIMINARIES:
-        x, y, z, w = PAIRING_CONFIGURATIONS[np.random.randint(3)]
+        x, y, z, w = PAIRING_CONFIGURATIONS[np.random.choice(PRELIMINARY_ROUNDS)]
         deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
                                           decks[matchup[z, z]], decks[matchup[w, w]]]
     else:
@@ -358,31 +356,38 @@ def generate_pairings(duelists, decks, matchup, round_):
 
 def register_wins(duelist_x, duelist_y, duelist_z, duelist_w):
 
-    winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}?',
+    winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}? ',
                                  'choose_from', options=[duelist_x.name, duelist_y.name])
-    winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}?',
+    winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}? ',
                                  'choose_from', options=[duelist_z.name, duelist_w.name])
-    for duelist in [duelist_x, duelist_y, duelist_z, duelist_w]:
-        if duelist in [winner_xy, winner_zw]:
-            duelist.wins += 1
 
-    return winner_xy, winner_zw
+    winner_xy, loser_xy = [duelist_x, duelist_y] if duelist_x == winner_xy else [duelist_y, duelist_x]
+    winner_zw, loser_zw = [duelist_z, duelist_w] if duelist_z == winner_zw else [duelist_w, duelist_z]
+
+    winner_xy.wins += 1
+    winner_zw.wins += 1
+
+    return winner_xy, loser_xy, winner_zw, loser_zw
 
 
-def display_standings(duelists_by_place, round_):
+def display_standings(winners_and_losers, round_):
 
     if round_ == FINAL_ROUND:
         round_ += IS_TIED_AFTER_PRELIMINARIES
 
-    config = STANDING_CONFIGURATIONS.get(round_).get(WINS).index(duelists_by_place)
+    duelists_by_wins = sorted(winners_and_losers, reverse=True)
+    config = STANDING_CONFIGURATIONS.get(round_).get(WINS).index(duelists_by_wins)
 
-    standings = {
-        PLACE: STANDING_CONFIGURATIONS.get(round_).get(PLACE)[config],
-        DUELIST: duelists_by_place,
-        WINS: STANDING_CONFIGURATIONS.get(round_).get(WINS)[config],
-        POINTS: STANDING_CONFIGURATIONS.get(round_).get(POINTS)[config]
-    }
-    print(f'\nStandings after round {round_ + 1}\n')
+    if round_ in PRELIMINARY_ROUNDS or IS_TIED_AFTER_PRELIMINARIES:
+        duelists_by_place = duelists_by_wins
+    else:
+        duelists_by_place = winners_and_losers
+
+    standings = {PLACE: STANDING_CONFIGURATIONS.get(round_).get(PLACE)[config],
+                 DUELIST: duelists_by_place,
+                 WINS: STANDING_CONFIGURATIONS.get(round_).get(WINS)[config],
+                 POINTS: STANDING_CONFIGURATIONS.get(round_).get(POINTS)[config]}
+    print(f'\nStandings after round {round_ + 1}\n')  # TODO is 5 for final round!
     print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center', 'center')))
 
 
@@ -390,26 +395,15 @@ def timeless(duelists, decks):
 
     matchup = random_timeless_square()
 
-    for round_ in range(4):
-
-        if round_ == FINAL_ROUND:
-            check_if_tied_after_preliminaries(duelists)
-
+    for round_ in ROUNDS:
         pairings = generate_pairings(duelists, decks, matchup, round_)
-        duelist_x, duelist_y, duelist_z, duelist_w = pairings
+        winners_and_losers = register_wins(*pairings)
+        display_standings(winners_and_losers, round_)
 
-        winner_xy, winner_zw = register_wins(*pairings)
 
-        if round_ in PRELIMINARY_ROUNDS or IS_TIED_AFTER_PRELIMINARIES:
-            duelists_by_place = sorted(duelists, reverse=True)
-        else:
-            duelist_1st = duelist_x if duelist_x == winner_xy else duelist_y
-            duelist_2nd = duelist_x if duelist_x != winner_xy else duelist_y
-            duelist_3rd = duelist_z if duelist_z == winner_zw else duelist_w
-            duelist_4th = duelist_z if duelist_z != winner_zw else duelist_w
-            duelists_by_place = [duelist_1st, duelist_2nd, duelist_3rd, duelist_4th]
-        display_standings(duelists_by_place, round_)
+def main():
+    timeless(**enter_tournament_information())
 
 
 if __name__ == '__main__':
-    timeless(**enter_tournament_information())
+    main()
