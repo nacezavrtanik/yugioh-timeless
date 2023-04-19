@@ -1,4 +1,4 @@
-"""Module for running the Yugioh Timeless tournament format."""
+"""Module for running the Yugioh TIMELESS tournament format."""
 
 import numpy as np
 from tabulate import tabulate
@@ -47,7 +47,7 @@ IS_TIED_AFTER_PRELIMINARIES = None
 
 
 class Duelist:
-    """Class for tracking duelists and scores in a Yugioh Timeless tournament.
+    """Track duelists and scores in the Yugioh TIMELESS tournament format.
 
     Attributes
     ----------
@@ -72,7 +72,7 @@ class Duelist:
         --------
         >>> duelist = Duelist('Amadeus', wins=1)
         >>> print(duelist)
-        Duelist Amadeus, with 1 win(s).
+        Amadeus
         """
         self.name = name
         self.wins = wins
@@ -163,7 +163,7 @@ def enter_tournament_information():
 
 
 def random_timeless_square():
-    """Randomly generate a timeless square.
+    """Randomly generate a Timeless square.
 
     Keeps randomly generating squares until a Timeless sqaure is generated.
 
@@ -175,7 +175,7 @@ def random_timeless_square():
     Notes
     -----
     Timeless squares are 4x4 arrays that are isomorphic to Latin squares.
-    They are used to model matchups in the Yugioh Timeless tournament format.
+    They are used to model matchups in the Yugioh TIMELESS tournament format.
 
     Note that results are not repeatable, as fixing a random seed would result
     in the initial random square being created over and over, creating a loop.
