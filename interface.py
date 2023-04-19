@@ -1,9 +1,109 @@
-"""  """
+"""Module for creating a user interface for the TIMELESS tournament format."""
 
+import string
+import textwrap
 import time
-from string import capwords
 
 from tabulate import tabulate
+
+
+LINE_WIDTH = 80
+LEFT_MARGIN = 5
+RIGHT_MARGIN = LINE_WIDTH - LEFT_MARGIN
+INDENT = LEFT_MARGIN * ' '
+
+text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, subsequent_indent=INDENT)
+
+TIMELESS = 'T I M E L E S S'.center(LINE_WIDTH)
+GIT = 'git: link'.center(LINE_WIDTH)
+YOUTUBE = 'youtube: link'.center(LINE_WIDTH)
+LINE = LINE_WIDTH * '-'
+
+test = '''test string snfsdf
+omf3m # 4rm2dlm2f_
+mf4 2232345 efe ?('''
+title_2 = f'\n\n\n{TIMELESS}\n'
+
+t = [[1, 2, 3], [4, 5, 6]]
+
+LOREM = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."""
+
+
+def typewriter(text, pause=0.5, custom=None):
+
+    if custom:
+        for i, character in enumerate(text):
+            print(character, sep='', end='')
+            if i in custom:
+                time.sleep(custom.get(i))
+
+    else:
+        for character in text:
+            print(character, sep='', end='')
+            time.sleep(pause)
+
+
+def print_centered_table(table):
+    table = tabulate(table)
+    rows = table.split('\n')
+    for row in rows:
+        print(row.center(80))
+        time.sleep(.5)
+
+
+def segment_title():
+
+    indices = [title_2.index(character) for character in 'TIME']
+    pauses = dict(zip(indices, [.25, .25, .25, 1.5]))
+
+    time.sleep(1)
+    typewriter(title_2, custom=pauses)
+    time.sleep(1)
+    print(f'\n{GIT}')
+    time.sleep(0.5)
+    print(f'{YOUTUBE}\n')
+    time.sleep(0.5)
+    print(LINE)
+
+
+def segment_format():
+    description = '''Timeless je poseben turnirski format za štiri igralce.
+Ti se pomerijo v treh predrundah (vsak z vsakim), nato
+pa sledi še finalna runda. Nobena izmed teh ni časovno
+omejena. Igra se z naborom štirih deckov, ki so med
+igralce razdeljeni naključno. Po vsaki rundi se decki
+ponovno naključno razdelijo med igralce, in sicer tako,
+da v štirih rundah vsak igralec igra z vsakim izmed
+štirih deckov natanko enkrat. Na voljo sta dva nabora
+deckov:
+
+ 1) BASIC
+ 2) EXTRA'''.center(LINE_WIDTH)
+    output = text_wrapper.fill(description)
+
+    print(output)
+
+
+def segment_entry_fee():
+    entry_fee = """Kaj pa prijavnina?
+Ta gre v celoti v nagradni sklad in se na koncu glede
+na dosežke razdeli nazaj med igralce.
+
+ 1) 5 €
+ 2) 10 €
+ 3) brez"""
+    output = text_wrapper.fill(entry_fee)
+    print(output)
+
+
+def segment_duelists():
+    print(text_wrapper.fill('Now enter duelist names.'))
+
+
+SEGMENTS = {}
 
 
 def is_string_of_integer(input_string):
@@ -104,7 +204,7 @@ def supervised_input(prompt, conditions, options=None):
 
     while True:
 
-        user_input = capwords(input(prompt))
+        user_input = string.capwords(input(prompt))
         check = True
 
         for condition in conditions:
@@ -120,87 +220,18 @@ def supervised_input(prompt, conditions, options=None):
             return user_input
 
 
-def _typewriter(text, seconds_per_character=0.05, final_nap=0.0):
-    """Print text character by character."""
-    for character in text:
-        print(character, sep='', end='')
-        time.sleep(seconds_per_character)
-    time.sleep(final_nap)
-
-
-LINE_WIDTH = 80
-title_ = 'T I M E L E S S'.center(LINE_WIDTH)
-git = 'git : link'.center(LINE_WIDTH)
-yt = 'youtube : link'.center(LINE_WIDTH)
-test = '''test string snfsdf
-omf3m # 4rm2dlm2f_
-mf4 2232345 efe ?('''
-title_2 = f'\n\n\n{title_}\n'
-
-t = tabulate([[1, 2, 3], [4, 5, 6]])
-
-# print('\n\n', 31 * ' ', end='')
-# typewriter('T I M E', seconds_per_character=0.5, final_nap=1)
-# typewriter(' L E S S\n\n', seconds_per_character=0, final_nap=1)
-# print(git)
-# time.sleep(1)
-# print(yt, end='\n\n')
-# time.sleep(1)
-# print(f"{'':-^80}", end='\n\n')
-#
-# segments = {'title': ''}
-#
-#
-# def interface_title(title, secs=0.5, nap=0.0):
-#     title_string = f'{title:^80}'
-#     typewriter(title_string, seconds_per_character=secs, final_nap=nap)
-
-
-def typewriter(text, pause=0.5, pause_after=None, end_pause=None, end='\n'):
-
-    # TODO ignore_whitespaces=True
-    # TODO pause_index
-
-    if not pause or pause == 0:
-        print(text, sep='', end=end)
-
-    if pause_after is None:
-        for character in text:
-            print(character, sep='', end='')
-            time.sleep(pause)
-
-    if isinstance(pause_after, str) or isinstance(pause_after, list):
-        pause_after = set(pause_after)
-
-    if isinstance(pause_after, set):
-        for character in text:
-            print(character, sep='', end='')
-            if character in pause_after:
-                time.sleep(pause)
-
-    if isinstance(pause_after, dict):
-        for character in text:
-            print(character, sep='', end='')
-            if character in pause_after:
-                time.sleep(pause_after.get(character))
-
-    if end:
-        print(end=end)
-
-    if end_pause:
-        time.sleep(end_pause)
-
-
-def print_centered_table(table):
-    rows = table.split('\n')
-    for row in rows:
-        typewriter(row.center(80), pause=False, end_pause=1)
-
-
 if __name__ == '__main__':
 
-    typewriter(title_2, pause_after='TIME', pause=1)
-    typewriter(git, pause=False, end_pause=1)
-    typewriter(yt, pause=False, end_pause=1)
-    print(f"\n{'':-^80}\n")
+    segment_title()
+    print()
+    time.sleep(1)
+    segment_format()
+    input()
+    segment_entry_fee()
+    input()
+    segment_duelists()
+    print()
+    print(LINE)
+    print()
+    time.sleep(1)
     print_centered_table(t)
