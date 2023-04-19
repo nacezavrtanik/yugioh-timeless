@@ -1,8 +1,7 @@
 """Module for running the Yugioh TIMELESS tournament format."""
 
 import numpy as np
-from tabulate import tabulate
-from interface import supervised_input
+import interface
 
 
 WINS = 'Wins'
@@ -18,18 +17,17 @@ STANDING_CONFIGURATIONS = {
     0: {
         WINS: ([1, 1, 0, 0], ),
         PLACE: ([1, 1, 3, 3], ),
-        POINTS: ([1, 1, 0, 0], )
+        POINTS: (None, )
     },
     1: {
         WINS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1]),
         PLACE: ([1, 1, 3, 3], [1, 2, 2, 4], [1, 1, 1, 1]),
-        POINTS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1])
+        POINTS: (None, None, None)
     },
     2: {
         WINS: ([3, 2, 1, 0], [2, 2, 1, 1], [3, 1, 1, 1], [2, 2, 2, 0]),
         PLACE: ([1, 2, 3, 4], [1, 1, 3, 3], [1, 2, 2, 2], [1, 1, 1, 4]),
-        POINTS: (['3 + 6!', '2 + 4!', '1 + 2!', '0'], ['2 + x!', '2 + x!', '1 + x!', '1'],
-                 [3, 1, 1, 1], [2, 2, 2, 0])  # TODO points system! scale to 100?
+        POINTS: (None, None, None, None)
     },
     3: {  # final round if NO TIE after preliminaries
         WINS: ([4, 2, 2, 0], [4, 2, 1, 1], [3, 3, 2, 0], [3, 3, 1, 1], [3, 2, 2, 1]),
@@ -134,7 +132,7 @@ def enter_unique_duelists():
     while True:
 
         duelist_candidates = [
-            Duelist(supervised_input(f'Duelist {i + 1}: ', ['alphabetical', 'less_than_30_characters']))
+            Duelist(interface.supervised_input(f'Duelist {i + 1}: ', ['alphabetical', 'less_than_30_characters']))
             for i in range(4)]
         candidate_names = [duelist_candidates[i].name for i in range(4)]
 
@@ -153,7 +151,7 @@ def enter_tournament_information():
     deck_sets = {'BASIC': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
                  'EXTRA': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']}
 
-    format_ = supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
+    format_ = interface.supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
     decks = deck_sets.get(format_)
     duelists = np.random.permutation(enter_unique_duelists())
 
@@ -233,18 +231,17 @@ def generate_pairings(duelists, decks, matchup, round_):
 
     pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
                 [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
-    print(f'\nPairings for round {round_ + 1}:\n')
-    print(tabulate(pairings, tablefmt='plain'), '\n')
+    interface.SEGMENTS.get('pairings')(pairings, round_)
 
     return duelist_x, duelist_y, duelist_z, duelist_w
 
 
 def register_wins(duelist_x, duelist_y, duelist_z, duelist_w):
 
-    winner_xy = supervised_input(f'Who won, {duelist_x} or {duelist_y}? ',
-                                 'choose_from', options=[duelist_x.name, duelist_y.name])
-    winner_zw = supervised_input(f'Who won, {duelist_z} or {duelist_w}? ',
-                                 'choose_from', options=[duelist_z.name, duelist_w.name])
+    winner_xy = interface.supervised_input(f'Who won, {duelist_x} or {duelist_y}? ',
+                                           'choose_from', options=[duelist_x.name, duelist_y.name])
+    winner_zw = interface.supervised_input(f'Who won, {duelist_z} or {duelist_w}? ',
+                                           'choose_from', options=[duelist_z.name, duelist_w.name])
 
     winner_xy, loser_xy = [duelist_x, duelist_y] if duelist_x == winner_xy else [duelist_y, duelist_x]
     winner_zw, loser_zw = [duelist_z, duelist_w] if duelist_z == winner_zw else [duelist_w, duelist_z]
@@ -272,8 +269,7 @@ def display_standings(winners_and_losers, round_):
                  DUELIST: duelists_by_place,
                  WINS: STANDING_CONFIGURATIONS.get(round_).get(WINS)[config],
                  POINTS: STANDING_CONFIGURATIONS.get(round_).get(POINTS)[config]}
-    print(f'\nStandings after round {round_ + 1}\n')  # TODO is 5 for final round!
-    print(tabulate(standings, headers='keys', colalign=('center', 'left', 'center', 'center')))
+    interface.SEGMENTS.get('standings')(standings, round_)
 
 
 def timeless(duelists, decks):

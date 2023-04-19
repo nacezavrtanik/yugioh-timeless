@@ -46,12 +46,13 @@ def typewriter(text, pause=0.5, custom=None):
             time.sleep(pause)
 
 
-def print_centered_table(table):
-    table = tabulate(table)
+def print_centered_table(table, **kwargs):
+    table = tabulate(table, **kwargs)
     rows = table.split('\n')
     for row in rows:
         print(row.center(80))
         time.sleep(.5)
+    print()
 
 
 def segment_title():
@@ -103,7 +104,27 @@ def segment_duelists():
     print(text_wrapper.fill('Now enter duelist names.'))
 
 
-SEGMENTS = {}
+def segment_pairings(pairings, round_):
+    print(f'\nPairings for round {round_ + 1}:\n')
+    print_centered_table(pairings, tablefmt='plain')
+
+
+def segment_standings(standings, round_):
+
+    if round_ in (0, 1, 2):
+        print(f'Standings after round {round_ + 1}:\n')
+        del standings['Points']
+        print_centered_table(standings, headers='keys', colalign=('center', 'left', 'center'))
+
+    else:
+        print('Final standings:\n')
+        print_centered_table(standings, headers='keys', colalign=('center', 'left', 'center', 'center'))
+
+
+SEGMENTS = {
+    'pairings': segment_pairings,
+    'standings': segment_standings
+}
 
 
 def is_string_of_integer(input_string):
