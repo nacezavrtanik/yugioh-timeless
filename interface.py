@@ -47,9 +47,9 @@ def typewriter(text, pause=0.1, custom=None):
 def print_centered_table(table, **kwargs):
     table = tabulate(table, **kwargs)
     rows = table.split('\n')
+    max_row_length = max(map(len, rows))
     for row in rows:
-        print(row.center(80))
-        # time.sleep(.5)
+        print(f'{row:<{max_row_length}}'.center(LINE_WIDTH))  # padded with ' ' for propper alignment when centered
     print()
 
 
