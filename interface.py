@@ -3,14 +3,16 @@
 import string
 import textwrap
 import time
+import datetime
 
 from tabulate import tabulate
 
 
 LINE_WIDTH = 80
-LEFT_MARGIN = 5
+LEFT_MARGIN = 4
 RIGHT_MARGIN = LINE_WIDTH - LEFT_MARGIN
 INDENT = LEFT_MARGIN * ' '
+LARGE_INDENT = 2 * INDENT
 
 text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, subsequent_indent=INDENT)
 
@@ -18,13 +20,9 @@ TIMELESS = 'T I M E L E S S'.center(LINE_WIDTH)
 GIT = 'git: link'.center(LINE_WIDTH)
 YOUTUBE = 'youtube: link'.center(LINE_WIDTH)
 LINE = LINE_WIDTH * '-'
+BOLD_LINE = LINE_WIDTH * '='
 
-test = '''test string snfsdf
-omf3m # 4rm2dlm2f_
-mf4 2232345 efe ?('''
 title_2 = f'\n\n\n{TIMELESS}\n'
-
-t = [[1, 2, 3], [4, 5, 6]]
 
 LOREM = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
 dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
@@ -32,17 +30,17 @@ consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."""
 
 
-def typewriter(text, pause=0.5, custom=None):
+def typewriter(text, pause=0.1, custom=None):
 
     if custom:
         for i, character in enumerate(text):
-            print(character, sep='', end='')
+            print(character, sep='', end='', flush=True)
             if i in custom:
                 time.sleep(custom.get(i))
 
     else:
         for character in text:
-            print(character, sep='', end='')
+            print(character, sep='', end='', flush=True)
             time.sleep(pause)
 
 
@@ -51,23 +49,25 @@ def print_centered_table(table, **kwargs):
     rows = table.split('\n')
     for row in rows:
         print(row.center(80))
-        time.sleep(.5)
+        # time.sleep(.5)
     print()
 
 
-def segment_title():
+def segment_initial():
 
-    indices = [title_2.index(character) for character in 'TIME']
-    pauses = dict(zip(indices, [.25, .25, .25, 1.5]))
+    indices = [35, 37, 39, 41, 43, 45, 47, 49]
+    pauses = 8 * [.25]
+    custom = dict(zip(indices, pauses))
 
-    time.sleep(1)
-    typewriter(title_2, custom=pauses)
-    time.sleep(1)
+    time.sleep(1.5)
+    typewriter(title_2, custom=custom)
     print(f'\n{GIT}')
-    time.sleep(0.5)
     print(f'{YOUTUBE}\n')
-    time.sleep(0.5)
-    print(LINE)
+    print(BOLD_LINE)
+    print()
+    time.sleep(1)
+    typewriter(text_wrapper.fill('Welcome to Yugioh TIMELESS!'))
+    print('\n')
 
 
 def segment_format():
@@ -82,13 +82,15 @@ da v štirih rundah vsak igralec igra z vsakim izmed
 deckov:
 
  1) BASIC
- 2) EXTRA'''.center(LINE_WIDTH)
+ 2) EXTRA'''
     output = text_wrapper.fill(description)
 
     print(output)
+    print()
 
 
 def segment_entry_fee():
+    print()
     entry_fee = """Kaj pa prijavnina?
 Ta gre v celoti v nagradni sklad in se na koncu glede
 na dosežke razdeli nazaj med igralce.
@@ -98,32 +100,59 @@ na dosežke razdeli nazaj med igralce.
  3) brez"""
     output = text_wrapper.fill(entry_fee)
     print(output)
+    print()
 
 
 def segment_duelists():
+    print()
     print(text_wrapper.fill('Now enter duelist names.'))
+    print()
+
+
+def segment_start():
+    tournament_date = str(datetime.datetime.today().date())
+    print()
+    print(BOLD_LINE)
+    print()
+    print(TIMELESS)
+    print('Format'.center(LINE_WIDTH))
+    print(tournament_date.center(LINE_WIDTH))
+    print()
+    print(BOLD_LINE)
 
 
 def segment_pairings(pairings, round_):
-    print(f'\nPairings for round {round_ + 1}:\n')
+    header = f' ROUND {round_ + 1} ' if round_ in (0, 1, 2) else ' FINAL ROUND '
+    print(f'\n{header:-^{LINE_WIDTH}}\n\n')
     print_centered_table(pairings, tablefmt='plain')
 
 
 def segment_standings(standings, round_):
 
     if round_ in (0, 1, 2):
-        print(f'Standings after round {round_ + 1}:\n')
         del standings['Points']
-        print_centered_table(standings, headers='keys', colalign=('center', 'left', 'center'))
-
+        colalign = ('center', 'left', 'center')
     else:
-        print('Final standings:\n')
-        print_centered_table(standings, headers='keys', colalign=('center', 'left', 'center', 'center'))
+        colalign = ('center', 'left', 'center', 'center')
+
+    print('\n')
+    print_centered_table(standings, headers='keys', tablefmt='double_outline', colalign=colalign)
 
 
-SEGMENTS = {
+def segment_final():
+    print(BOLD_LINE)
+    input()
+
+
+segments = {
+    'initial': segment_initial,
+    'format': segment_format,
+    'entry_fee': segment_entry_fee,
+    'duelists': segment_duelists,
+    'start': segment_start,
     'pairings': segment_pairings,
-    'standings': segment_standings
+    'standings': segment_standings,
+    'final': segment_final
 }
 
 
@@ -207,17 +236,17 @@ def supervised_input(prompt, conditions, options=None):
     condition_checks = {
         'choose_from': lambda input_string: input_string in options,
         'alphabetical': lambda input_string: input_string.replace(' ', '').isalpha(),
-        'less_than_30_characters': lambda input_string: len(input_string) < 30,
+        'less_than_25_characters': lambda input_string: len(input_string) < 25,
         'integer': lambda input_string: is_string_of_integer(input_string),
-        'multiple_of_5': lambda input_string: int(input_string) % 5 == 0 and int(input_string) >= 0,
+        'multiple_of_10': lambda input_string: int(input_string) % 10 == 0 and int(input_string) >= 0,
     }
 
     input_tips = {
         'choose_from': f'''Enter one of these: {options.__str__()[1: -1].replace("'", "")}.''',
         'alphabetical': 'Use only letters and whitespaces.',
-        'less_than_30_characters': 'Use less than 30 characters.',
+        'less_than_25_characters': 'Use less than 25 characters.',
         'integer': 'Enter an integer.',
-        'multiple_of_5': 'Pick a non-negative multiple of 5.',
+        'multiple_of_10': 'Pick a non-negative multiple of 10.',
     }
 
     if isinstance(conditions, str):
@@ -225,7 +254,8 @@ def supervised_input(prompt, conditions, options=None):
 
     while True:
 
-        user_input = string.capwords(input(prompt))
+        typewriter(LARGE_INDENT + prompt)
+        user_input = string.capwords(input())
         check = True
 
         for condition in conditions:
@@ -234,25 +264,8 @@ def supervised_input(prompt, conditions, options=None):
             check = check and condition_satisfied
 
             if not condition_satisfied:
-                print(f'TIP: {input_tips.get(condition)}')
+                print(f'\r{LARGE_INDENT}TIP: {input_tips.get(condition)}', flush=True)
                 break
 
         if check:
             return user_input
-
-
-if __name__ == '__main__':
-
-    segment_title()
-    print()
-    time.sleep(1)
-    segment_format()
-    input()
-    segment_entry_fee()
-    input()
-    segment_duelists()
-    print()
-    print(LINE)
-    print()
-    time.sleep(1)
-    print_centered_table(t)

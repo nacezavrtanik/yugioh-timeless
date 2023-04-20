@@ -132,7 +132,7 @@ def enter_unique_duelists():
     while True:
 
         duelist_candidates = [
-            Duelist(interface.supervised_input(f'Duelist {i + 1}: ', ['alphabetical', 'less_than_30_characters']))
+            Duelist(interface.supervised_input(f'Duelist {i + 1}: ', ['alphabetical', 'less_than_25_characters']))
             for i in range(4)]
         candidate_names = [duelist_candidates[i].name for i in range(4)]
 
@@ -151,11 +151,15 @@ def enter_tournament_information():
     deck_sets = {'BASIC': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
                  'EXTRA': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']}
 
+    interface.segments.get('format')()
     format_ = interface.supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
     decks = deck_sets.get(format_)
+    interface.segments.get('entry_fee')()
+    entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10']))
+    interface.segments.get('duelists')()
     duelists = np.random.permutation(enter_unique_duelists())
 
-    tournament_information = {'decks': decks, 'duelists': duelists}
+    tournament_information = {'decks': decks, 'entry_fee': entry_fee, 'duelists': duelists}
 
     return tournament_information
 
@@ -231,7 +235,7 @@ def generate_pairings(duelists, decks, matchup, round_):
 
     pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
                 [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
-    interface.SEGMENTS.get('pairings')(pairings, round_)
+    interface.segments.get('pairings')(pairings, round_)
 
     return duelist_x, duelist_y, duelist_z, duelist_w
 
@@ -252,7 +256,7 @@ def register_wins(duelist_x, duelist_y, duelist_z, duelist_w):
     return winner_xy, loser_xy, winner_zw, loser_zw
 
 
-def display_standings(winners_and_losers, round_):
+def display_standings(winners_and_losers, round_, entry_fee):
 
     if round_ == FINAL_ROUND:
         round_ += IS_TIED_AFTER_PRELIMINARIES
@@ -269,21 +273,25 @@ def display_standings(winners_and_losers, round_):
                  DUELIST: duelists_by_place,
                  WINS: STANDING_CONFIGURATIONS.get(round_).get(WINS)[config],
                  POINTS: STANDING_CONFIGURATIONS.get(round_).get(POINTS)[config]}
-    interface.SEGMENTS.get('standings')(standings, round_)
+    interface.segments.get('standings')(standings, round_)
 
 
-def timeless(duelists, decks):
+def timeless(duelists, decks, entry_fee):
 
+    interface.segments.get('start')()
     matchup = random_timeless_square()
 
     for round_ in ROUNDS:
         pairings = generate_pairings(duelists, decks, matchup, round_)
         winners_and_losers = register_wins(*pairings)
-        display_standings(winners_and_losers, round_)
+        display_standings(winners_and_losers, round_, entry_fee)
 
 
 def main():
+
+    interface.segments.get('initial')()
     timeless(**enter_tournament_information())
+    interface.segments.get('final')()
 
 
 if __name__ == '__main__':
