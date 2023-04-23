@@ -8,6 +8,7 @@ import datetime
 from tabulate import tabulate
 
 from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, TIMELESS, GIT, YOUTUBE, BOLD_LINE
+from config import PRELIMINARY_ROUNDS
 
 
 text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, subsequent_indent=INDENT)
@@ -111,18 +112,9 @@ def segment_pairings(pairings, round_):
     print_centered_table(pairings, tablefmt='plain')
 
 
-def segment_standings(standings, round_, entry_fee):
+def segment_standings(standings, round_):
 
-    if round_ in (0, 1, 2):
-        del standings['Points']
-        colalign = ('center', 'left', 'center')
-    else:
-        colalign = ('center', 'left', 'center', 'center')
-
-    if round_ == 3 and entry_fee != 0:
-        standings['Prizes'] = map(lambda x: f'¤{x * (entry_fee // 5)}', standings.get('Points'))
-        del standings['Points']
-
+    colalign = ('center', 'left', 'center') if round_ in PRELIMINARY_ROUNDS else ('center', 'left', 'center', 'center')
     print('\n')
     print_centered_table(standings, headers='keys', tablefmt='double_outline', colalign=colalign)
 

@@ -239,7 +239,15 @@ def display_standings(winners_and_losers, round_, entry_fee):
                  DUELIST: duelists_by_place,
                  WINS: STANDING_CONFIGURATIONS.get(round_).get(WINS)[config],
                  POINTS: STANDING_CONFIGURATIONS.get(round_).get(POINTS)[config]}
-    interface.segments.get('standings')(standings, round_, entry_fee)
+
+    if round_ in PRELIMINARY_ROUNDS:
+        del standings[POINTS]
+
+    if round_ == FINAL_ROUND and entry_fee != 0:
+        standings[PRIZES] = map(lambda x: f'¤{x * (entry_fee // 5)}', standings.get(POINTS))
+        del standings[POINTS]
+
+    interface.segments.get('standings')(standings, round_)
 
 
 def timeless(duelists, decks, entry_fee):
