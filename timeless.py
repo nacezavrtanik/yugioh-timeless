@@ -1,46 +1,12 @@
 """Module for running the Yugioh TIMELESS tournament format."""
 
 import numpy as np
+
 import interface
+from config import ROUNDS, PRELIMINARY_ROUNDS, FINAL_ROUND, WINS, DUELIST, PLACE, POINTS, PRIZES
+from config import PAIRING_CONFIGURATIONS, STANDING_CONFIGURATIONS, TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
 
-WINS = 'Wins'
-DUELIST = 'Duelist'
-PLACE = 'Place'
-POINTS = 'Points'
-
-ROUNDS = (0, 1, 2, 3)
-PRELIMINARY_ROUNDS = (0, 1, 2)
-FINAL_ROUND = 3
-PAIRING_CONFIGURATIONS = ([0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2])
-STANDING_CONFIGURATIONS = {
-    0: {
-        WINS: ([1, 1, 0, 0], ),
-        PLACE: ([1, 1, 3, 3], ),
-        POINTS: (None, )
-    },
-    1: {
-        WINS: ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1]),
-        PLACE: ([1, 1, 3, 3], [1, 2, 2, 4], [1, 1, 1, 1]),
-        POINTS: (None, None, None)
-    },
-    2: {
-        WINS: ([3, 2, 1, 0], [2, 2, 1, 1], [3, 1, 1, 1], [2, 2, 2, 0]),
-        PLACE: ([1, 2, 3, 4], [1, 1, 3, 3], [1, 2, 2, 2], [1, 1, 1, 4]),
-        POINTS: (None, None, None, None)
-    },
-    3: {  # final round if NO TIE after preliminaries
-        WINS: ([4, 2, 2, 0], [4, 2, 1, 1], [3, 3, 2, 0], [3, 3, 1, 1], [3, 2, 2, 1]),
-        PLACE: ([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]),
-        POINTS: ([10, 6, 4, 0], [10, 6, 3, 1], [9, 7, 4, 0], [9, 7, 3, 1], [9, 6, 4, 1])
-    },
-    4: {  # final round IF TIE after preliminaries
-        WINS: ([4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]),
-        PLACE: ([1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]),
-        POINTS: ([10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1])
-    }
-}
-TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES = ([3, 1, 1, 1], [2, 2, 2, 0])
 IS_TIED_AFTER_PRELIMINARIES = None
 
 

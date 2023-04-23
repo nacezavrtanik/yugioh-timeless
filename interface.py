@@ -7,27 +7,10 @@ import datetime
 
 from tabulate import tabulate
 
+from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, TIMELESS, GIT, YOUTUBE, BOLD_LINE
 
-LINE_WIDTH = 80
-LEFT_MARGIN = 4
-RIGHT_MARGIN = LINE_WIDTH - LEFT_MARGIN
-INDENT = LEFT_MARGIN * ' '
-LARGE_INDENT = 2 * INDENT
 
 text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, subsequent_indent=INDENT)
-
-TIMELESS = 'T I M E L E S S'.center(LINE_WIDTH)
-GIT = 'git: link'.center(LINE_WIDTH)
-YOUTUBE = 'youtube: link'.center(LINE_WIDTH)
-LINE = LINE_WIDTH * '-'
-BOLD_LINE = LINE_WIDTH * '='
-
-title_2 = f'\n\n\n{TIMELESS}\n'
-
-LOREM = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."""
 
 
 def typewriter(text, pause=0.1, custom=None):
@@ -60,8 +43,9 @@ def segment_initial():
     custom = dict(zip(indices, pauses))
 
     time.sleep(1.5)
-    typewriter(title_2, custom=custom)
-    print(f'\n{GIT}')
+    print('\n\n')
+    typewriter(TIMELESS, custom=custom)
+    print(f'\n\n{GIT}')
     print(f'{YOUTUBE}\n')
     print(BOLD_LINE)
     print()
