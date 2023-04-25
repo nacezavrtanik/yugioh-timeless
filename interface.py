@@ -1,5 +1,7 @@
 """Module for creating a user interface for the TIMELESS tournament format."""
 
+import io
+import shutil
 import string
 import textwrap
 import time
@@ -12,6 +14,15 @@ from config import PRELIMINARY_ROUNDS
 
 
 text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, subsequent_indent=INDENT)
+tournament_report = io.StringIO()
+
+
+def save_tournament_report():
+
+    with open('report.txt', 'w', encoding='utf-8') as report_file:
+        tournament_report.seek(0)
+        shutil.copyfileobj(tournament_report, report_file)
+    tournament_report.close()
 
 
 def typewriter(text, delay=0.1, ignore_whitespaces=False):
@@ -38,7 +49,7 @@ def segment_initial():
 
     prefix = 2 * NEWLINE
     body_1 = TIMELESS
-    body_2 = NEWLINE + GIT
+    body_2 = 2 * NEWLINE + GIT
     body_3 = YOUTUBE + NEWLINE
     suffix = BOLD_LINE
 
@@ -144,6 +155,8 @@ def segment_start():
     print(body_3)
     print(suffix)
 
+    tournament_report.write(prefix + body_1 + body_2 + body_3 + suffix)
+
     return prefix + body_1 + body_2 + body_3 + suffix
 
 
@@ -160,6 +173,8 @@ def segment_pairings(pairings, round_):
     print(body_2)
     print(suffix)
 
+    tournament_report.write(prefix + body_1 + body_2 + suffix)
+
     return prefix + body_1 + body_2 + suffix
 
 
@@ -175,11 +190,15 @@ def segment_standings(standings, round_):
     print(body)
     print(suffix)
 
+    tournament_report.write(prefix + body + suffix)
+
     return prefix + body + suffix
 
 
 def segment_final():
-    input()
+
+    if input('Save tournament report? (y/n) ') == 'y':
+        save_tournament_report()
 
 
 segments = {
