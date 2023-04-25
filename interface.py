@@ -14,18 +14,13 @@ from config import PRELIMINARY_ROUNDS
 text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, subsequent_indent=INDENT)
 
 
-def typewriter(text, pause=0.1, custom=None):
+def typewriter(text, delay=0.1, ignore_whitespaces=False):
 
-    if custom:
-        for i, character in enumerate(text):
-            print(character, sep='', end='', flush=True)
-            if i in custom:
-                time.sleep(custom.get(i))
-
-    else:
-        for character in text:
-            print(character, sep='', end='', flush=True)
-            time.sleep(pause)
+    for character in text:
+        print(character, sep='', end='', flush=True)
+        if ignore_whitespaces and character == ' ':
+            continue
+        time.sleep(delay)
 
 
 def print_centered_table(table, **kwargs):
@@ -39,13 +34,9 @@ def print_centered_table(table, **kwargs):
 
 def segment_initial():
 
-    indices = [35, 37, 39, 41, 43, 45, 47, 49]
-    pauses = 8 * [.25]
-    custom = dict(zip(indices, pauses))
-
     time.sleep(1.5)
     print('\n\n')
-    typewriter(TIMELESS, custom=custom)
+    typewriter(TIMELESS, delay=0.2, ignore_whitespaces=True)
     print(f'\n\n{GIT}')
     print(f'{YOUTUBE}\n')
     print(BOLD_LINE)
