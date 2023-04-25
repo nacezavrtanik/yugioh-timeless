@@ -3,7 +3,7 @@
 import numpy as np
 
 import interface
-from config import ROUNDS, PRELIMINARY_ROUNDS, FINAL_ROUND, WINS, DUELIST, PLACE, POINTS, PRIZES
+from config import DECK_SETS, ROUNDS, PRELIMINARY_ROUNDS, FINAL_ROUND, WINS, DUELIST, PLACE, POINTS, PRIZES
 from config import PAIRING_CONFIGURATIONS, STANDING_CONFIGURATIONS, TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
 
@@ -114,19 +114,15 @@ def enter_unique_duelists():
 
 def enter_tournament_information():
 
-    deck_sets = {'BASIC': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
-                 'EXTRA': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']}
-
     interface.segments.get('format')()
-    format_ = interface.supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra']).upper()
-    decks = deck_sets.get(format_)
+    format_ = interface.supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra'])
     interface.segments.get('entry_fee')()
     entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10']))
     interface.segments.get('duelists')()
     duelists = np.random.permutation(enter_unique_duelists())
     interface.segments.get('enter_data')()
 
-    tournament_information = {'decks': decks, 'entry_fee': entry_fee, 'duelists': duelists}
+    tournament_information = {'format_': format_, 'entry_fee': entry_fee, 'duelists': duelists}
 
     return tournament_information
 
@@ -253,15 +249,18 @@ def display_standings(winners_and_losers, round_, entry_fee):
     interface.segments.get('standings')(standings, round_)
 
 
-def timeless(duelists, decks, entry_fee):
+def timeless(duelists, format_, entry_fee):
 
-    interface.segments.get('start')()
+    interface.segments.get('start')(format_)
+    decks = DECK_SETS.get(format_)
     matchup = random_timeless_square()
 
     for round_ in ROUNDS:
         pairings = generate_pairings(duelists, decks, matchup, round_)
         winners_and_losers = register_wins(*pairings)
         display_standings(winners_and_losers, round_, entry_fee)
+
+    interface.segments.get('report')(format_)
 
 
 def main():

@@ -22,6 +22,11 @@ PLACE = 'Place'
 POINTS = 'Points'
 PRIZES = 'Prizes'
 
+DECK_SETS = {
+    'Basic': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
+    'Extra': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']
+}
+
 ROUNDS = (0, 1, 2, 3)
 PRELIMINARY_ROUNDS = (0, 1, 2)
 FINAL_ROUND = 3

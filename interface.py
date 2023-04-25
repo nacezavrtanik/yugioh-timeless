@@ -1,6 +1,8 @@
 """Module for creating a user interface for the TIMELESS tournament format."""
 
 import io
+import itertools
+import os
 import shutil
 import string
 import textwrap
@@ -17,6 +19,9 @@ text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, s
 tournament_report = io.StringIO()
 
 
+TODAY = datetime.datetime.today().date()
+
+
 def display_segment(*args, report=False):
 
     for segment_component in args:
@@ -26,21 +31,26 @@ def display_segment(*args, report=False):
         tournament_report.write(NEWLINE.join(args) + NEWLINE)
 
 
-def save_tournament_report(filename):
+def save_tournament_report(format_):
+
+    filename = f'{TODAY} TIMELESS {format_} Report.txt'
+    counter = itertools.count(2)
+    while filename in os.listdir():
+        filename = f'{TODAY} TIMELESS {format_} Report {next(counter)}.txt'
 
     try:
-        with open(f'{filename}.txt', 'w', encoding='utf-8') as report_file:
+        with open(filename, 'w', encoding='utf-8') as report_file:
             tournament_report.seek(0)
             shutil.copyfileobj(tournament_report, report_file)
 
     except OSError:
-        print('Sorry, a system-related error occured. Unable to save report.')
+        print(NEWLINE + text_wrapper.fill('Sorry, a system-related error occured. Unable to save report.'))
 
     except Exception:
-        print('Sorry, an unexpected error occured. Unable to save report.')
+        print(NEWLINE + text_wrapper.fill('Sorry, an unexpected error occured. Unable to save report.'))
 
     else:
-        print(NEWLINE + text_wrapper.fill(f'Report saved to {filename}.txt!'))
+        print(NEWLINE + text_wrapper.fill(f'Report saved to {filename}!'))
 
 
 def typewriter(text, delay=0.05, ignore_whitespaces=False):
@@ -127,11 +137,11 @@ def segment_enter_data():
     print(2 * NEWLINE + BOLDLINE)
 
 
-def segment_start():
+def segment_start(format_):
 
     body_1 = 2 * NEWLINE + TIMELESS
-    body_2 = 'Format'.center(LINE_WIDTH)
-    body_3 = str(datetime.datetime.today().date()).center(LINE_WIDTH)
+    body_2 = f'{format_}'.center(LINE_WIDTH)
+    body_3 = str(TODAY).center(LINE_WIDTH)
     suffix = 2 * NEWLINE + BOLDLINE
 
     display_segment(body_1, body_2, body_3, suffix, report=True)
@@ -161,13 +171,18 @@ def segment_standings(standings, round_):
     display_segment(body, suffix, report=True)
 
 
-def segment_final():
+def segment_report(format_):
 
     print(NEWLINE + text_wrapper.fill('The tournament is concluded. Congratulations to all duelists!') + NEWLINE)
     save_report = supervised_input('Do you wish to save a tournament report? ', 'choose_from', options=['Yes', 'No'])
     if save_report == 'Yes':
-        save_tournament_report('report')
-    input(2 * NEWLINE + BOLDLINE + NEWLINE + '(Press ENTER to close the window.)')
+        save_tournament_report(format_)
+    else:
+        print(NEWLINE + text_wrapper.fill('Report not saved.'))
+
+
+def segment_final():
+    input(2 * NEWLINE + BOLDLINE + NEWLINE + '(Press ENTER to exit.)')
 
 
 segments = {
@@ -180,7 +195,8 @@ segments = {
     'pairings': segment_pairings,
     'wins': segment_wins,
     'standings': segment_standings,
-    'final': segment_final
+    'report': segment_report,
+    'final': segment_final,
 }
 
 
