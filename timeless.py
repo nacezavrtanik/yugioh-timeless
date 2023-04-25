@@ -3,8 +3,8 @@
 import numpy as np
 
 import interface
-from config import DECK_SETS, ROUNDS, PRELIMINARY_ROUNDS, FINAL_ROUND, WINS, DUELIST, PLACE, POINTS, PRIZES
-from config import PAIRING_CONFIGURATIONS, STANDING_CONFIGURATIONS, TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
+from config import FORMATS, DECK_SETS, ROUNDS, PRELIMINARY_ROUNDS, FINAL_ROUND
+from config import PAIRING_CONFIGURATIONS, TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES, STANDING_CONFIGURATIONS
 
 
 IS_TIED_AFTER_PRELIMINARIES = None
@@ -114,13 +114,13 @@ def enter_unique_duelists():
 
 def enter_tournament_information():
 
-    interface.segments.get('format')()
-    format_ = interface.supervised_input('Choose format: ', 'choose_from', options=['Basic', 'Extra'])
-    interface.segments.get('entry_fee')()
+    interface.segments.get('enter_format')()
+    format_ = interface.supervised_input('Choose format: ', 'choose_from', options=FORMATS)
+    interface.segments.get('enter_entry_fee')()
     entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10']))
-    interface.segments.get('duelists')()
+    interface.segments.get('enter_duelists')()
     duelists = np.random.permutation(enter_unique_duelists())
-    interface.segments.get('enter_data')()
+    interface.segments.get('enter_tournament_information_end')()
 
     tournament_information = {'format_': format_, 'entry_fee': entry_fee, 'duelists': duelists}
 
@@ -198,7 +198,8 @@ def generate_pairings(duelists, decks, matchup, round_):
 
     pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
                 [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
-    interface.segments.get('pairings')(pairings, round_)
+
+    interface.segments.get('generate_pairings')(pairings, round_)
 
     return duelist_x, duelist_y, duelist_z, duelist_w
 
@@ -216,37 +217,34 @@ def register_wins(duelist_x, duelist_y, duelist_z, duelist_w):
     winner_xy.wins += 1
     winner_zw.wins += 1
 
-    interface.segments.get('wins')()
+    interface.segments.get('register_wins')()
 
     return winner_xy, loser_xy, winner_zw, loser_zw
 
 
 def display_standings(winners_and_losers, round_, entry_fee):
 
-    if round_ == FINAL_ROUND:
-        round_ += IS_TIED_AFTER_PRELIMINARIES
-
     duelists_by_wins = sorted(winners_and_losers, reverse=True)
-    config = STANDING_CONFIGURATIONS.get(round_).get(WINS).index(duelists_by_wins)
+    key = round_ if round_ in PRELIMINARY_ROUNDS else round_ + IS_TIED_AFTER_PRELIMINARIES
+    index = STANDING_CONFIGURATIONS.get(key).get('Wins').index(duelists_by_wins)
 
     if round_ in PRELIMINARY_ROUNDS or IS_TIED_AFTER_PRELIMINARIES:
         duelists_by_place = duelists_by_wins
     else:
         duelists_by_place = winners_and_losers
 
-    standings = {PLACE: STANDING_CONFIGURATIONS.get(round_).get(PLACE)[config],
-                 DUELIST: duelists_by_place,
-                 WINS: STANDING_CONFIGURATIONS.get(round_).get(WINS)[config],
-                 POINTS: STANDING_CONFIGURATIONS.get(round_).get(POINTS)[config]}
+    standings = {'Place': STANDING_CONFIGURATIONS.get(key).get('Places')[index],
+                 'Duelist': duelists_by_place,
+                 'Wins': STANDING_CONFIGURATIONS.get(key).get('Wins')[index]}
 
-    if round_ in PRELIMINARY_ROUNDS:
-        del standings[POINTS]
+    if round_ == FINAL_ROUND and entry_fee == 0:
+        standings['Points'] = STANDING_CONFIGURATIONS.get(key).get('Points')[index]
+    elif round_ == FINAL_ROUND and entry_fee != 0:
+        entry_fee_unit = entry_fee // 5
+        standings['Prize'] = map(
+            lambda x: f'¤{x * entry_fee_unit}', STANDING_CONFIGURATIONS.get(key).get('Points')[index])
 
-    if round_ == FINAL_ROUND and entry_fee != 0:
-        standings[PRIZES] = map(lambda x: f'¤{x * (entry_fee // 5)}', standings.get(POINTS))
-        del standings[POINTS]
-
-    interface.segments.get('standings')(standings, round_)
+    interface.segments.get('display_standings')(standings, round_)
 
 
 def timeless(duelists, format_, entry_fee):
@@ -260,7 +258,7 @@ def timeless(duelists, format_, entry_fee):
         winners_and_losers = register_wins(*pairings)
         display_standings(winners_and_losers, round_, entry_fee)
 
-    interface.segments.get('report')(format_)
+    interface.segments.get('end')(format_)
 
 
 def main():
