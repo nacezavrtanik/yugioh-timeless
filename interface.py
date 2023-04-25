@@ -9,7 +9,7 @@ import datetime
 
 from tabulate import tabulate
 
-from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, TIMELESS, GIT, YOUTUBE, BOLD_LINE, NEWLINE
+from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, TIMELESS, GIT, YOUTUBE, BOLDLINE, NEWLINE
 from config import PRELIMINARY_ROUNDS
 
 
@@ -17,15 +17,33 @@ text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, s
 tournament_report = io.StringIO()
 
 
-def save_tournament_report():
+def display_segment(*args, report=False):
 
-    with open('report.txt', 'w', encoding='utf-8') as report_file:
-        tournament_report.seek(0)
-        shutil.copyfileobj(tournament_report, report_file)
-    tournament_report.close()
+    for segment_component in args:
+        print(segment_component)
+
+    if report:
+        tournament_report.write(NEWLINE.join(args) + NEWLINE)
 
 
-def typewriter(text, delay=0.1, ignore_whitespaces=False):
+def save_tournament_report(filename):
+
+    try:
+        with open(f'{filename}.txt', 'w', encoding='utf-8') as report_file:
+            tournament_report.seek(0)
+            shutil.copyfileobj(tournament_report, report_file)
+
+    except OSError:
+        print('Sorry, a system-related error occured. Unable to save report.')
+
+    except Exception:
+        print('Sorry, an unexpected error occured. Unable to save report.')
+
+    else:
+        print(NEWLINE + text_wrapper.fill(f'Report saved to {filename}.txt!'))
+
+
+def typewriter(text, delay=0.05, ignore_whitespaces=False):
 
     for character in text:
         print(character, sep='', end='', flush=True)
@@ -34,12 +52,12 @@ def typewriter(text, delay=0.1, ignore_whitespaces=False):
         time.sleep(delay)
 
 
-def center_table(table, **kwargs):
+def center_table(data, **kwargs):
 
-    table = tabulate(table, **kwargs)
+    table = tabulate(data, **kwargs)
     rows = table.split(NEWLINE)
     max_row_length = max(map(len, rows))
-    centered_rows = [f'{row:<{max_row_length}}'.center(LINE_WIDTH) for row in rows]  # padded for propper alignment
+    centered_rows = [f'{row:<{max_row_length}}'.center(LINE_WIDTH) for row in rows]  # padded for proper alignment
     centered_table = NEWLINE.join(centered_rows)
 
     return centered_table
@@ -51,7 +69,8 @@ def segment_initial():
     body_1 = TIMELESS
     body_2 = 2 * NEWLINE + GIT
     body_3 = YOUTUBE + NEWLINE
-    body_4 = text_wrapper.fill('''Timeless je poseben turnirski format za štiri igralce.
+    body_4 = text_wrapper.fill(
+        '''Timeless je poseben turnirski format za štiri igralce.
 Ti se pomerijo v treh predrundah (vsak z vsakim), nato
 pa sledi še finalna runda. Nobena izmed teh ni časovno
 omejena. Igra se z naborom štirih deckov, ki so med
@@ -59,10 +78,10 @@ igralce razdeljeni naključno. Po vsaki rundi se decki
 ponovno naključno razdelijo med igralce, in sicer tako,
 da v štirih rundah vsak igralec igra z vsakim izmed
 štirih deckov natanko enkrat.''')
-    suffix = 2 * NEWLINE + BOLD_LINE + NEWLINE
+    suffix = 2 * NEWLINE + BOLDLINE
 
-    print(prefix)
     time.sleep(1.5)
+    print(prefix)
     typewriter(body_1, delay=0.2, ignore_whitespaces=True)
     print(body_2)
     print(body_3)
@@ -70,121 +89,85 @@ da v štirih rundah vsak igralec igra z vsakim izmed
     print(suffix)
     time.sleep(1)
 
-    return prefix + body_1 + body_2 + body_3 + body_4 + suffix
-
 
 def segment_format():
 
-    description = '''Na voljo sta dva nabora
+    body = NEWLINE + text_wrapper.fill(
+        '''Na voljo sta dva nabora
 deckov:
 
  1) BASIC
- 2) EXTRA'''
+ 2) EXTRA''') + NEWLINE
 
-    prefix = ''
-    body = text_wrapper.fill(description)
-    suffix = ''
-
-    print(body)
-    print(suffix)
-
-    return prefix + body + suffix
+    display_segment(body)
 
 
 def segment_entry_fee():
 
-    entry_fee = """Kaj pa prijavnina?
+    body = NEWLINE + text_wrapper.fill(
+        """Kaj pa prijavnina?
 Ta gre v celoti v nagradni sklad in se na koncu glede
 na dosežke razdeli nazaj med igralce.
 
  1) 5 €
  2) 10 €
- 3) brez"""
+ 3) brez""") + NEWLINE
 
-    prefix = ''
-    body = text_wrapper.fill(entry_fee)
-    suffix = ''
-    print(prefix)
-    print(body)
-    print(suffix)
-
-    return prefix + body + suffix
+    display_segment(body)
 
 
 def segment_duelists():
 
-    prefix = ''
-    body = text_wrapper.fill('Now enter duelist names.')
-    suffix = ''
+    body = NEWLINE + text_wrapper.fill('Now enter duelist names.') + NEWLINE
 
-    print(prefix)
-    print(body)
-    print(suffix)
+    display_segment(body)
 
-    return prefix + body + suffix
+
+def segment_enter_data():
+    print(2 * NEWLINE + BOLDLINE)
 
 
 def segment_start():
 
-    tournament_date = str(datetime.datetime.today().date())
-
-    prefix = NEWLINE + BOLD_LINE + NEWLINE
-    body_1 = NEWLINE + TIMELESS
+    body_1 = 2 * NEWLINE + TIMELESS
     body_2 = 'Format'.center(LINE_WIDTH)
-    body_3 = tournament_date.center(LINE_WIDTH)
-    suffix = 2 * NEWLINE + BOLD_LINE
+    body_3 = str(datetime.datetime.today().date()).center(LINE_WIDTH)
+    suffix = 2 * NEWLINE + BOLDLINE
 
-    print(prefix)
-    print(body_1)
-    print(body_2)
-    print(body_3)
-    print(suffix)
-
-    tournament_report.write(prefix + body_1 + body_2 + body_3 + suffix)
-
-    return prefix + body_1 + body_2 + body_3 + suffix
+    display_segment(body_1, body_2, body_3, suffix, report=True)
 
 
 def segment_pairings(pairings, round_):
 
     header = f' ROUND {round_ + 1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
 
-    prefix = ''
-    body_1 = f'{header:-^{LINE_WIDTH}}' + 2 * NEWLINE
-    body_2 = center_table(pairings, tablefmt='plain')
-    suffix = ''
+    body_1 = NEWLINE + f'{header:-^{LINE_WIDTH}}' + NEWLINE
+    body_2 = NEWLINE + center_table(pairings, tablefmt='plain') + NEWLINE
 
-    print(prefix)
-    print(body_1)
-    print(body_2)
-    print(suffix)
+    display_segment(body_1, body_2, report=True)
 
-    tournament_report.write(prefix + body_1 + body_2 + suffix)
 
-    return prefix + body_1 + body_2 + suffix
+def segment_wins():
+    print(NEWLINE)
 
 
 def segment_standings(standings, round_):
 
     colalign = ('center', 'left', 'center') if round_ in PRELIMINARY_ROUNDS else ('center', 'left', 'center', 'center')
 
-    prefix = NEWLINE
     body = center_table(standings, headers='keys', tablefmt='double_outline', colalign=colalign)
-    suffix = '' if round_ in PRELIMINARY_ROUNDS else BOLD_LINE
+    suffix = '' if round_ in PRELIMINARY_ROUNDS else 2 * NEWLINE + BOLDLINE
 
-    print(prefix)
-    print(body)
-    print(suffix)
-
-    tournament_report.write(prefix + body + suffix)
-
-    return prefix + body + suffix
+    display_segment(body, suffix, report=True)
 
 
 def segment_final():
 
-    if input('Save tournament report? (y/n) ') == 'y':
-        save_tournament_report()
+    print(NEWLINE + text_wrapper.fill('The tournament is concluded. Congratulations to all duelists!') + NEWLINE)
+    save_report = supervised_input('Do you wish to save a tournament report? ', 'choose_from', options=['Yes', 'No'])
+    if save_report == 'Yes':
+        save_tournament_report('report')
+    input(2 * NEWLINE + BOLDLINE + NEWLINE + '(Press ENTER to close the window.)')
 
 
 segments = {
@@ -192,8 +175,10 @@ segments = {
     'format': segment_format,
     'entry_fee': segment_entry_fee,
     'duelists': segment_duelists,
+    'enter_data': segment_enter_data,
     'start': segment_start,
     'pairings': segment_pairings,
+    'wins': segment_wins,
     'standings': segment_standings,
     'final': segment_final
 }
@@ -307,7 +292,7 @@ def supervised_input(prompt, conditions, options=None):
             check = check and condition_satisfied
 
             if not condition_satisfied:
-                print(f'\r{LARGE_INDENT}TIP: {input_tips.get(condition)}', flush=True)
+                print(f'{LARGE_INDENT}TIP: {input_tips.get(condition)}', flush=True)
                 break
 
         if check:

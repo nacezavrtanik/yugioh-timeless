@@ -1,5 +1,6 @@
 """Module containing constants for the Yugioh TIMELESS tournament format."""
 
+
 # interface.py
 LINE_WIDTH = 80
 LEFT_MARGIN = 4
@@ -10,9 +11,9 @@ LARGE_INDENT = 2 * INDENT
 TIMELESS = 'T I M E L E S S'.center(LINE_WIDTH)
 GIT = 'git: link'.center(LINE_WIDTH)
 YOUTUBE = 'youtube: link'.center(LINE_WIDTH)
-LINE = LINE_WIDTH * '-'
-BOLD_LINE = LINE_WIDTH * '='
+BOLDLINE = LINE_WIDTH * '='
 NEWLINE = '\n'
+
 
 # timeless.py
 WINS = 'Wins'

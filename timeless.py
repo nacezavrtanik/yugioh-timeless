@@ -124,6 +124,7 @@ def enter_tournament_information():
     entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10']))
     interface.segments.get('duelists')()
     duelists = np.random.permutation(enter_unique_duelists())
+    interface.segments.get('enter_data')()
 
     tournament_information = {'decks': decks, 'entry_fee': entry_fee, 'duelists': duelists}
 
@@ -218,6 +219,8 @@ def register_wins(duelist_x, duelist_y, duelist_z, duelist_w):
 
     winner_xy.wins += 1
     winner_zw.wins += 1
+
+    interface.segments.get('wins')()
 
     return winner_xy, loser_xy, winner_zw, loser_zw
 
