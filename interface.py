@@ -51,25 +51,7 @@ def segment_initial():
     body_1 = TIMELESS
     body_2 = 2 * NEWLINE + GIT
     body_3 = YOUTUBE + NEWLINE
-    suffix = BOLD_LINE
-
-    print(prefix)
-    time.sleep(1.5)
-    typewriter(body_1, delay=0.2, ignore_whitespaces=True)
-    print(body_2)
-    print(body_3)
-    print(suffix)
-    time.sleep(1)
-
-    return prefix + body_1 + body_2 + body_3 + suffix
-
-
-def segment_description():
-
-    prefix = ''
-    body_1 = text_wrapper.fill('Welcome to Yugioh TIMELESS!')
-    body_2 = NEWLINE
-    body_3 = text_wrapper.fill('''Timeless je poseben turnirski format za štiri igralce.
+    body_4 = text_wrapper.fill('''Timeless je poseben turnirski format za štiri igralce.
 Ti se pomerijo v treh predrundah (vsak z vsakim), nato
 pa sledi še finalna runda. Nobena izmed teh ni časovno
 omejena. Igra se z naborom štirih deckov, ki so med
@@ -77,15 +59,18 @@ igralce razdeljeni naključno. Po vsaki rundi se decki
 ponovno naključno razdelijo med igralce, in sicer tako,
 da v štirih rundah vsak igralec igra z vsakim izmed
 štirih deckov natanko enkrat.''')
-    suffix = ''
+    suffix = 2 * NEWLINE + BOLD_LINE + NEWLINE
 
     print(prefix)
-    typewriter(body_1)
+    time.sleep(1.5)
+    typewriter(body_1, delay=0.2, ignore_whitespaces=True)
     print(body_2)
     print(body_3)
+    print(body_4)
     print(suffix)
+    time.sleep(1)
 
-    return prefix + body_1 + body_2 + body_3 + suffix
+    return prefix + body_1 + body_2 + body_3 + body_4 + suffix
 
 
 def segment_format():
@@ -143,11 +128,11 @@ def segment_start():
 
     tournament_date = str(datetime.datetime.today().date())
 
-    prefix = NEWLINE + BOLD_LINE
+    prefix = NEWLINE + BOLD_LINE + NEWLINE
     body_1 = NEWLINE + TIMELESS
     body_2 = 'Format'.center(LINE_WIDTH)
     body_3 = tournament_date.center(LINE_WIDTH)
-    suffix = NEWLINE + BOLD_LINE
+    suffix = 2 * NEWLINE + BOLD_LINE
 
     print(prefix)
     print(body_1)
@@ -163,8 +148,9 @@ def segment_start():
 def segment_pairings(pairings, round_):
 
     header = f' ROUND {round_ + 1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
+
     prefix = ''
-    body_1 = f'{header:-^{LINE_WIDTH}}' + NEWLINE
+    body_1 = f'{header:-^{LINE_WIDTH}}' + 2 * NEWLINE
     body_2 = center_table(pairings, tablefmt='plain')
     suffix = ''
 
@@ -203,7 +189,6 @@ def segment_final():
 
 segments = {
     'initial': segment_initial,
-    'description': segment_description,
     'format': segment_format,
     'entry_fee': segment_entry_fee,
     'duelists': segment_duelists,

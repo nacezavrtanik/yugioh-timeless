@@ -264,7 +264,6 @@ def timeless(duelists, decks, entry_fee):
 def main():
 
     interface.segments.get('initial')()
-    interface.segments.get('description')()
     timeless(**enter_tournament_information())
     interface.segments.get('final')()
 
