@@ -12,6 +12,7 @@ GIT = 'git: link'.center(LINE_WIDTH)
 YOUTUBE = 'youtube: link'.center(LINE_WIDTH)
 LINE = LINE_WIDTH * '-'
 BOLD_LINE = LINE_WIDTH * '='
+NEWLINE = '\n'
 
 # timeless.py
 WINS = 'Wins'

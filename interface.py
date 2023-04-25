@@ -7,7 +7,7 @@ import datetime
 
 from tabulate import tabulate
 
-from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, TIMELESS, GIT, YOUTUBE, BOLD_LINE
+from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, TIMELESS, GIT, YOUTUBE, BOLD_LINE, NEWLINE
 from config import PRELIMINARY_ROUNDS
 
 
@@ -23,50 +23,80 @@ def typewriter(text, delay=0.1, ignore_whitespaces=False):
         time.sleep(delay)
 
 
-def print_centered_table(table, **kwargs):
+def center_table(table, **kwargs):
+
     table = tabulate(table, **kwargs)
-    rows = table.split('\n')
+    rows = table.split(NEWLINE)
     max_row_length = max(map(len, rows))
-    for row in rows:
-        print(f'{row:<{max_row_length}}'.center(LINE_WIDTH))  # padded with ' ' for propper alignment when centered
-    print()
+    centered_rows = [f'{row:<{max_row_length}}'.center(LINE_WIDTH) for row in rows]  # padded for propper alignment
+    centered_table = NEWLINE.join(centered_rows)
+
+    return centered_table
 
 
 def segment_initial():
 
+    prefix = 2 * NEWLINE
+    body_1 = TIMELESS
+    body_2 = NEWLINE + GIT
+    body_3 = YOUTUBE + NEWLINE
+    suffix = BOLD_LINE
+
+    print(prefix)
     time.sleep(1.5)
-    print('\n\n')
-    typewriter(TIMELESS, delay=0.2, ignore_whitespaces=True)
-    print(f'\n\n{GIT}')
-    print(f'{YOUTUBE}\n')
-    print(BOLD_LINE)
-    print()
+    typewriter(body_1, delay=0.2, ignore_whitespaces=True)
+    print(body_2)
+    print(body_3)
+    print(suffix)
     time.sleep(1)
-    typewriter(text_wrapper.fill('Welcome to Yugioh TIMELESS!'))
-    print('\n')
+
+    return prefix + body_1 + body_2 + body_3 + suffix
 
 
-def segment_format():
-    description = '''Timeless je poseben turnirski format za štiri igralce.
+def segment_description():
+
+    prefix = ''
+    body_1 = text_wrapper.fill('Welcome to Yugioh TIMELESS!')
+    body_2 = NEWLINE
+    body_3 = text_wrapper.fill('''Timeless je poseben turnirski format za štiri igralce.
 Ti se pomerijo v treh predrundah (vsak z vsakim), nato
 pa sledi še finalna runda. Nobena izmed teh ni časovno
 omejena. Igra se z naborom štirih deckov, ki so med
 igralce razdeljeni naključno. Po vsaki rundi se decki
 ponovno naključno razdelijo med igralce, in sicer tako,
 da v štirih rundah vsak igralec igra z vsakim izmed
-štirih deckov natanko enkrat. Na voljo sta dva nabora
+štirih deckov natanko enkrat.''')
+    suffix = ''
+
+    print(prefix)
+    typewriter(body_1)
+    print(body_2)
+    print(body_3)
+    print(suffix)
+
+    return prefix + body_1 + body_2 + body_3 + suffix
+
+
+def segment_format():
+
+    description = '''Na voljo sta dva nabora
 deckov:
 
  1) BASIC
  2) EXTRA'''
-    output = text_wrapper.fill(description)
 
-    print(output)
-    print()
+    prefix = ''
+    body = text_wrapper.fill(description)
+    suffix = ''
+
+    print(body)
+    print(suffix)
+
+    return prefix + body + suffix
 
 
 def segment_entry_fee():
-    print()
+
     entry_fee = """Kaj pa prijavnina?
 Ta gre v celoti v nagradni sklad in se na koncu glede
 na dosežke razdeli nazaj med igralce.
@@ -74,49 +104,87 @@ na dosežke razdeli nazaj med igralce.
  1) 5 €
  2) 10 €
  3) brez"""
-    output = text_wrapper.fill(entry_fee)
-    print(output)
-    print()
+
+    prefix = ''
+    body = text_wrapper.fill(entry_fee)
+    suffix = ''
+    print(prefix)
+    print(body)
+    print(suffix)
+
+    return prefix + body + suffix
 
 
 def segment_duelists():
-    print()
-    print(text_wrapper.fill('Now enter duelist names.'))
-    print()
+
+    prefix = ''
+    body = text_wrapper.fill('Now enter duelist names.')
+    suffix = ''
+
+    print(prefix)
+    print(body)
+    print(suffix)
+
+    return prefix + body + suffix
 
 
 def segment_start():
+
     tournament_date = str(datetime.datetime.today().date())
-    print()
-    print(BOLD_LINE)
-    print()
-    print(TIMELESS)
-    print('Format'.center(LINE_WIDTH))
-    print(tournament_date.center(LINE_WIDTH))
-    print()
-    print(BOLD_LINE)
+
+    prefix = NEWLINE + BOLD_LINE
+    body_1 = NEWLINE + TIMELESS
+    body_2 = 'Format'.center(LINE_WIDTH)
+    body_3 = tournament_date.center(LINE_WIDTH)
+    suffix = NEWLINE + BOLD_LINE
+
+    print(prefix)
+    print(body_1)
+    print(body_2)
+    print(body_3)
+    print(suffix)
+
+    return prefix + body_1 + body_2 + body_3 + suffix
 
 
 def segment_pairings(pairings, round_):
-    header = f' ROUND {round_ + 1} ' if round_ in (0, 1, 2) else ' FINAL ROUND '
-    print(f'\n{header:-^{LINE_WIDTH}}\n\n')
-    print_centered_table(pairings, tablefmt='plain')
+
+    header = f' ROUND {round_ + 1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
+    prefix = ''
+    body_1 = f'{header:-^{LINE_WIDTH}}' + NEWLINE
+    body_2 = center_table(pairings, tablefmt='plain')
+    suffix = ''
+
+    print(prefix)
+    print(body_1)
+    print(body_2)
+    print(suffix)
+
+    return prefix + body_1 + body_2 + suffix
 
 
 def segment_standings(standings, round_):
 
     colalign = ('center', 'left', 'center') if round_ in PRELIMINARY_ROUNDS else ('center', 'left', 'center', 'center')
-    print('\n')
-    print_centered_table(standings, headers='keys', tablefmt='double_outline', colalign=colalign)
+
+    prefix = NEWLINE
+    body = center_table(standings, headers='keys', tablefmt='double_outline', colalign=colalign)
+    suffix = '' if round_ in PRELIMINARY_ROUNDS else BOLD_LINE
+
+    print(prefix)
+    print(body)
+    print(suffix)
+
+    return prefix + body + suffix
 
 
 def segment_final():
-    print(BOLD_LINE)
     input()
 
 
 segments = {
     'initial': segment_initial,
+    'description': segment_description,
     'format': segment_format,
     'entry_fee': segment_entry_fee,
     'duelists': segment_duelists,
