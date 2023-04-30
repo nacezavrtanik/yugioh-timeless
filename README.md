@@ -1,10 +1,5 @@
-# Timeless (custom turnirski format)
+# Yu-Gi-Oh! TIMELESS
 
-Timeless je poseben turnirski format za štiri igralce.
-Ti se pomerijo v treh predrundah (vsak z vsakim), nato
-pa sledi še finalna runda. Nobena izmed teh ni èasovno
-omejena. Igra se z naborom štirih deckov, ki so med
-igralce razdeljeni nakljuèno. Po vsaki rundi se decki
-ponovno nakljuèno razdelijo med igralce, in sicer tako,
-da v štirih rundah vsak igralec igra z vsakim izmed
-štirih deckov natanko enkrat.
+TiMELESS is a custom 4-player tournament format for the Yu-Gi-Oh! Trading Card Game. Created from the desire for
+high-level gameplay, TIMELESS is designed to facilitate long, strategic games, while staying true to the core concepts
+of classic Yu-Gi-Oh!
