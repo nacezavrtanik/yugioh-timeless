@@ -1,4 +1,60 @@
-"""Module for creating a user interface for the TIMELESS tournament format."""
+"""Module for creating a user interface for the TIMELESS tournament format.
+
+This module contains functions pertaining to user interaction during the
+TIMELESS tournament format. Its purpose is to separate this part of the code
+from the `timeless` module, which implements the actual core structure of the
+TIMELESS format, increasing the readability of the `timeless` module in the
+process.
+
+Beside other functions, this module contains so-called segment functions,
+which are mostly used to print chunks (segments) of text to give the
+terminal interface its intended look and feel.
+
+Variables
+---------
+`TODAY`
+    Constant containding today's date as a `datetime.date` instance.
+`tournament_report`
+    Instance of `io.StringIO` for documentting the course of the tournament.
+`segments`
+    Dictionary containing all segment functions.
+
+Functions
+---------
+`wrap`
+    Wrap text to fit inside margins, with empty lines before and after.
+`typewriter`
+    Print text character by character for typewriter effect.
+`supervised_input`
+    Require user input to satisfy specified conditions.
+`generate_centered_table`
+    Generate table with `tabulate.tabulate`, and center it.
+`save_tournament_report`
+    Save contents of the global variable `tournament_report` to a file.
+`segment_initial`
+    Print general information on the TIMELESS format.
+`segment_enter_format`
+    Print deck choice description.
+`segment_enter_entry_fee`
+    Print entry fee description.
+`segment_enter_duelists`
+    Print duelist sign-up prompt.
+`segment_enter_tournament_information_end`
+    Print bold line.
+`segment_start`
+    Print information on the TIMELESS tournament about to start.
+`segment_generate_pairings`
+    Print pairings.
+`segment_register_wins`
+    Print empty line.
+`segment_display_standings`
+    Print standings.
+`segment_end`
+    Ask user if a tournament report should be saved and do it (or not).
+`segment_final`
+    Print exit instructions.
+
+"""
 
 import io
 import itertools
@@ -21,26 +77,34 @@ tournament_report = io.StringIO()
 
 
 def wrap(text):
+    """Wrap text to fit inside margins, with empty lines before and after."""
     text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, subsequent_indent=INDENT)
     return NEWLINE + text_wrapper.fill(text) + NEWLINE
 
 
 def typewriter(text, delay=0.05, ignore_whitespaces=False):
+    """Print text character by character for typewriter effect.
+
+    Parameters
+    ----------
+    text : str
+        Text to be printed.
+    delay : float or int
+        Delay after printing each character, in seconds.
+    ignore_whitespaces : bool, optional
+        If True, no delay after characters ' ' and '\n'.
+        (defaults to False)
+
+    Returns
+    -------
+    None
+    """
 
     for character in text:
         print(character, sep='', end='', flush=True)
         if ignore_whitespaces and character in [' ', NEWLINE]:
             continue
         time.sleep(delay)
-
-
-def is_string_of_integer(input_string):
-    """Check if a string represents an integer."""
-    try:
-        int(input_string)
-    except ValueError:
-        return False
-    return True
 
 
 def supervised_input(prompt, conditions, options=None):
@@ -58,12 +122,14 @@ def supervised_input(prompt, conditions, options=None):
     conditions: str, list of str
         Names of conditions. A string can be passed if only one condition is
         specified, otherwise a list of strings.
+        Valid strings: 'choose_from', 'alphabetical', 'less_than_25_characters',
+        'integer', 'multiple_of_10'.
     options: list of str, optional
         Valid input options if argument `conditions` is set to 'choose_from'.
         If `conditions` does not include 'choose_from', this argument is not
         relevant.
 
-        As user input first is passed to the `string.capwords` function,
+        As user input is first passed to the `string.capwords` function,
         strings in `options` should adhere to that same format as well.
         (defaults to None)
 
@@ -71,15 +137,14 @@ def supervised_input(prompt, conditions, options=None):
     -------
     str
         User input, satisfying all conditions in `conditions`. Words are
-        capitalised, consecutive whitespaces are replaced by a single
-        whitespace, and leading and trailing whitespaces are removed.
+        capitalised, consecutive whitespaces are replaced by a single space,
+        and leading and trailing whitespaces are removed.
 
     Notes
     -----
     User input is immediately passed to the `string.capwords` function, which
     capitalises words, strips leading and trailing whitespaces, and replaces
-    consecutive whitespaces by a single whitespace. There are two reasons for
-    this.
+    consecutive whitespaces by a single space. There are two reasons for this.
 
     (1) It is more convenient for the user. As all the checks will aplly to
     the modified string, user input will not be sensitive to choice of case
@@ -89,27 +154,35 @@ def supervised_input(prompt, conditions, options=None):
     Examples
     --------
     >>> supervised_input('Favourite integer: ', 'integer')
-    Favourite integer: >? 3.14
-    TIP: Enter an integer.
-    Favourite integer: >? 3
+            Favourite integer: >? 3.14
+            TIP: Enter an integer.
+            Favourite integer: >? 3
     '3'
 
     >>> supervised_input('Your name: ',
-    ...                  ['alphabetical', 'less_than_30_characters'])
-    Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart 1756
-    TIP: Use only letters and whitespaces.
-    Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart
-    TIP: Use less than 30 characters.
-    Your name: >? Amadeus
+    ...                  ['alphabetical', 'less_than_25_characters'])
+            Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart 1756
+            TIP: Use only letters and whitespaces.
+            Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart
+            TIP: Use less than 25 characters.
+            Your name: >? Amadeus
     'Amadeus'
 
     >>> supervised_input('Do you like yes or no questions?',
     ...                 'choose_from', options=['Yes', 'No'])
-    Do you like yes or no questions?>? I'm not sure
-    TIP: Enter one of these: Yes, No.
-    Do you like yes or no questions?>? No
+            Do you like yes or no questions?>? I'm not sure
+            TIP: Enter one of these: Yes, No.
+            Do you like yes or no questions?>? No
     'No'
     """
+
+    def is_string_of_integer(input_string):
+        """Check if a string represents an integer."""
+        try:
+            int(input_string)
+        except ValueError:
+            return False
+        return True
 
     condition_checks = {
         'choose_from': lambda input_string: input_string in options,
@@ -150,6 +223,35 @@ def supervised_input(prompt, conditions, options=None):
 
 
 def generate_centered_table(data, **kwargs):
+    """Generate table with `tabulate.tabulate`, and center it.
+
+    Parameters
+    ----------
+    data : Any
+        Valid input format for `tabulate.tabulate` function.
+    kwargs : Any
+        Valid keyword arguments for `tabulate.tabulate` function.
+
+    Returns
+    -------
+    str
+        Centered table.
+
+    Examples
+    --------
+    >>> my_data = {'Composers': ['Amadeus', 'Johann S', 'Johann C', 'Falco'],
+    ...            'Food': ['pizza', 'apple', 'ice cream', 'sushi']}
+    >>> my_table = generate_centered_table(my_data, headers='keys', tablefmt='fancy_outline')
+    >>> print(my_table)
+                              ╒═════════════╤═══════════╕
+                              │ Composers   │ Food      │
+                              ╞═════════════╪═══════════╡
+                              │ Amadeus     │ pizza     │
+                              │ Johann S    │ apple     │
+                              │ Johann C    │ ice cream │
+                              │ Falco       │ sushi     │
+                              ╘═════════════╧═══════════╛
+    """
 
     table = tabulate(data, **kwargs)
     rows = table.split(NEWLINE)
@@ -161,6 +263,22 @@ def generate_centered_table(data, **kwargs):
 
 
 def save_tournament_report(format_):
+    """Save contents of the global variable `tournament_report` to a file.
+
+    Parameters
+    ----------
+    format_ : {'Basic', 'Extra'}
+        Name of the TIMELESS format.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    A filename is generated automatically. If a file with that name already
+    exists, a number is appended.
+    """
 
     filename = f'{TODAY} TIMELESS {format_} Report.txt'
     counter = itertools.count(2)
@@ -183,6 +301,7 @@ def save_tournament_report(format_):
 
 
 def segment_initial():
+    """Print general information on the TIMELESS format."""
 
     text = '''Timeless je poseben turnirski format za štiri igralce.
 Ti se pomerijo v treh predrundah (vsak z vsakim), nato
@@ -206,6 +325,7 @@ da v štirih rundah vsak igralec igra z vsakim izmed
 
 
 def segment_enter_format():
+    """Print deck choice description."""
     text = '''Na voljo sta dva nabora
 deckov:
 
@@ -215,6 +335,7 @@ deckov:
 
 
 def segment_enter_entry_fee():
+    """Print entry fee description."""
     text = """Kaj pa prijavnina?
 Ta gre v celoti v nagradni sklad in se na koncu glede
 na dosežke razdeli nazaj med igralce.
@@ -226,14 +347,17 @@ na dosežke razdeli nazaj med igralce.
 
 
 def segment_enter_duelists():
+    """Print duelist sign-up prompt."""
     print(wrap('Enter duelist names.'))
 
 
 def segment_enter_tournament_information_end():
+    """Print bold line."""
     print(2 * NEWLINE + BOLDLINE)
 
 
 def segment_start(format_):
+    """Print information on the TIMELESS tournament about to start."""
 
     component_1 = 2 * NEWLINE + ' '.join('TIMELESS').center(LINE_WIDTH)
     component_2 = format_.center(LINE_WIDTH)
@@ -245,6 +369,7 @@ def segment_start(format_):
 
 
 def segment_generate_pairings(pairings, round_):
+    """Print pairings."""
 
     round_label = f' ROUND {round_ + 1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
 
@@ -256,10 +381,12 @@ def segment_generate_pairings(pairings, round_):
 
 
 def segment_register_wins():
+    """Print empty line."""
     print(NEWLINE)
 
 
 def segment_display_standings(standings, round_):
+    """Print standings."""
 
     colalign = ('center', 'left', 'center') if round_ in PRELIMINARY_ROUNDS else ('center', 'left', 'center', 'center')
 
@@ -271,6 +398,7 @@ def segment_display_standings(standings, round_):
 
 
 def segment_end(format_):
+    """Ask user if a tournament report should be saved and do it (or not)."""
 
     print(wrap('The tournament has concluded. Congratulations to all duelists!'))
     save_report = supervised_input('Would you like to save a tournament report, yes or no? ',
@@ -282,6 +410,7 @@ def segment_end(format_):
 
 
 def segment_final():
+    """Print exit instructions."""
     input(NEWLINE + BOLDLINE + NEWLINE + '(Press ENTER to exit.)')
 
 

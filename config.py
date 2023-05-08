@@ -1,7 +1,7 @@
 """Module containing constants for the Yugioh TIMELESS tournament format."""
 
 
-# interface.py
+# Used in `interface` module
 LINE_WIDTH = 80
 LEFT_MARGIN = 4
 RIGHT_MARGIN = LINE_WIDTH - LEFT_MARGIN
@@ -15,7 +15,7 @@ BOLDLINE = LINE_WIDTH * '='
 NEWLINE = '\n'
 
 
-# timeless.py
+# Used in `timeless` module
 FORMATS = ['Basic', 'Extra']
 DECK_SETS = {
     'Basic': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
@@ -23,7 +23,7 @@ DECK_SETS = {
 }
 
 ROUNDS = (0, 1, 2, 3)
-PRELIMINARY_ROUNDS = (0, 1, 2)  # used in interface.py as well
+PRELIMINARY_ROUNDS = (0, 1, 2)  # also used in `interface`
 FINAL_ROUND = 3
 PAIRING_CONFIGURATIONS = ([0, 1, 2, 3], [1, 3, 0, 2], [3, 0, 1, 2])
 TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES = ([3, 1, 1, 1], [2, 2, 2, 0])
