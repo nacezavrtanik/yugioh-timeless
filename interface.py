@@ -31,7 +31,7 @@ Functions
     Save contents of the global variable `tournament_report` to a file.
 `segment_initial`
     Print general information on the TIMELESS format.
-`segment_enter_format`
+`segment_enter_variant`
     Print deck choice description.
 `segment_enter_entry_fee`
     Print entry fee description.
@@ -241,13 +241,13 @@ def center_multiline_string(multiline_string):
     return centered_multiline_string
 
 
-def save_tournament_report(format_):
+def save_tournament_report(variant):
     """Save contents of the global variable `tournament_report` to a file.
 
     Parameters
     ----------
-    format_ : {'Basic', 'Extra'}
-        Name of the TIMELESS format.
+    variant : {'Basic', 'Extra'}
+        Name of the TIMELESS variant.
 
     Returns
     -------
@@ -259,10 +259,10 @@ def save_tournament_report(format_):
     exists, a number is appended.
     """
 
-    filename = f'{TODAY} TIMELESS {format_} Report.txt'
+    filename = f'{TODAY} TIMELESS {variant} Report.txt'
     counter = itertools.count(2)
     while filename in os.listdir():
-        filename = f'{TODAY} TIMELESS {format_} Report {next(counter)}.txt'
+        filename = f'{TODAY} TIMELESS {variant} Report {next(counter)}.txt'
 
     try:
         with open(filename, 'w', encoding='utf-8') as report_file:
@@ -301,7 +301,7 @@ da v štirih rundah vsak igralec igra z vsakim izmed
     time.sleep(1)
 
 
-def segment_enter_format():
+def segment_enter_variant():
     """Print deck choice description."""
     text = '''Na voljo sta dva nabora
 deckov:
@@ -335,11 +335,11 @@ def segment_enter_tournament_information_end():
     print(colorise(SUBTITLE, 2 * NEWLINE + LINE))
 
 
-def segment_starting(format_):
+def segment_starting(variant):
     """Print information on the TIMELESS tournament about to start."""
 
     component_1 = colorise(TITLE, 2 * NEWLINE + ' '.join('TIMELESS').center(LINE_WIDTH))
-    component_2 = colorise(TITLE, format_.center(LINE_WIDTH))
+    component_2 = colorise(TITLE, variant.center(LINE_WIDTH))
     component_3 = colorise(TITLE, str(TODAY).center(LINE_WIDTH))
     component_4 = colorise(TITLE, 2 * NEWLINE + BOLDLINE)
 
@@ -377,7 +377,7 @@ def segment_display_standings(standings, round_):
     print(component_1, component_2, sep=NEWLINE, file=tournament_report)
 
 
-def segment_ending(format_):
+def segment_ending(variant):
     """Ask user if a tournament report should be saved and do it (or not)."""
 
     print(colorise(SUBTITLE, NEWLINE + f'{" COVERAGE ":-^{LINE_WIDTH}}'))
@@ -386,7 +386,7 @@ def segment_ending(format_):
     save_report = supervised_input('Would you like to save a tournament report, yes or no? ',
                                    'choose_from', options=['Yes', 'No'])
     if save_report == 'Yes':
-        save_tournament_report(format_)
+        save_tournament_report(variant)
     else:
         print(wrap('Report not saved.'))
 

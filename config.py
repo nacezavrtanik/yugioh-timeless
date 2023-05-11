@@ -25,7 +25,7 @@ TIMELESS = NEWLINE.join([
 
 
 # Used in `timeless` module
-FORMATS = ['Basic', 'Extra']
+VARIANTS = ['Basic', 'Extra']
 DECK_SETS = {
     'Basic': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
     'Extra': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']

@@ -38,7 +38,7 @@ Functions
 import numpy as np
 
 import interface
-from config import FORMATS, DECK_SETS, ROUNDS, PRELIMINARY_ROUNDS, FINAL_ROUND
+from config import VARIANTS, DECK_SETS, ROUNDS, PRELIMINARY_ROUNDS, FINAL_ROUND
 from config import PAIRING_CONFIGURATIONS, TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES, STANDING_CONFIGURATIONS
 
 
@@ -158,19 +158,19 @@ def enter_tournament_information():
     Returns
     -------
     dict
-        Keys are 'format_', 'entry_fee', and 'duelists'. Used as input
+        Keys are 'variant', 'entry_fee', and 'duelists'. Used as input
         for the `timeless` function.
     """
 
-    interface.segments.get('enter_format')()
-    format_ = interface.supervised_input('Choose format: ', 'choose_from', options=FORMATS)
-    interface.segments.get('enter_entry_fee')()
+    interface.segment_enter_variant()
+    variant = interface.supervised_input('Choose variant: ', 'choose_from', options=VARIANTS)
+    interface.segment_enter_entry_fee()
     entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10']))
-    interface.segments.get('enter_duelists')()
+    interface.segment_enter_duelists()
     duelists = np.random.permutation(enter_unique_duelists())
-    interface.segments.get('enter_tournament_information_end')()
+    interface.segment_enter_tournament_information_end()
 
-    tournament_information = {'format_': format_, 'entry_fee': entry_fee, 'duelists': duelists}
+    tournament_information = {'variant': variant, 'entry_fee': entry_fee, 'duelists': duelists}
 
     return tournament_information
 
@@ -278,7 +278,7 @@ def generate_pairings(duelists, decks, matchup, round_):
     pairings = [[f'{duelist_x} ({deck_x})', 'VS', f'{duelist_y} ({deck_y})'],
                 [f'{duelist_z} ({deck_z})', 'VS', f'{duelist_w} ({deck_w})']]
 
-    interface.segments.get('generate_pairings')(pairings, round_)
+    interface.segment_generate_pairings(pairings, round_)
 
     return duelist_x, duelist_y, duelist_z, duelist_w
 
@@ -324,7 +324,7 @@ def register_wins(duelist_x, duelist_y, duelist_z, duelist_w):
     winner_xy.wins += 1
     winner_zw.wins += 1
 
-    interface.segments.get('register_wins')()
+    interface.segment_register_wins()
 
     return winner_xy, loser_xy, winner_zw, loser_zw
 
@@ -380,10 +380,10 @@ def display_standings(winners_and_losers, round_, entry_fee):
         standings['Prize'] = map(
             lambda x: f'¤{x * entry_fee_unit}', STANDING_CONFIGURATIONS.get(key).get('Points')[index])
 
-    interface.segments.get('display_standings')(standings, round_)
+    interface.segment_display_standings(standings, round_)
 
 
-def timeless(duelists, format_, entry_fee):
+def timeless(duelists, variant, entry_fee):
     """Run the TIMELESS tournament.
 
     Parameters
@@ -396,8 +396,8 @@ def timeless(duelists, format_, entry_fee):
         which depend on this order also depend on the particular choice of
         Timeless square, and that is generated (randomly) after the argument
         `duelists` is already set.
-    format_ : {'Basic', 'Extra'}
-        Name of the TIMELESS format.
+    variant : {'Basic', 'Extra'}
+        Name of the TIMELESS variant.
     entry_fee : int
         The entry fee is required to be a multiple of 10.
 
@@ -414,8 +414,8 @@ def timeless(duelists, format_, entry_fee):
     list of duelists, making irrelevant the order in which they are entered.
     """
 
-    interface.segments.get('start')(format_)
-    decks = DECK_SETS.get(format_)
+    interface.segment_starting(variant)
+    decks = DECK_SETS.get(variant)
     matchup = random_timeless_square()
 
     for round_ in ROUNDS:
@@ -423,15 +423,15 @@ def timeless(duelists, format_, entry_fee):
         winners_and_losers = register_wins(*pairings)
         display_standings(winners_and_losers, round_, entry_fee)
 
-    interface.segments.get('end')(format_)
+    interface.segment_ending(variant)
 
 
 def main():
     """Run the TIMELESS tournament in the standard, intended way."""
 
-    interface.segments.get('initial')()
+    interface.segment_initial()
     timeless(**enter_tournament_information())
-    interface.segments.get('final')()
+    interface.segment_final()
 
 
 if __name__ == '__main__':
