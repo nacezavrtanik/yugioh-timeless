@@ -11,7 +11,8 @@ LARGE_INDENT = 2 * INDENT
 GIT = 'git-url'
 YOUTUBE = 'youtube-url'
 
-BOLDLINE = LINE_WIDTH * '='
+LINE = '-' * LINE_WIDTH
+BOLDLINE = '=' * LINE_WIDTH
 NEWLINE = '\n'
 
 TIMELESS = NEWLINE.join([
