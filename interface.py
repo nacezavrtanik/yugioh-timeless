@@ -57,6 +57,7 @@ Functions
 import io
 import itertools
 import os
+import random
 import shutil
 import string
 import textwrap
@@ -69,6 +70,8 @@ from tabulate import tabulate
 from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, GIT, YOUTUBE, LINE, BOLDLINE, NEWLINE, TIMELESS
 from config import PRELIMINARY_ROUNDS
 
+
+LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mauris cursus mattis molestie a iaculis. Habitant morbi tristique senectus et. Sit amet luctus venenatis lectus magna fringilla urna.'
 
 colorama.just_fix_windows_console()  # enable ANSI escape characters on Windows
 
@@ -230,6 +233,27 @@ def colorise(color, text):
     return color + text + colorama.Style.RESET_ALL
 
 
+def simulate_loading(label):
+    """TODO"""
+
+    label = label.strip()
+    leading_spaces = label.center(LINE_WIDTH).index(label[0])
+
+    print()
+
+    for progress in range(LINE_WIDTH):
+
+        if progress < leading_spaces:
+            bar = f'{progress * "-"}{" " * (leading_spaces - progress)}{label}'
+        else:
+            bar = f'{"-" * (leading_spaces - 1)} {label} {"-" * (progress - leading_spaces - len(label))}'
+
+        print(colorise(SUBTITLE, bar), end='\r', flush=True)
+        time.sleep(random.uniform(0, 0.1))
+
+    print()
+
+
 def center_multiline_string(multiline_string):
     """TODO"""
 
@@ -282,52 +306,32 @@ def save_tournament_report(variant):
 def segment_initial():
     """Print general information on the TIMELESS format."""
 
-    text = '''Timeless je poseben turnirski format za štiri igralce.
-Ti se pomerijo v treh predrundah (vsak z vsakim), nato
-pa sledi še finalna runda. Nobena izmed teh ni časovno
-omejena. Igra se z naborom štirih deckov, ki so med
-igralce razdeljeni naključno. Po vsaki rundi se decki
-ponovno naključno razdelijo med igralce, in sicer tako,
-da v štirih rundah vsak igralec igra z vsakim izmed
-štirih deckov natanko enkrat.'''
+    text = LOREM
 
     component_1 = colorise(TITLE, 2 * NEWLINE + center_multiline_string(TIMELESS) + NEWLINE)
     component_2 = colorise(SUBTITLE, f'git: {GIT}'.center(LINE_WIDTH))
     component_3 = colorise(SUBTITLE, f'youtube: {YOUTUBE}'.center(LINE_WIDTH))
     component_4 = wrap(text) + NEWLINE
-    component_5 = colorise(TITLE, BOLDLINE)
 
-    print(component_1, component_2, component_3, component_4, component_5, sep=NEWLINE)
-    time.sleep(1)
+    print(component_1, component_2, component_3, component_4, sep=NEWLINE)
 
 
 def segment_enter_variant():
     """Print deck choice description."""
-    text = '''Na voljo sta dva nabora
-deckov:
-
- 1) BASIC
- 2) EXTRA'''
-    component_1 = colorise(SUBTITLE, NEWLINE + f'{" SIGN-UP ":-^{LINE_WIDTH}}')
-    component_2 = wrap(text)
-    print(component_1, component_2, sep=NEWLINE)
+    text = LOREM
+    simulate_loading('SIGN-UP')
+    print(wrap(text))
 
 
 def segment_enter_entry_fee():
     """Print entry fee description."""
-    text = """Kaj pa prijavnina?
-Ta gre v celoti v nagradni sklad in se na koncu glede
-na dosežke razdeli nazaj med igralce.
-
- 1) 5 €
- 2) 10 €
- 3) brez"""
+    text = LOREM
     print(wrap(text))
 
 
 def segment_enter_duelists():
     """Print duelist sign-up prompt."""
-    print(wrap('Enter duelist names.'))
+    print(wrap(LOREM))
 
 
 def segment_enter_tournament_information_end():
@@ -349,14 +353,9 @@ def segment_starting(variant):
 
 def segment_generate_pairings(pairings, round_):
     """Print pairings."""
-
     round_label = f' ROUND {round_ + 1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
-
-    component_1 = colorise(SUBTITLE, NEWLINE + f'{round_label:-^{LINE_WIDTH}}' + NEWLINE)
-    component_2 = NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE
-
-    print(component_1, component_2, sep=NEWLINE)
-    print(component_1, component_2, sep=NEWLINE, file=tournament_report)
+    simulate_loading(round_label)
+    print(2 * NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE)
 
 
 def segment_register_wins():
@@ -371,7 +370,7 @@ def segment_display_standings(standings, round_):
 
     component_1 = center_multiline_string(
         tabulate(standings, headers='keys', tablefmt='double_outline', colalign=colalign))
-    component_2 = '' if round_ in PRELIMINARY_ROUNDS else colorise(TITLE, 2 * NEWLINE + BOLDLINE)
+    component_2 = '' if round_ in PRELIMINARY_ROUNDS else colorise(TITLE, 2 * NEWLINE + BOLDLINE + NEWLINE)
 
     print(component_1, component_2, sep=NEWLINE)
     print(component_1, component_2, sep=NEWLINE, file=tournament_report)
@@ -380,8 +379,8 @@ def segment_display_standings(standings, round_):
 def segment_ending(variant):
     """Ask user if a tournament report should be saved and do it (or not)."""
 
-    print(colorise(SUBTITLE, NEWLINE + f'{" COVERAGE ":-^{LINE_WIDTH}}'))
-    print(wrap('The tournament has concluded. Congratulations to all duelists!'))
+    simulate_loading('COVERAGE')
+    print(wrap(LOREM))
 
     save_report = supervised_input('Would you like to save a tournament report, yes or no? ',
                                    'choose_from', options=['Yes', 'No'])
@@ -395,5 +394,4 @@ def segment_ending(variant):
 
 def segment_final():
     """Print exit instructions."""
-    print(colorise(TITLE, NEWLINE + BOLDLINE))
     input(colorise(SUBTITLE, '(Press ENTER to exit.)'))
