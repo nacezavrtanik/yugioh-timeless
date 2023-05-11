@@ -14,6 +14,14 @@ YOUTUBE = 'youtube-url'
 BOLDLINE = LINE_WIDTH * '='
 NEWLINE = '\n'
 
+TIMELESS = NEWLINE.join([
+    r'  ____________  ___________    ________________',
+    r' /_  __/  _/  |/  / ____/ /   / ____/ ___/ ___/',
+    r'  / /  / // /|_/ / __/ / /   / __/  \__ \\__ \ ',
+    r' / / _/ // /  / / /___/ /___/ /___ ___/ /__/ / ',
+    r'/_/ /___/_/  /_/_____/_____/_____//____/____/  '
+])
+
 
 # Used in `timeless` module
 FORMATS = ['Basic', 'Extra']

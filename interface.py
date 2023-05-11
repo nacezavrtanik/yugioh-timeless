@@ -67,7 +67,8 @@ import datetime
 
 from tabulate import tabulate
 
-from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, GIT, YOUTUBE, BOLDLINE, NEWLINE, PRELIMINARY_ROUNDS
+from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, GIT, YOUTUBE, BOLDLINE, NEWLINE, TIMELESS
+from config import PRELIMINARY_ROUNDS
 
 
 TODAY = datetime.datetime.today().date()
@@ -222,44 +223,15 @@ def supervised_input(prompt, conditions, options=None):
             return user_input
 
 
-def generate_centered_table(data, **kwargs):
-    """Generate table with `tabulate.tabulate`, and center it.
+def center_multiline_string(multiline_string):
+    """TODO"""
 
-    Parameters
-    ----------
-    data : Any
-        Valid input format for `tabulate.tabulate` function.
-    kwargs : Any
-        Valid keyword arguments for `tabulate.tabulate` function.
+    lines = multiline_string.split(NEWLINE)
+    max_line_length = max(map(len, lines))
+    centered_lines = [f'{row:<{max_line_length}}'.center(LINE_WIDTH) for row in lines]  # padded for proper alignment
+    centered_multiline_string = NEWLINE.join(centered_lines)
 
-    Returns
-    -------
-    str
-        Centered table.
-
-    Examples
-    --------
-    >>> my_data = {'Composers': ['Amadeus', 'Johann S', 'Johann C', 'Falco'],
-    ...            'Food': ['pizza', 'apple', 'ice cream', 'sushi']}
-    >>> my_table = generate_centered_table(my_data, headers='keys', tablefmt='fancy_outline')
-    >>> print(my_table)
-                              ╒═════════════╤═══════════╕
-                              │ Composers   │ Food      │
-                              ╞═════════════╪═══════════╡
-                              │ Amadeus     │ pizza     │
-                              │ Johann S    │ apple     │
-                              │ Johann C    │ ice cream │
-                              │ Falco       │ sushi     │
-                              ╘═════════════╧═══════════╛
-    """
-
-    table = tabulate(data, **kwargs)
-    rows = table.split(NEWLINE)
-    max_row_length = max(map(len, rows))
-    centered_rows = [f'{row:<{max_row_length}}'.center(LINE_WIDTH) for row in rows]  # padded for proper alignment
-    centered_table = NEWLINE.join(centered_rows)
-
-    return centered_table
+    return centered_multiline_string
 
 
 def save_tournament_report(format_):
@@ -312,16 +284,14 @@ ponovno naključno razdelijo med igralce, in sicer tako,
 da v štirih rundah vsak igralec igra z vsakim izmed
 štirih deckov natanko enkrat.'''
 
-    component_1 = 3 * NEWLINE + ' '.join('TIMELESS').center(LINE_WIDTH) + 2 * NEWLINE
+    component_1 = 3 * NEWLINE + center_multiline_string(TIMELESS) + NEWLINE
     component_2 = f'git: {GIT}'.center(LINE_WIDTH)
     component_3 = f'youtube: {YOUTUBE}'.center(LINE_WIDTH)
     component_4 = wrap(text) + NEWLINE
     component_5 = BOLDLINE
 
-    time.sleep(1)
-    typewriter(component_1, delay=0.2, ignore_whitespaces=True)
-    print(component_2, component_3, component_4, component_5, sep=NEWLINE)
-    time.sleep(1)
+    print(component_1, component_2, component_3, component_4, component_5, sep=NEWLINE)
+    time.sleep(2)
 
 
 def segment_enter_format():
@@ -374,7 +344,7 @@ def segment_generate_pairings(pairings, round_):
     round_label = f' ROUND {round_ + 1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
 
     component_1 = NEWLINE + f'{round_label:-^{LINE_WIDTH}}' + NEWLINE
-    component_2 = NEWLINE + generate_centered_table(pairings, tablefmt='plain') + NEWLINE
+    component_2 = NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE
 
     print(component_1, component_2, sep=NEWLINE)
     print(component_1, component_2, sep=NEWLINE, file=tournament_report)
@@ -390,7 +360,8 @@ def segment_display_standings(standings, round_):
 
     colalign = ('center', 'left', 'center') if round_ in PRELIMINARY_ROUNDS else ('center', 'left', 'center', 'center')
 
-    component_1 = generate_centered_table(standings, headers='keys', tablefmt='double_outline', colalign=colalign)
+    component_1 = center_multiline_string(
+        tabulate(standings, headers='keys', tablefmt='double_outline', colalign=colalign))
     component_2 = '' if round_ in PRELIMINARY_ROUNDS else 2 * NEWLINE + BOLDLINE
 
     print(component_1, component_2, sep=NEWLINE)
