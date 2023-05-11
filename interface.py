@@ -16,8 +16,6 @@ Variables
     Constant containding today's date as a `datetime.date` instance.
 `tournament_report`
     Instance of `io.StringIO` for documentting the course of the tournament.
-`segments`
-    Dictionary containing all segment functions.
 
 Functions
 ---------
@@ -41,7 +39,7 @@ Functions
     Print duelist sign-up prompt.
 `segment_enter_tournament_information_end`
     Print bold line.
-`segment_start`
+`segment_starting`
     Print information on the TIMELESS tournament about to start.
 `segment_generate_pairings`
     Print pairings.
@@ -49,7 +47,7 @@ Functions
     Print empty line.
 `segment_display_standings`
     Print standings.
-`segment_end`
+`segment_ending`
     Ask user if a tournament report should be saved and do it (or not).
 `segment_final`
     Print exit instructions.
@@ -337,7 +335,7 @@ def segment_enter_tournament_information_end():
     print(colorise(SUBTITLE, 2 * NEWLINE + LINE))
 
 
-def segment_start(format_):
+def segment_starting(format_):
     """Print information on the TIMELESS tournament about to start."""
 
     component_1 = colorise(TITLE, 2 * NEWLINE + ' '.join('TIMELESS').center(LINE_WIDTH))
@@ -379,7 +377,7 @@ def segment_display_standings(standings, round_):
     print(component_1, component_2, sep=NEWLINE, file=tournament_report)
 
 
-def segment_end(format_):
+def segment_ending(format_):
     """Ask user if a tournament report should be saved and do it (or not)."""
 
     print(colorise(SUBTITLE, NEWLINE + f'{" COVERAGE ":-^{LINE_WIDTH}}'))
@@ -399,18 +397,3 @@ def segment_final():
     """Print exit instructions."""
     print(colorise(TITLE, NEWLINE + BOLDLINE))
     input(colorise(SUBTITLE, '(Press ENTER to exit.)'))
-
-
-segments = {
-    'initial': segment_initial,
-    'enter_format': segment_enter_format,
-    'enter_entry_fee': segment_enter_entry_fee,
-    'enter_duelists': segment_enter_duelists,
-    'enter_tournament_information_end': segment_enter_tournament_information_end,
-    'start': segment_start,
-    'generate_pairings': segment_generate_pairings,
-    'register_wins': segment_register_wins,
-    'display_standings': segment_display_standings,
-    'end': segment_end,
-    'final': segment_final,
-}
