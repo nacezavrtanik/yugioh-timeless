@@ -414,7 +414,7 @@ def timeless(duelists, variant, entry_fee):
     list of duelists, making irrelevant the order in which they are entered.
     """
 
-    interface.segment_starting(variant)
+    interface.segment_starting(variant, entry_fee)
     decks = DECK_SETS.get(variant)
     matchup = random_timeless_square()
 
@@ -423,7 +423,7 @@ def timeless(duelists, variant, entry_fee):
         winners_and_losers = register_wins(*pairings)
         display_standings(winners_and_losers, round_, entry_fee)
 
-    interface.segment_ending(variant)
+    interface.segment_ending(variant, entry_fee)
 
 
 def main():

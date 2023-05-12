@@ -245,13 +245,15 @@ def center_multiline_string(multiline_string):
     return centered_multiline_string
 
 
-def save_tournament_report(variant):
+def save_tournament_report(variant, entry_fee):
     """Save contents of the global variable `tournament_report` to a file.
 
     Parameters
     ----------
     variant : {'Basic', 'Extra'}
         Name of the TIMELESS variant.
+    entry_fee : int
+        Entry fee for the TIMELESS tournament.
 
     Returns
     -------
@@ -263,10 +265,10 @@ def save_tournament_report(variant):
     exists, a number is appended.
     """
 
-    filename = f'{TODAY} TIMELESS {variant} Report.txt'
+    filename = f'{TODAY} TIMELESS-{variant}-{entry_fee} Report.txt'
     counter = itertools.count(2)
     while filename in os.listdir():
-        filename = f'{TODAY} TIMELESS {variant} Report {next(counter)}.txt'
+        filename = f'{TODAY} TIMELESS-{variant}-{entry_fee} Report {next(counter)}.txt'
 
     try:
         with open(filename, 'w', encoding='utf-8') as report_file:
@@ -319,11 +321,11 @@ def segment_enter_tournament_information_end():
     print(colorise(SUBTITLE, 2 * NEWLINE + LINE))
 
 
-def segment_starting(variant):
+def segment_starting(variant, entry_fee):
     """Print information on the TIMELESS tournament about to start."""
 
     component_1 = colorise(TITLE, 2 * NEWLINE + ' '.join('TIMELESS').center(LINE_WIDTH))
-    component_2 = colorise(TITLE, variant.center(LINE_WIDTH))
+    component_2 = colorise(TITLE, f'{variant}, ¤{entry_fee}'.center(LINE_WIDTH))
     component_3 = colorise(TITLE, str(TODAY).center(LINE_WIDTH))
     component_4 = colorise(TITLE, 2 * NEWLINE + BOLDLINE)
 
@@ -356,7 +358,7 @@ def segment_display_standings(standings, round_):
     print(component_1, component_2, sep=NEWLINE, file=tournament_report)
 
 
-def segment_ending(variant):
+def segment_ending(variant, entry_fee):
     """Ask user if a tournament report should be saved and do it (or not)."""
 
     simulate_loading('COVERAGE')
@@ -365,7 +367,7 @@ def segment_ending(variant):
     save_report = supervised_input('Would you like to save a tournament report, yes or no? ',
                                    'choose_from', options=['Yes', 'No'])
     if save_report == 'Yes':
-        save_tournament_report(variant)
+        save_tournament_report(variant, entry_fee)
     else:
         print(wrap('Report not saved.'))
 
