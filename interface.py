@@ -172,6 +172,7 @@ def supervised_input(prompt, conditions, options=None):
         'less_than_25_characters': lambda input_string: len(input_string) < 25,
         'integer': lambda input_string: is_string_of_integer(input_string),
         'multiple_of_10': lambda input_string: int(input_string) % 10 == 0 and int(input_string) >= 0,
+        'max_1000': lambda input_string: int(input_string) <= 1000,
     }
 
     input_tips = {
@@ -180,6 +181,7 @@ def supervised_input(prompt, conditions, options=None):
         'less_than_25_characters': 'Use less than 25 characters.',
         'integer': 'Enter an integer.',
         'multiple_of_10': 'Pick a non-negative multiple of 10.',
+        'max_1000': 'Enter a maximum of 1000.',
     }
 
     if isinstance(conditions, str):
