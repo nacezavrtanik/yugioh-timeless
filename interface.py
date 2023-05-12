@@ -200,13 +200,12 @@ def supervised_input(prompt, conditions, options=None):
             check = check and condition_satisfied
 
             if not condition_satisfied:
-                # Insert tip above prompt, replace previous tip if any
-                upstep = Cursor.UP() * (1 + tip_is_displayed)
-                print(upstep + clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}', flush=True)
+                print(clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}', end='\r' + Cursor.UP())
                 tip_is_displayed = True
                 break
 
         if check:
+            print(clear_line(), end='') if tip_is_displayed else None
             return user_input
 
 
