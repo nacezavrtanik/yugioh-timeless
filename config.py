@@ -1,18 +1,24 @@
 """Module containing constants for the Yugioh TIMELESS tournament format."""
 
 
+# Temporary
+LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mauris cursus mattis molestie a iaculis. Habitant morbi tristique senectus et. Sit amet luctus venenatis lectus magna fringilla urna.'
+
+
 # Used in `interface` module
-LINE_WIDTH = 80
-LEFT_MARGIN = 4
-RIGHT_MARGIN = LINE_WIDTH - LEFT_MARGIN
-INDENT = LEFT_MARGIN * ' '
+TERMINAL_WIDTH = 80
+MARGIN = 2
+LINE_WIDTH = TERMINAL_WIDTH - 2 * MARGIN
+
+LEFT_MARGIN = 2 * MARGIN
+RIGHT_MARGIN = TERMINAL_WIDTH - LEFT_MARGIN
+
+INDENT = ' ' * LEFT_MARGIN  # == 2 * SMALL_INDENT
+SMALL_INDENT = ' ' * MARGIN
 LARGE_INDENT = 2 * INDENT
 
-GIT = 'git-url'
-YOUTUBE = 'youtube-url'
-
-LINE = '-' * LINE_WIDTH
-BOLDLINE = '=' * LINE_WIDTH
+LINE = SMALL_INDENT + '-' * LINE_WIDTH
+BOLDLINE = SMALL_INDENT + '=' * LINE_WIDTH
 NEWLINE = '\n'
 
 TIMELESS = NEWLINE.join([  # created with `pyfiglet`
@@ -22,6 +28,8 @@ TIMELESS = NEWLINE.join([  # created with `pyfiglet`
     r' / / _/ // /  / / /___/ /___/ /___ ___/ /__/ / ',
     r'/_/ /___/_/  /_/_____/_____/_____//____/____/  '
 ])
+GIT = 'git-url'
+YOUTUBE = 'youtube-url'
 
 
 # Used in `timeless` module

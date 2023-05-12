@@ -68,11 +68,11 @@ from colorama import Cursor, Fore, Style, just_fix_windows_console
 from colorama.ansi import clear_line
 from tabulate import tabulate
 
-from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, GIT, YOUTUBE, LINE, BOLDLINE, NEWLINE, TIMELESS
+from config import TERMINAL_WIDTH, MARGIN, RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
+from config import LINE, BOLDLINE, NEWLINE, TIMELESS, GIT, YOUTUBE
 from config import PRELIMINARY_ROUNDS
+from config import LOREM
 
-
-LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mauris cursus mattis molestie a iaculis. Habitant morbi tristique senectus et. Sit amet luctus venenatis lectus magna fringilla urna.'
 
 just_fix_windows_console()  # enable ANSI escape characters on Windows
 
@@ -217,19 +217,17 @@ def colorise(color, text):
 def simulate_loading(label):
     """TODO"""
 
-    label = label.strip()
-    leading_spaces = label.center(LINE_WIDTH).index(label[0])
+    label = f' {label.strip()} '
+    leading_spaces = label.center(TERMINAL_WIDTH).index(label)
 
     print()
 
-    for progress in range(LINE_WIDTH):
+    for progress in range(1, TERMINAL_WIDTH - MARGIN + 1):
 
-        if progress < leading_spaces:
-            bar = f'{progress * "-"}{" " * (leading_spaces - progress)}{label}'
-        else:
-            bar = f'{"-" * (leading_spaces - 1)} {label} {"-" * (progress - leading_spaces - len(label))}'
+        bar = ('-' * progress).ljust(TERMINAL_WIDTH - MARGIN)
+        labeled_bar = SMALL_INDENT + bar[MARGIN:leading_spaces] + label + bar[leading_spaces+len(label):]
 
-        print(colorise(SUBTITLE, bar), end='\r', flush=True)
+        print(colorise(SUBTITLE, labeled_bar), end='\r', flush=True)
         time.sleep(random.uniform(0, 0.1))
 
     print()
@@ -240,7 +238,7 @@ def center_multiline_string(multiline_string):
 
     lines = multiline_string.split(NEWLINE)
     max_line_length = max(map(len, lines))
-    centered_lines = [f'{row:<{max_line_length}}'.center(LINE_WIDTH) for row in lines]  # padded for proper alignment
+    centered_lines = [f'{row:<{max_line_length}}'.center(TERMINAL_WIDTH).rstrip() for row in lines]
     centered_multiline_string = NEWLINE.join(centered_lines)
 
     return centered_multiline_string
@@ -291,10 +289,10 @@ def segment_initial():
 
     text = LOREM
 
-    component_1 = colorise(TITLE, 2 * NEWLINE + center_multiline_string(TIMELESS) + NEWLINE)
-    component_2 = colorise(SUBTITLE, f'git: {GIT}'.center(LINE_WIDTH))
-    component_3 = colorise(SUBTITLE, f'youtube: {YOUTUBE}'.center(LINE_WIDTH))
-    component_4 = wrap(text) + NEWLINE
+    component_1 = colorise(TITLE, 3 * NEWLINE + center_multiline_string(TIMELESS) + 2 * NEWLINE)
+    component_2 = colorise(SUBTITLE, f'git: {GIT}'.center(TERMINAL_WIDTH).rstrip())
+    component_3 = colorise(SUBTITLE, f'youtube: {YOUTUBE}'.center(TERMINAL_WIDTH).rstrip())
+    component_4 = NEWLINE + wrap(text)
 
     print(component_1, component_2, component_3, component_4, sep=NEWLINE)
 
@@ -319,18 +317,18 @@ def segment_enter_duelists():
 
 def segment_enter_tournament_information_end():
     """Print bold line."""
-    print(colorise(SUBTITLE, 2 * NEWLINE + LINE))
+    print(colorise(SUBTITLE, NEWLINE + LINE))
 
 
 def segment_starting(variant, entry_fee):
     """Print information on the TIMELESS tournament about to start."""
 
-    component_1 = colorise(TITLE, 2 * NEWLINE + ' '.join('TIMELESS').center(LINE_WIDTH))
-    component_2 = colorise(TITLE, f'{variant}, ¤{entry_fee}'.center(LINE_WIDTH))
-    component_3 = colorise(TITLE, str(TODAY).center(LINE_WIDTH))
-    component_4 = colorise(TITLE, 2 * NEWLINE + BOLDLINE)
+    component_1 = colorise(TITLE, 3 * NEWLINE + ' '.join('TIMELESS').center(TERMINAL_WIDTH).rstrip())
+    component_2 = colorise(TITLE, f'{variant}, ¤{entry_fee}'.center(TERMINAL_WIDTH).rstrip())
+    component_3 = colorise(TITLE, str(TODAY).center(TERMINAL_WIDTH).rstrip())
+    component_4 = colorise(TITLE, NEWLINE + BOLDLINE + NEWLINE)
 
-    print(component_1, component_2, component_3, component_4, sep=NEWLINE)
+    print(component_1, component_2, component_3, component_4, sep=2*NEWLINE)
     print(component_1, component_2, component_3, component_4, sep=NEWLINE, file=tournament_report)
 
 
@@ -343,7 +341,7 @@ def segment_generate_pairings(pairings, round_):
 
 def segment_register_wins():
     """Print empty line."""
-    print(NEWLINE)
+    print()
 
 
 def segment_display_standings(standings, round_):
@@ -372,9 +370,9 @@ def segment_ending(variant, entry_fee):
     else:
         print(wrap('Report not saved.'))
 
-    print(colorise(SUBTITLE, NEWLINE + LINE))
+    print(colorise(SUBTITLE, LINE))
 
 
 def segment_final():
     """Print exit instructions."""
-    input(colorise(SUBTITLE, '(Press ENTER to exit.)'))
+    input(colorise(SUBTITLE, SMALL_INDENT + '(Press ENTER to exit.)'))
