@@ -15,7 +15,7 @@ LINE = '-' * LINE_WIDTH
 BOLDLINE = '=' * LINE_WIDTH
 NEWLINE = '\n'
 
-TIMELESS = NEWLINE.join([
+TIMELESS = NEWLINE.join([  # created with `pyfiglet`
     r'  ____________  ___________    ________________',
     r' /_  __/  _/  |/  / ____/ /   / ____/ ___/ ___/',
     r'  / /  / // /|_/ / __/ / /   / __/  \__ \\__ \ ',

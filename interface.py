@@ -88,31 +88,6 @@ def wrap(text):
     return NEWLINE + text_wrapper.fill(text) + NEWLINE
 
 
-def typewriter(text, delay=0.05, ignore_whitespaces=False):
-    """Print text character by character for typewriter effect.
-
-    Parameters
-    ----------
-    text : str
-        Text to be printed.
-    delay : float or int
-        Delay after printing each character, in seconds.
-    ignore_whitespaces : bool, optional
-        If True, no delay after characters ' ' and '\n'.
-        (defaults to False)
-
-    Returns
-    -------
-    None
-    """
-
-    for character in text:
-        print(character, sep='', end='', flush=True)
-        if ignore_whitespaces and character in [' ', NEWLINE]:
-            continue
-        time.sleep(delay)
-
-
 def supervised_input(prompt, conditions, options=None):
     """Require user input to satisfy specified conditions.
 
@@ -211,8 +186,7 @@ def supervised_input(prompt, conditions, options=None):
 
     while True:
 
-        typewriter(LARGE_INDENT + prompt)
-        user_input = string.capwords(input())
+        user_input = string.capwords(input(colorise(colorama.Style.BRIGHT, LARGE_INDENT + prompt)))
         check = True
 
         for condition in conditions:
