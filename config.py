@@ -1,12 +1,14 @@
 """Module containing constants for the Yugioh TIMELESS tournament format."""
 
+import shutil
+
 
 # Temporary
 LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mauris cursus mattis molestie a iaculis. Habitant morbi tristique senectus et. Sit amet luctus venenatis lectus magna fringilla urna.'
 
 
 # Used in `interface` module
-TERMINAL_WIDTH = 80
+TERMINAL_WIDTH = max(80, shutil.get_terminal_size().columns)
 MARGIN = 2
 LINE_WIDTH = TERMINAL_WIDTH - 2 * MARGIN
 
