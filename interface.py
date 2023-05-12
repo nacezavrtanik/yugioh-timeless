@@ -64,7 +64,8 @@ import textwrap
 import time
 import datetime
 
-import colorama
+from colorama import Cursor, Fore, Style, just_fix_windows_console
+from colorama.ansi import clear_line
 from tabulate import tabulate
 
 from config import RIGHT_MARGIN, INDENT, LARGE_INDENT, LINE_WIDTH, GIT, YOUTUBE, LINE, BOLDLINE, NEWLINE, TIMELESS
@@ -73,10 +74,10 @@ from config import PRELIMINARY_ROUNDS
 
 LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mauris cursus mattis molestie a iaculis. Habitant morbi tristique senectus et. Sit amet luctus venenatis lectus magna fringilla urna.'
 
-colorama.just_fix_windows_console()  # enable ANSI escape characters on Windows
+just_fix_windows_console()  # enable ANSI escape characters on Windows
 
-TITLE = colorama.Fore.CYAN + colorama.Style.BRIGHT
-SUBTITLE = colorama.Fore.CYAN
+TITLE = Fore.CYAN + Style.BRIGHT
+SUBTITLE = Fore.CYAN
 TODAY = datetime.datetime.today().date()
 
 tournament_report = io.StringIO()
@@ -184,9 +185,11 @@ def supervised_input(prompt, conditions, options=None):
     if isinstance(conditions, str):
         conditions = [conditions]
 
+    tip_is_displayed = False
+
     while True:
 
-        user_input = string.capwords(input(colorise(colorama.Style.BRIGHT, LARGE_INDENT + prompt)))
+        user_input = string.capwords(input(colorise(Style.BRIGHT, clear_line() + LARGE_INDENT + prompt)))
         check = True
 
         for condition in conditions:
@@ -195,7 +198,10 @@ def supervised_input(prompt, conditions, options=None):
             check = check and condition_satisfied
 
             if not condition_satisfied:
-                print(LARGE_INDENT + f'TIP: {input_tips.get(condition)}', flush=True)
+                # Insert tip above prompt, replace previous tip if any
+                upstep = Cursor.UP() * (1 + tip_is_displayed)
+                print(upstep + clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}', flush=True)
+                tip_is_displayed = True
                 break
 
         if check:
@@ -204,7 +210,7 @@ def supervised_input(prompt, conditions, options=None):
 
 def colorise(color, text):
     """TODO"""
-    return color + text + colorama.Style.RESET_ALL
+    return color + text + Style.RESET_ALL
 
 
 def simulate_loading(label):
