@@ -200,7 +200,9 @@ def supervised_input(prompt, conditions, options=None):
             check = check and condition_satisfied
 
             if not condition_satisfied:
-                print(clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}', end='\r' + Cursor.UP())
+                print(colorise(Fore.BLACK + Style.BRIGHT,
+                               clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}'),
+                      end='\r' + Cursor.UP())
                 tip_is_displayed = True
                 break
 
