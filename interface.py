@@ -68,7 +68,7 @@ from colorama import Cursor, Fore, Style, just_fix_windows_console
 from colorama.ansi import clear_line
 from tabulate import tabulate
 
-from config import TERMINAL_WIDTH, MARGIN, RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
+from config import TERMINAL_WIDTH, LINE_WIDTH, RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
 from config import LINE, BOLDLINE, NEWLINE, TIMELESS, GIT, YOUTUBE
 from config import PRELIMINARY_ROUNDS
 from config import LOREM
@@ -219,18 +219,23 @@ def colorise(color, text):
 def simulate_loading(label):
     """TODO"""
 
-    label = f' {label.strip()} '
-    leading_spaces = label.center(TERMINAL_WIDTH).index(label)
-
     print()
 
-    for progress in range(1, TERMINAL_WIDTH - MARGIN + 1):
+    label = f' {label.strip()} '
+    label_index = label.center(TERMINAL_WIDTH).index(label)
 
-        bar = ('-' * progress).ljust(TERMINAL_WIDTH - MARGIN)
-        labeled_bar = SMALL_INDENT + bar[MARGIN:leading_spaces] + label + bar[leading_spaces+len(label):]
+    lag_base = TERMINAL_WIDTH / 800  # 0.1 seconds per character for standard terminal width
+
+    for progress in range(1, LINE_WIDTH + 1):
+
+        bar = (SMALL_INDENT + '-' * progress).ljust(label_index)
+        labeled_bar = bar[:label_index] + label + bar[label_index+len(label):]
+
+        lag_is_long = random.choices([True, False], weights=[2, LINE_WIDTH])[0]
+        lag_range = (lag_base, 4 * lag_base) if lag_is_long else (0, lag_base)
 
         print(colorise(SUBTITLE, labeled_bar), end='\r', flush=True)
-        time.sleep(random.uniform(0, 0.1))
+        time.sleep(random.uniform(*lag_range))
 
     print()
 
