@@ -216,7 +216,7 @@ def colorise(color, text):
     return color + text + CLEAR
 
 
-def simulate_loading(label):
+def simulate_loading(label, report=False):
     """TODO"""
 
     print()
@@ -238,6 +238,9 @@ def simulate_loading(label):
         time.sleep(random.uniform(*lag_range))
 
     print()
+
+    if report:
+        print(NEWLINE + labeled_bar, file=tournament_report)
 
 
 def center_multiline_string(multiline_string):
@@ -276,7 +279,9 @@ def save_tournament_report(variant, entry_fee):
     while filename in os.listdir():
         filename = f'{TODAY} TIMELESS-{variant}-{entry_fee} Report {next(counter)}.txt'
 
-    report_text = tournament_report.getvalue().replace(PRIMARY, '').replace(SECONDARY, '').replace(CLEAR, '')
+    report_text = tournament_report.getvalue()\
+        .replace(PRIMARY, '').replace(SECONDARY, '').replace(CLEAR, '')\
+        .replace(3 * NEWLINE, 2 * NEWLINE).rstrip(NEWLINE)
 
     try:
         with open(filename, 'w', encoding='utf-8') as report_file:
@@ -343,8 +348,9 @@ def segment_starting(variant, entry_fee):
 def segment_generate_pairings(pairings, round_):
     """Print pairings."""
     round_label = f' ROUND {round_ + 1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
-    simulate_loading(round_label)
+    simulate_loading(round_label, report=True)
     print(2 * NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE)
+    print(2 * NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE, file=tournament_report)
 
 
 def segment_register_wins():
