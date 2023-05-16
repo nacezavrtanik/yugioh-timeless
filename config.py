@@ -8,8 +8,10 @@ LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
 
 
 # Used in `interface` module
-TERMINAL_WIDTH = max(80, shutil.get_terminal_size().columns)
+DEFAULT_TERMINAL_WIDTH = 80
+TERMINAL_WIDTH = max(DEFAULT_TERMINAL_WIDTH, shutil.get_terminal_size().columns)
 MARGIN = 2
+DEFAULT_LINE_WIDTH = DEFAULT_TERMINAL_WIDTH - 2 * MARGIN
 LINE_WIDTH = TERMINAL_WIDTH - 2 * MARGIN
 
 LEFT_MARGIN = 2 * MARGIN
@@ -21,6 +23,7 @@ LARGE_INDENT = 2 * INDENT
 
 LINE = SMALL_INDENT + '-' * LINE_WIDTH
 BOLDLINE = SMALL_INDENT + '=' * LINE_WIDTH
+DEFAULT_BOLDLINE = SMALL_INDENT + '=' * DEFAULT_LINE_WIDTH
 NEWLINE = '\n'
 
 TIMELESS = NEWLINE.join([  # based on `pyfiglet` output

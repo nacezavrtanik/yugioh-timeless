@@ -68,7 +68,7 @@ from colorama.ansi import clear_line
 from tabulate import tabulate
 
 from config import TERMINAL_WIDTH, LINE_WIDTH, RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
-from config import LINE, BOLDLINE, NEWLINE, TIMELESS, GIT, YOUTUBE
+from config import LINE, BOLDLINE, NEWLINE, TIMELESS, GIT, YOUTUBE, DEFAULT_BOLDLINE, DEFAULT_LINE_WIDTH
 from config import PRELIMINARY_ROUNDS
 from config import LOREM
 
@@ -212,12 +212,10 @@ def supervised_input(prompt, conditions, options=None):
 
 
 def colorise(color, text):
-    """TODO"""
     return color + text + CLEAR
 
 
 def simulate_loading(label, report=False):
-    """TODO"""
 
     print()
 
@@ -243,15 +241,31 @@ def simulate_loading(label, report=False):
         print(NEWLINE + labeled_bar, file=tournament_report)
 
 
-def center_multiline_string(multiline_string):
-    """TODO"""
+def center_multiline_string(multiline_string, width=LINE_WIDTH, lstrip=False):
 
-    lines = multiline_string.split(NEWLINE)
-    max_line_length = max(map(len, lines))
-    centered_lines = [f'{row:<{max_line_length}}'.center(TERMINAL_WIDTH).rstrip() for row in lines]
+    lines = [line.lstrip() if lstrip else line for line in multiline_string.split(NEWLINE)]
+    # min_length = min(map(lambda x: x.index(x.lstrip()), lines))
+    max_length = max(map(len, lines))
+    centered_lines = [SMALL_INDENT + line.ljust(max_length).center(width).rstrip() for line in lines]
     centered_multiline_string = NEWLINE.join(centered_lines)
 
     return centered_multiline_string
+
+
+def convert_to_default_width(chunk):
+
+    if chunk.lstrip().startswith('T I M E L E S S' + NEWLINE):
+        return NEWLINE.join(
+            [SMALL_INDENT + line.strip().center(DEFAULT_LINE_WIDTH).rstrip() for line in chunk.split(NEWLINE)])
+
+    elif chunk == BOLDLINE:
+        return DEFAULT_BOLDLINE
+
+    elif chunk.startswith(SMALL_INDENT + '-'):
+        return SMALL_INDENT + f' {chunk.strip(" -")} '.center(DEFAULT_LINE_WIDTH, '-').rstrip()
+
+    else:
+        return center_multiline_string(chunk, DEFAULT_LINE_WIDTH, lstrip=True)
 
 
 def save_tournament_report(variant, entry_fee):
@@ -279,9 +293,11 @@ def save_tournament_report(variant, entry_fee):
     while filename in os.listdir():
         filename = f'{TODAY} TIMELESS-{variant}-{entry_fee} Report {next(counter)}.txt'
 
-    report_text = tournament_report.getvalue()\
-        .replace(PRIMARY, '').replace(SECONDARY, '').replace(CLEAR, '')\
-        .replace(3 * NEWLINE, 2 * NEWLINE).rstrip(NEWLINE)
+    report_text = tournament_report.getvalue() \
+        .replace(PRIMARY, '').replace(SECONDARY, '').replace(CLEAR, '') \
+        .replace(3 * NEWLINE, 2 * NEWLINE).strip(NEWLINE)
+    report_text = (2 * NEWLINE).join([convert_to_default_width(chunk) for chunk in report_text.split(2 * NEWLINE)])
+    report_text = NEWLINE + report_text
 
     try:
         with open(filename, 'w', encoding='utf-8') as report_file:
@@ -336,7 +352,7 @@ def segment_enter_tournament_information_end():
 def segment_starting(variant, entry_fee):
     """Print information on the TIMELESS tournament about to start."""
 
-    component_1 = colorise(PRIMARY, 3 * NEWLINE + ' '.join('TIMELESS').center(TERMINAL_WIDTH).rstrip())
+    component_1 = colorise(PRIMARY, 3 * NEWLINE + 'T I M E L E S S'.center(TERMINAL_WIDTH).rstrip())
     component_2 = colorise(PRIMARY, f'{variant}, ¤{entry_fee}'.center(TERMINAL_WIDTH).rstrip())
     component_3 = colorise(PRIMARY, str(TODAY).center(TERMINAL_WIDTH).rstrip())
     component_4 = colorise(PRIMARY, NEWLINE + BOLDLINE + NEWLINE)
