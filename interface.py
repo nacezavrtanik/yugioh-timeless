@@ -58,7 +58,6 @@ import io
 import itertools
 import os
 import random
-import shutil
 import string
 import textwrap
 import time
@@ -76,8 +75,9 @@ from config import LOREM
 
 just_fix_windows_console()  # enable ANSI escape characters on Windows
 
-TITLE = Fore.CYAN + Style.BRIGHT
-SUBTITLE = Fore.CYAN
+PRIMARY = Fore.CYAN + Style.BRIGHT
+SECONDARY = Fore.CYAN
+CLEAR = Style.RESET_ALL
 TODAY = datetime.datetime.today().date()
 
 tournament_report = io.StringIO()
@@ -213,7 +213,7 @@ def supervised_input(prompt, conditions, options=None):
 
 def colorise(color, text):
     """TODO"""
-    return color + text + Style.RESET_ALL
+    return color + text + CLEAR
 
 
 def simulate_loading(label):
@@ -234,7 +234,7 @@ def simulate_loading(label):
         lag_is_long = random.choices([True, False], weights=[2, LINE_WIDTH])[0]
         lag_range = (lag_base, 4 * lag_base) if lag_is_long else (0, lag_base)
 
-        print(colorise(SUBTITLE, labeled_bar), end='\r', flush=True)
+        print(colorise(SECONDARY, labeled_bar), end='\r', flush=True)
         time.sleep(random.uniform(*lag_range))
 
     print()
@@ -276,10 +276,11 @@ def save_tournament_report(variant, entry_fee):
     while filename in os.listdir():
         filename = f'{TODAY} TIMELESS-{variant}-{entry_fee} Report {next(counter)}.txt'
 
+    report_text = tournament_report.getvalue().replace(PRIMARY, '').replace(SECONDARY, '').replace(CLEAR, '')
+
     try:
         with open(filename, 'w', encoding='utf-8') as report_file:
-            tournament_report.seek(0)
-            shutil.copyfileobj(tournament_report, report_file)
+            print(report_text, file=report_file)
 
     except OSError:
         print(wrap('Sorry, a system-related error occured. Unable to save report.'))
@@ -296,9 +297,9 @@ def segment_initial():
 
     text = LOREM
 
-    component_1 = colorise(TITLE, 3 * NEWLINE + center_multiline_string(TIMELESS) + 2 * NEWLINE)
-    component_2 = colorise(SUBTITLE, f'git: {GIT}'.center(TERMINAL_WIDTH).rstrip())
-    component_3 = colorise(SUBTITLE, f'youtube: {YOUTUBE}'.center(TERMINAL_WIDTH).rstrip())
+    component_1 = colorise(PRIMARY, 3 * NEWLINE + center_multiline_string(TIMELESS) + 2 * NEWLINE)
+    component_2 = colorise(SECONDARY, f'git: {GIT}'.center(TERMINAL_WIDTH).rstrip())
+    component_3 = colorise(SECONDARY, f'youtube: {YOUTUBE}'.center(TERMINAL_WIDTH).rstrip())
     component_4 = NEWLINE + wrap(text)
 
     print(component_1, component_2, component_3, component_4, sep=NEWLINE)
@@ -324,16 +325,16 @@ def segment_enter_duelists():
 
 def segment_enter_tournament_information_end():
     """Print bold line."""
-    print(colorise(SUBTITLE, NEWLINE + LINE))
+    print(colorise(SECONDARY, NEWLINE + LINE))
 
 
 def segment_starting(variant, entry_fee):
     """Print information on the TIMELESS tournament about to start."""
 
-    component_1 = colorise(TITLE, 3 * NEWLINE + ' '.join('TIMELESS').center(TERMINAL_WIDTH).rstrip())
-    component_2 = colorise(TITLE, f'{variant}, ¤{entry_fee}'.center(TERMINAL_WIDTH).rstrip())
-    component_3 = colorise(TITLE, str(TODAY).center(TERMINAL_WIDTH).rstrip())
-    component_4 = colorise(TITLE, NEWLINE + BOLDLINE + NEWLINE)
+    component_1 = colorise(PRIMARY, 3 * NEWLINE + ' '.join('TIMELESS').center(TERMINAL_WIDTH).rstrip())
+    component_2 = colorise(PRIMARY, f'{variant}, ¤{entry_fee}'.center(TERMINAL_WIDTH).rstrip())
+    component_3 = colorise(PRIMARY, str(TODAY).center(TERMINAL_WIDTH).rstrip())
+    component_4 = colorise(PRIMARY, NEWLINE + BOLDLINE + NEWLINE)
 
     print(component_1, component_2, component_3, component_4, sep=2*NEWLINE)
     print(component_1, component_2, component_3, component_4, sep=NEWLINE, file=tournament_report)
@@ -358,7 +359,7 @@ def segment_display_standings(standings, round_):
 
     component_1 = center_multiline_string(
         tabulate(standings, headers='keys', tablefmt='double_outline', colalign=colalign))
-    component_2 = '' if round_ in PRELIMINARY_ROUNDS else colorise(TITLE, 2 * NEWLINE + BOLDLINE + NEWLINE)
+    component_2 = '' if round_ in PRELIMINARY_ROUNDS else colorise(PRIMARY, 2 * NEWLINE + BOLDLINE + NEWLINE)
 
     print(component_1, component_2, sep=NEWLINE)
     print(component_1, component_2, sep=NEWLINE, file=tournament_report)
@@ -377,9 +378,9 @@ def segment_ending(variant, entry_fee):
     else:
         print(wrap('Report not saved.'))
 
-    print(colorise(SUBTITLE, LINE))
+    print(colorise(SECONDARY, LINE))
 
 
 def segment_final():
     """Print exit instructions."""
-    input(colorise(SUBTITLE, SMALL_INDENT + '(Press ENTER to exit.)'))
+    input(colorise(SECONDARY, SMALL_INDENT + '(Press ENTER to exit.)'))
