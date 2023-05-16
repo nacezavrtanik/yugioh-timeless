@@ -224,12 +224,12 @@ def simulate_loading(label):
     label = f' {label.strip()} '
     label_index = label.center(TERMINAL_WIDTH).index(label)
 
-    lag_base = TERMINAL_WIDTH / 800  # 0.1 seconds per character for standard terminal width
+    lag_base = 8 / TERMINAL_WIDTH  # 0.1 seconds per character for standard terminal width
 
-    for progress in range(1, LINE_WIDTH + 1):
+    for progress in range(1, LINE_WIDTH + 1 - len(label)):
 
         bar = (SMALL_INDENT + '-' * progress).ljust(label_index)
-        labeled_bar = bar[:label_index] + label + bar[label_index+len(label):]
+        labeled_bar = bar[:label_index] + label + bar[label_index:]
 
         lag_is_long = random.choices([True, False], weights=[2, LINE_WIDTH])[0]
         lag_range = (lag_base, 4 * lag_base) if lag_is_long else (0, lag_base)
