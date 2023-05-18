@@ -145,8 +145,8 @@ def enter_unique_duelists():
         duplicate_names = {name for name in candidate_names if candidate_names.count(name) > 1}
 
         if duplicate_names:
-            duplicate_names_string = duplicate_names.__str__()[1: -1].replace('\'', '')
-            print(f'You\'ve entered some duplicate names: {duplicate_names_string}.\nPlease try again.')
+            duplicate_names_string = str(duplicate_names).replace("'", "").replace("{", "").replace("}", "")
+            interface.segment_enter_unique_duelists(duplicate_names_string)
             continue
 
         return duelist_candidates
@@ -377,8 +377,7 @@ def display_standings(winners_and_losers, round_, entry_fee):
         standings['Points'] = STANDING_CONFIGURATIONS.get(key).get('Points')[index]
     elif round_ == FINAL_ROUND and entry_fee != 0:
         entry_fee_unit = entry_fee // 5
-        standings['Prize'] = map(
-            lambda x: f'¤{x * entry_fee_unit}', STANDING_CONFIGURATIONS.get(key).get('Points')[index])
+        standings['Prize'] = [f'¤{x*entry_fee_unit}' for x in STANDING_CONFIGURATIONS.get(key).get('Points')[index]]
 
     interface.segment_display_standings(standings, round_)
 
@@ -426,13 +425,9 @@ def timeless(duelists, variant, entry_fee):
     interface.segment_ending(variant, entry_fee)
 
 
-def main():
+def run_yugioh_timeless():
     """Run the TIMELESS tournament in the standard, intended way."""
 
     interface.segment_initial()
     timeless(**enter_tournament_information())
     interface.segment_final()
-
-
-if __name__ == '__main__':
-    main()

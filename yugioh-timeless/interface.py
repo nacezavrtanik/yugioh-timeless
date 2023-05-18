@@ -13,7 +13,7 @@ terminal interface its intended look and feel.
 Variables
 ---------
 `TODAY`
-    Constant containding today's date as a `datetime.date` instance.
+    Constant containing today's date as a `datetime.date` instance.
 `tournament_report`
     Instance of `io.StringIO` for documentting the course of the tournament.
 
@@ -63,17 +63,18 @@ import textwrap
 import time
 import datetime
 
-from colorama import Cursor, Fore, Style, just_fix_windows_console
-from colorama.ansi import clear_line
+from colorama import just_fix_windows_console
+from colorama.ansi import Fore, Style, Cursor, clear_line
 from tabulate import tabulate
 
-from config import TERMINAL_WIDTH, LINE_WIDTH, RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
-from config import LINE, BOLDLINE, NEWLINE, TIMELESS, GIT, YOUTUBE, DEFAULT_BOLDLINE, DEFAULT_LINE_WIDTH
+from config import TERMINAL_WIDTH, TERMINAL_WIDTH_DEFAULT , LINE_WIDTH, LINE_WIDTH_DEFAULT
+from config import RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
+from config import LINE, LINE_DEFAULT, BOLDLINE, BOLDLINE_DEFAULT, NEWLINE, TIMELESS, GIT, YOUTUBE
 from config import PRELIMINARY_ROUNDS
 from config import LOREM
 
 
-just_fix_windows_console()  # enable ANSI escape characters on Windows
+just_fix_windows_console()  # enable ANSI escape sequences on Windows
 
 PRIMARY = Fore.CYAN + Style.BRIGHT
 SECONDARY = Fore.CYAN
@@ -87,6 +88,10 @@ def wrap(text):
     """Wrap text to fit inside margins, with empty lines before and after."""
     text_wrapper = textwrap.TextWrapper(width=RIGHT_MARGIN, initial_indent=INDENT, subsequent_indent=INDENT)
     return NEWLINE + text_wrapper.fill(text) + NEWLINE
+
+
+def colorise(color, text):
+    return color + text + CLEAR
 
 
 def supervised_input(prompt, conditions, options=None):
@@ -151,7 +156,7 @@ def supervised_input(prompt, conditions, options=None):
     'Amadeus'
 
     >>> supervised_input('Do you like yes or no questions?',
-    ...                 'choose_from', options=['Yes', 'No'])
+    ...                  'choose_from', options=['Yes', 'No'])
             Do you like yes or no questions?>? I'm not sure
             TIP: Enter one of these: Yes, No.
             Do you like yes or no questions?>? No
@@ -176,7 +181,7 @@ def supervised_input(prompt, conditions, options=None):
     }
 
     input_tips = {
-        'choose_from': f'''Enter one of these: {options.__str__()[1: -1].replace("'", "")}.''',
+        'choose_from': f'''Enter one of these: {str(options).replace("'", "").replace("[", "").replace("]", "")}.''',
         'alphabetical': 'Use only letters and whitespaces.',
         'less_than_25_characters': 'Use less than 25 characters.',
         'integer': 'Enter an integer.',
@@ -211,10 +216,6 @@ def supervised_input(prompt, conditions, options=None):
             return user_input
 
 
-def colorise(color, text):
-    return color + text + CLEAR
-
-
 def simulate_loading(label, report=False):
 
     print()
@@ -222,15 +223,15 @@ def simulate_loading(label, report=False):
     label = f' {label.strip()} '
     label_index = label.center(TERMINAL_WIDTH).index(label)
 
-    lag_base = 8 / TERMINAL_WIDTH  # 0.1 seconds per character for standard terminal width
+    lag_base = TERMINAL_WIDTH_DEFAULT / (10*TERMINAL_WIDTH)
 
     for progress in range(1, LINE_WIDTH + 1 - len(label)):
 
-        bar = (SMALL_INDENT + '-' * progress).ljust(label_index)
+        bar = (SMALL_INDENT + '-'*progress).ljust(label_index)
         labeled_bar = bar[:label_index] + label + bar[label_index:]
 
         lag_is_long = random.choices([True, False], weights=[2, LINE_WIDTH])[0]
-        lag_range = (lag_base, 4 * lag_base) if lag_is_long else (0, lag_base)
+        lag_range = (lag_base, 4*lag_base) if lag_is_long else (0, lag_base)
 
         print(colorise(SECONDARY, labeled_bar), end='\r', flush=True)
         time.sleep(random.uniform(*lag_range))
@@ -241,12 +242,11 @@ def simulate_loading(label, report=False):
         print(NEWLINE + labeled_bar, file=tournament_report)
 
 
-def center_multiline_string(multiline_string, width=LINE_WIDTH, lstrip=False):
+def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=False):
 
-    lines = [line.lstrip() if lstrip else line for line in multiline_string.split(NEWLINE)]
-    # min_length = min(map(lambda x: x.index(x.lstrip()), lines))
+    lines = [line.lstrip() if leftstrip else line for line in multiline_string.split(NEWLINE)]
     max_length = max(map(len, lines))
-    centered_lines = [SMALL_INDENT + line.ljust(max_length).center(width).rstrip() for line in lines]
+    centered_lines = [line.ljust(max_length).center(width).rstrip() for line in lines]
     centered_multiline_string = NEWLINE.join(centered_lines)
 
     return centered_multiline_string
@@ -255,17 +255,19 @@ def center_multiline_string(multiline_string, width=LINE_WIDTH, lstrip=False):
 def convert_to_default_width(chunk):
 
     if chunk.lstrip().startswith('T I M E L E S S' + NEWLINE):
-        return NEWLINE.join(
-            [SMALL_INDENT + line.strip().center(DEFAULT_LINE_WIDTH).rstrip() for line in chunk.split(NEWLINE)])
+        return NEWLINE.join([line.strip().center(TERMINAL_WIDTH_DEFAULT).rstrip() for line in chunk.split(NEWLINE)])
+
+    elif chunk == LINE:
+        return LINE_DEFAULT
 
     elif chunk == BOLDLINE:
-        return DEFAULT_BOLDLINE
+        return BOLDLINE_DEFAULT
 
     elif chunk.startswith(SMALL_INDENT + '-'):
-        return SMALL_INDENT + f' {chunk.strip(" -")} '.center(DEFAULT_LINE_WIDTH, '-').rstrip()
+        return SMALL_INDENT + f' {chunk.strip(" -")} '.center(LINE_WIDTH_DEFAULT, '-')
 
     else:
-        return center_multiline_string(chunk, DEFAULT_LINE_WIDTH, lstrip=True)
+        return center_multiline_string(chunk, width=TERMINAL_WIDTH_DEFAULT, leftstrip=True)
 
 
 def save_tournament_report(variant, entry_fee):
@@ -295,8 +297,8 @@ def save_tournament_report(variant, entry_fee):
 
     report_text = tournament_report.getvalue() \
         .replace(PRIMARY, '').replace(SECONDARY, '').replace(CLEAR, '') \
-        .replace(3 * NEWLINE, 2 * NEWLINE).strip(NEWLINE)
-    report_text = (2 * NEWLINE).join([convert_to_default_width(chunk) for chunk in report_text.split(2 * NEWLINE)])
+        .replace(3*NEWLINE, 2*NEWLINE).strip(NEWLINE)
+    report_text = (2*NEWLINE).join([convert_to_default_width(chunk) for chunk in report_text.split(2*NEWLINE)])
     report_text = NEWLINE + report_text
 
     try:
@@ -318,7 +320,7 @@ def segment_initial():
 
     text = LOREM
 
-    component_1 = colorise(PRIMARY, 3 * NEWLINE + center_multiline_string(TIMELESS) + 2 * NEWLINE)
+    component_1 = colorise(PRIMARY, 3*NEWLINE + center_multiline_string(TIMELESS) + 2*NEWLINE)
     component_2 = colorise(SECONDARY, f'git: {GIT}'.center(TERMINAL_WIDTH).rstrip())
     component_3 = colorise(SECONDARY, f'youtube: {YOUTUBE}'.center(TERMINAL_WIDTH).rstrip())
     component_4 = NEWLINE + wrap(text)
@@ -341,7 +343,12 @@ def segment_enter_entry_fee():
 
 def segment_enter_duelists():
     """Print duelist sign-up prompt."""
-    print(wrap(LOREM))
+    text = LOREM
+    print(wrap(text))
+
+
+def segment_enter_unique_duelists(duplicate_names_string):
+    print(f'You\'ve entered some duplicate names: {duplicate_names_string}.{NEWLINE}Please try again.')
 
 
 def segment_enter_tournament_information_end():
@@ -352,7 +359,7 @@ def segment_enter_tournament_information_end():
 def segment_starting(variant, entry_fee):
     """Print information on the TIMELESS tournament about to start."""
 
-    component_1 = colorise(PRIMARY, 3 * NEWLINE + 'T I M E L E S S'.center(TERMINAL_WIDTH).rstrip())
+    component_1 = colorise(PRIMARY, 2*NEWLINE + 'T I M E L E S S'.center(TERMINAL_WIDTH).rstrip())
     component_2 = colorise(PRIMARY, f'{variant}, ¤{entry_fee}'.center(TERMINAL_WIDTH).rstrip())
     component_3 = colorise(PRIMARY, str(TODAY).center(TERMINAL_WIDTH).rstrip())
     component_4 = colorise(PRIMARY, NEWLINE + BOLDLINE + NEWLINE)
@@ -363,10 +370,10 @@ def segment_starting(variant, entry_fee):
 
 def segment_generate_pairings(pairings, round_):
     """Print pairings."""
-    round_label = f' ROUND {round_ + 1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
+    round_label = f' ROUND {round_+1} ' if round_ in PRELIMINARY_ROUNDS else ' FINAL ROUND '
     simulate_loading(round_label, report=True)
-    print(2 * NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE)
-    print(2 * NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE, file=tournament_report)
+    print(2*NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE)
+    print(2*NEWLINE + center_multiline_string(tabulate(pairings, tablefmt='plain')) + NEWLINE, file=tournament_report)
 
 
 def segment_register_wins():
@@ -381,7 +388,11 @@ def segment_display_standings(standings, round_):
 
     component_1 = center_multiline_string(
         tabulate(standings, headers='keys', tablefmt='double_outline', colalign=colalign))
-    component_2 = '' if round_ in PRELIMINARY_ROUNDS else colorise(PRIMARY, 2 * NEWLINE + BOLDLINE + NEWLINE)
+    if round_ in PRELIMINARY_ROUNDS:
+        component_2 = ''
+    else:
+        component_2 =  colorise(SECONDARY, 2*NEWLINE + LINE + 2*NEWLINE) + \
+                       colorise(PRIMARY, NEWLINE + BOLDLINE + NEWLINE)
 
     print(component_1, component_2, sep=NEWLINE)
     print(component_1, component_2, sep=NEWLINE, file=tournament_report)
