@@ -78,6 +78,7 @@ just_fix_windows_console()  # enable ANSI escape sequences on Windows
 
 PRIMARY = Fore.CYAN + Style.BRIGHT
 SECONDARY = Fore.CYAN
+TIP = Fore.BLACK + Style.BRIGHT
 CLEAR = Style.RESET_ALL
 TODAY = datetime.datetime.today().date()
 
@@ -205,9 +206,8 @@ def supervised_input(prompt, conditions, options=None):
             check = check and condition_satisfied
 
             if not condition_satisfied:
-                print(colorise(Fore.BLACK + Style.BRIGHT,
-                               clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}'),
-                      end='\r' + Cursor.UP())
+                print(colorise(TIP, clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}'),
+                      end='\r'+Cursor.UP())
                 tip_is_displayed = True
                 break
 
@@ -348,7 +348,9 @@ def segment_enter_duelists():
 
 
 def segment_enter_unique_duelists(duplicate_names_string):
-    print(f'You\'ve entered some duplicate names: {duplicate_names_string}.{NEWLINE}Please try again.')
+
+    tip = colorise(TIP, LARGE_INDENT + f'TIP: Enter unique names only. (Duplicate names: {duplicate_names_string}.)')
+    print('', clear_line(), clear_line(), clear_line() + tip, clear_line(), sep='\r'+Cursor.UP(), end='\r')
 
 
 def segment_enter_tournament_information_end():
