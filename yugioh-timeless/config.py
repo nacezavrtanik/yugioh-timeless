@@ -1,4 +1,8 @@
-"""Module containing constants for the Yugioh TIMELESS tournament format."""
+"""Module containing constants for the `yugioh-timeless` package.
+
+Some constants are techincally redundant, but they improve readability.
+
+"""
 
 import shutil
 

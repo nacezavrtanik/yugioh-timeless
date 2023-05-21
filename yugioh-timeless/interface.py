@@ -1,17 +1,21 @@
-"""Module for creating a user interface for the TIMELESS tournament format.
+"""Module for creating a user interface for the `yugioh-timeless` package.
 
-This module contains functions pertaining to user interaction during the
-TIMELESS tournament format. Its purpose is to separate this part of the code
-from the `timeless` module, which implements the actual core structure of the
-TIMELESS format, increasing the readability of the `timeless` module in the
-process.
-
-Beside other functions, this module contains so-called segment functions,
-which are mostly used to print chunks (segments) of text to give the
-terminal interface its intended look and feel.
+The purpose of this module is to improve the readability of the `timeless`
+module, by separating from it interface-related functions. Beside other such
+functions, this module contains so-called "segment" functions, which are mostly
+used to print chunks (segments) of text to give the terminal interface its
+intended look and feel.
 
 Variables
 ---------
+`PRIMARY`
+    ANSI code for the primary interface color.
+`SECONDARY`
+    ANSI code for the secondary interface color.
+`TIP`
+    ANSI code for the color in which to display user input tips.
+`CLEAR`
+    ANSI code for clearing all colors and styles.
 `TODAY`
     Constant containing today's date as a `datetime.date` instance.
 `tournament_report`
@@ -21,12 +25,16 @@ Functions
 ---------
 `wrap`
     Wrap text to fit inside margins, with empty lines before and after.
-`typewriter`
-    Print text character by character for typewriter effect.
+`colorise`
+    Apply color to text using ANSI codes.
 `supervised_input`
     Require user input to satisfy specified conditions.
-`generate_centered_table`
-    Generate table with `tabulate.tabulate`, and center it.
+`simulate_loading`
+    Create a labeled loading bar.
+`center_multiline_string`
+    Center a multiline string, with trailing whitespaces removed.
+`convert_to_default_width`
+    Resize a chunk of the `tournament_report` variable to default width.
 `save_tournament_report`
     Save contents of the global variable `tournament_report` to a file.
 `segment_initial`
@@ -37,8 +45,10 @@ Functions
     Print entry fee description.
 `segment_enter_duelists`
     Print duelist sign-up prompt.
+`segment_enter_unique_duelists`
+    Print tip to avoid duplicate names, clear previous duelist entries.
 `segment_enter_tournament_information_end`
-    Print bold line.
+    Print line.
 `segment_starting`
     Print information on the TIMELESS tournament about to start.
 `segment_generate_pairings`
@@ -92,6 +102,7 @@ def wrap(text):
 
 
 def colorise(color, text):
+    """Apply color to text using ANSI codes."""
     return color + text + CLEAR
 
 
@@ -99,9 +110,9 @@ def supervised_input(prompt, conditions, options=None):
     """Require user input to satisfy specified conditions.
 
     The user is asked to provide an input value. If the provided value violates
-    a specified condition, a tip for correcting the input is displayed, then
-    the user is once again asked to provide an input value. This process is
-    repeated until all specified conditions are satisfied.
+    a specified condition, a tip for correcting the input is displayed below
+    the prompt, then the user has to provide another input value. This process
+    is repeated until all specified conditions are satisfied.
 
     Parameters
     ----------
@@ -111,7 +122,7 @@ def supervised_input(prompt, conditions, options=None):
         Names of conditions. A string can be passed if only one condition is
         specified, otherwise a list of strings.
         Valid strings: 'choose_from', 'alphabetical', 'less_than_25_characters',
-        'integer', 'multiple_of_10'.
+        'integer', 'multiple_of_10', 'max_1000'.
     options: list of str, optional
         Valid input options if argument `conditions` is set to 'choose_from'.
         If `conditions` does not include 'choose_from', this argument is not
@@ -138,30 +149,6 @@ def supervised_input(prompt, conditions, options=None):
     the modified string, user input will not be sensitive to choice of case
     nor to consecutive whitespaces.
     (2) It looks cleaner.
-
-    Examples
-    --------
-    >>> supervised_input('Favourite integer: ', 'integer')
-            Favourite integer: >? 3.14
-            TIP: Enter an integer.
-            Favourite integer: >? 3
-    '3'
-
-    >>> supervised_input('Your name: ',
-    ...                  ['alphabetical', 'less_than_25_characters'])
-            Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart 1756
-            TIP: Use only letters and whitespaces.
-            Your name: >? Johannes Chrysostomus Wolfgangus Theophilus Mozart
-            TIP: Use less than 25 characters.
-            Your name: >? Amadeus
-    'Amadeus'
-
-    >>> supervised_input('Do you like yes or no questions?',
-    ...                  'choose_from', options=['Yes', 'No'])
-            Do you like yes or no questions?>? I'm not sure
-            TIP: Enter one of these: Yes, No.
-            Do you like yes or no questions?>? No
-    'No'
     """
 
     def is_string_of_integer(input_string):
@@ -207,16 +194,32 @@ def supervised_input(prompt, conditions, options=None):
 
             if not condition_satisfied:
                 print(colorise(TIP, clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}'),
-                      end='\r'+Cursor.UP())
+                      end='\r' + Cursor.UP())
                 tip_is_displayed = True
                 break
 
         if check:
-            print(clear_line(), end='') if tip_is_displayed else None
+            if tip_is_displayed:
+                print(clear_line(), end='')
             return user_input
 
 
 def simulate_loading(label, report=False):
+    """Create a labeled loading bar.
+
+    Parameters
+    ----------
+    label : str
+        Text to be displayed on top of the loading bar.
+    report : bool, optional
+        If True, the final loading bar will be printed to the
+        `tournament_report` variable.
+        (defaults to False)
+
+    Returns
+    -------
+    None
+    """
 
     print()
 
@@ -243,6 +246,30 @@ def simulate_loading(label, report=False):
 
 
 def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=False):
+    """Center a multiline string, with trailing whitespaces removed.
+
+    This function preserves the original alignment of the mulitiline string,
+    rather than simply centering each line to the provided width.
+
+    Parameters
+    ----------
+    multiline_string : str
+        String to be centered. May or may not contain newline characters.
+    width : int, optional
+        The width in respect to which to center.
+        (defaults to `config.TERMINAL_WIDTH`)
+    leftstrip : bool, optional
+        If True, lines have leading whitespaces removed before centering.
+        This is particularly useful when re-centering centerd tables to
+        a different width.
+        (defaults to False)
+
+    Returns
+    -------
+    str
+        `multiline_string` centered to `width`, with trailing whitespaces
+        removed, and preserved original alignment.
+    """
 
     lines = [line.lstrip() if leftstrip else line for line in multiline_string.split(NEWLINE)]
     max_length = max(map(len, lines))
@@ -253,6 +280,7 @@ def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=Fa
 
 
 def convert_to_default_width(chunk):
+    """Resize a chunk of the `tournament_report` variable to default width."""
 
     if chunk.lstrip().startswith('T I M E L E S S' + NEWLINE):
         return NEWLINE.join([line.strip().center(TERMINAL_WIDTH_DEFAULT).rstrip() for line in chunk.split(NEWLINE)])
@@ -288,6 +316,11 @@ def save_tournament_report(variant, entry_fee):
     -----
     A filename is generated automatically. If a file with that name already
     exists, a number is appended.
+
+    The exact formatting of the text in the `tournament_report` variable
+    depends on the width of the user's terminal. For the sake of consistency,
+    the contents of the `tournament_report` variable are resized to the
+    default width `config.TERMINAL_WIDTH_DEFAULT` before saving.
     """
 
     filename = f'{TODAY} TIMELESS-{variant}-{entry_fee} Report.txt'
@@ -348,13 +381,13 @@ def segment_enter_duelists():
 
 
 def segment_enter_unique_duelists(duplicate_names_string):
-
+    """Print tip to avoid duplicate names, clear previous duelist entries."""
     tip = colorise(TIP, LARGE_INDENT + f'TIP: Enter unique names only. (Duplicate names: {duplicate_names_string}.)')
     print('', clear_line(), clear_line(), clear_line() + tip, clear_line(), sep='\r'+Cursor.UP(), end='\r')
 
 
 def segment_enter_tournament_information_end():
-    """Print bold line."""
+    """Print line."""
     print(colorise(SECONDARY, NEWLINE + LINE))
 
 

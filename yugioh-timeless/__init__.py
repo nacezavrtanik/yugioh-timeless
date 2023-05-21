@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Package for running the Yugioh TIMELESS tournament format."""
 
 

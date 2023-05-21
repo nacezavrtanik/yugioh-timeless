@@ -1,8 +1,4 @@
-"""Module for running the Yugioh TIMELESS tournament format.
-
-This module can be run as a script to run the Yugioh TIMELESS tournament.
-Alternatively, it can be imported from another module, in which case the
-tournament can be started by executing the `main` function of this module.
+"""Module containing the main functions for the `yugioh-timeless` package.
 
 Variables
 ---------
@@ -12,7 +8,7 @@ Variables
 Classes
 -------
 `Duelist`
-    Handle duelists and scores in the Yugioh TIMELESS tournament format.
+    Handle duelist scores in the Yugioh TIMELESS tournament format.
 
 Functions
 ---------
@@ -21,7 +17,7 @@ Functions
 `random_timeless_square`
     Randomly generate a Timeless square.
 `check_if_tied_after_preliminaries`
-    Set global constant `IS_TIED_AFTER_PRELIMINARIES`
+    Set global constant `IS_TIED_AFTER_PRELIMINARIES`.
 `generate_pairings`
     Generate and display pairings for given round.
 `register_wins`
@@ -30,7 +26,7 @@ Functions
     Display standings after given round.
 `timeless`
     Run the TIMELESS tournament.
-`main`
+`run_yugioh_timeless`
     Run the TIMELESS tournament in the standard, intended way.
 
 """
@@ -46,12 +42,13 @@ IS_TIED_AFTER_PRELIMINARIES = None
 
 
 class Duelist:
-    """Handle duelists and scores in the Yugioh TIMELESS tournament format.
+    """Handle duelist scores in the Yugioh TIMELESS tournament format.
 
-    Keeps track of the win count for each duelist. Additionally, thoughout
-    the implementation of the Yugioh TIMELESS tournament format, instances of
-    the `Duelist` class are printed, and compared to instances of classes
-    `Duelist`, `int`, and `str`.
+    An instance of this class keeps track of the win count for a duelist.
+    Another purpose of this class is to improve the readability of the
+    `timeless` module by simplifying the syntax for both printing, and
+    comparing instances of this class to instances of classes `Duelist`
+    `int`, and `str`.
 
     Attributes
     ----------
@@ -62,7 +59,7 @@ class Duelist:
     """
 
     def __init__(self, name, wins=0):
-        """Create instance of Duelist class.
+        """Create instance of the `Duelist` class.
 
         Parameters
         ----------
@@ -71,12 +68,6 @@ class Duelist:
         wins : int, optional
             Number of wins.
             (defaults to 0)
-
-        Examples
-        --------
-        >>> duelist = Duelist('Amadeus', wins=1)
-        >>> print(duelist)
-        Amadeus
         """
         self.name = name
         self.wins = wins
@@ -119,26 +110,17 @@ def enter_unique_duelists():
     list
         List of four `Duelist` instances with unique `name` attributes.
 
-    Examples
-    --------
-    >>> enter_unique_duelists()
-    Duelist 1: >? Johann
-    Duelist 2: >? Johann
-    Duelist 3: >? Amadeus
-    Duelist 4: >? Amadeus
-    You've entered some duplicate names: Johann, Amadeus.
-    Please try again.
-    Duelist 1: >? Johann S
-    Duelist 2: >? Johann C
-    Duelist 3: >? Amadeus
-    Duelist 4: >? Falco
-    [Duelist('Johann S', wins=0), Duelist('Johann C', wins=0), Duelist('Amadeus', wins=0), Duelist('Falco', wins=0)]
+    Notes
+    -----
+    As names are obtained with the function `interface.supervised_input`,
+    they are first passed to the `string.capwords` function. Hence, the
+    names 'Amadeus', 'amadeus', and ' aMaDEuS   ' are considered the same.
     """
 
     while True:
 
         duelist_candidates = [
-            Duelist(interface.supervised_input(f'Duelist {i + 1}: ', ['alphabetical', 'less_than_25_characters']))
+            Duelist(interface.supervised_input(f'Duelist {i+1}: ', ['alphabetical', 'less_than_25_characters']))
             for i in range(4)]
         candidate_names = [duelist_candidates[i].name for i in range(4)]
 
@@ -232,12 +214,12 @@ def generate_pairings(duelists, decks, matchup, round_):
     duelists : list of Duelist
         Duelists that are participating in the tournament, as instances of the
         `Duelist` class. The order of the list matters and should not be
-        changed over multiple calls of the function.
+        changed over multiple calls of this function.
     decks : list of str
         Deck names. The order of the list matters and should not be changed
-        over multiple calls of the function.
+        over multiple calls of this function.
     matchup : numpy.ndarray
-        A timeless square.
+        A Timeless square.
     round_ : {0, 1, 2, 3}
         Number of the round to generate pairings for.
 
@@ -252,9 +234,9 @@ def generate_pairings(duelists, decks, matchup, round_):
     Notes
     -----
     The input arguments for this function are intended to be passed from the
-    scope of the function `timeless`.
+    scope of the `timeless` function.
     The elements of the output tuple of this function serve as input for the
-    function `register_wins`.
+    `register_wins` function.
     """
 
     if round_ == FINAL_ROUND:
@@ -302,15 +284,15 @@ def register_wins(duelist_x, duelist_y, duelist_z, duelist_w):
     tuple of Duelist
         Elements are the input arguments, but ordered in such a way as to
         represent the outcome of the round, i.e. the winner of the first
-        match, the loser of the first match, the winner of the second match,
-        and the loser of the second match.
+        match, followed by the loser of the first match, followed by the
+        winner of the second match, and finally the loser of the second match.
 
     Notes
     -----
     The input arguments for this function are intended to be generated with
-    the function `generate_pairings`.
+    the `generate_pairings` function.
     The output tuple of this function serves as the first input argument for
-    the function `display_standings`.
+    the `display_standings` function.
     """
 
     winner_xy = interface.supervised_input(f'Who won, {duelist_x} or {duelist_y}? ',
@@ -346,8 +328,7 @@ def display_standings(winners_and_losers, round_, entry_fee):
     round_ : {0, 1, 2, 3}
         Number of the round to display standings for.
     entry_fee : int
-        The entry fee for the tournament in progress. The entry fee is required
-        to be a multiple of 10.
+        The entry fee for the tournament in progress.
 
     Returns
     -------
@@ -356,8 +337,8 @@ def display_standings(winners_and_losers, round_, entry_fee):
     Notes
     -----
     The first input argument for this function is intended to be generated with
-    the function `register_wins`. The second and third input arguments are
-    intended to be passed from the scope of the function `timeless`.
+    the `register_wins` function. The second and third input arguments are
+    intended to be passed from the scope of the `timeless` function.
     """
 
     duelists_by_wins = sorted(winners_and_losers, reverse=True)
@@ -392,13 +373,13 @@ def timeless(duelists, variant, entry_fee):
         `Duelist` class. The order of the list technically matters, as the
         course of the tournament depends on it. Practically, however, the order
         of the list does not matter, as the same aspects of the tournament
-        which depend on this order also depend on the particular choice of
-        Timeless square, and that is generated (randomly) after the argument
-        `duelists` is already set.
+        which depend on this order also depend on the particular choice of the
+        Timeless square, which is generated (randomly) after the `duelists`
+        argument is already set.
     variant : {'Basic', 'Extra'}
         Name of the TIMELESS variant.
     entry_fee : int
-        The entry fee is required to be a multiple of 10.
+        The entry fee for this TIMELESS tournament.
 
     Returns
     -------
@@ -407,10 +388,10 @@ def timeless(duelists, variant, entry_fee):
     Notes
     -----
     The input arguments for this function are intended to be generated with the
-    function `enter_tournament_information`. Said function ensures that the
-    arguments are of correct types, and have correct values (such as the entry
+    `enter_tournament_information` function. Said function ensures that the
+    arguments are of correct types, and have intended values (such as the entry
     fee being a non-negative multiple of 10). It also randomly shuffles the
-    list of duelists, making irrelevant the order in which they are entered.
+    list of duelists.
     """
 
     interface.segment_starting(variant, entry_fee)
