@@ -124,10 +124,10 @@ def enter_unique_duelists():
             for i in range(4)]
         candidate_names = [duelist_candidates[i].name for i in range(4)]
 
-        duplicate_names = {name for name in candidate_names if candidate_names.count(name) > 1}
+        duplicate_names = sorted(list({name for name in candidate_names if candidate_names.count(name) > 1}))
 
         if duplicate_names:
-            duplicate_names_string = str(duplicate_names).replace("'", "").replace("{", "").replace("}", "")
+            duplicate_names_string = str(duplicate_names).replace("'", "").replace("[", "").replace("]", "")
             interface.segment_enter_unique_duelists(duplicate_names_string)
             continue
 
