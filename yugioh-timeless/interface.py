@@ -105,7 +105,7 @@ def colorize(color, text):
     return color + text + CLEAR
 
 
-def supervised_input(prompt, conditions, options=None):
+def supervised_input(prompt, conditions, options=None, default_tip=None):
     """Require user input to satisfy specified conditions.
 
     The user is asked to provide an input value. If the provided value violates
@@ -130,6 +130,10 @@ def supervised_input(prompt, conditions, options=None):
         As user input is first passed to the `string.capwords` function,
         strings in `options` should adhere to that same format as well.
         (defaults to None)
+    default_tip : str, optional
+        A default tip to be displayed below the input prompt prior to the
+        first user input. The message is overwritten by any subsequent tips.
+        (defaults to None)
 
     Returns
     -------
@@ -149,7 +153,6 @@ def supervised_input(prompt, conditions, options=None):
     nor to consecutive whitespaces.
     (2) It looks cleaner.
     """
-
     def is_string_of_integer(input_string):
         """Check if a string represents an integer."""
         try:
@@ -181,7 +184,17 @@ def supervised_input(prompt, conditions, options=None):
 
     tip_is_displayed = False
 
+    def display_tip(tip, is_default=False):
+        """Print the tip and move cursor up again."""
+        prefix = NEWLINE if is_default else ""  # to appear below the prompt, the default tip has to be moved down
+        print(colorize(TIP, clear_line() + prefix + LARGE_INDENT + f'TIP: {tip}'), end='\r' + Cursor.UP())
+        nonlocal tip_is_displayed
+        tip_is_displayed = True
+
     while True:
+
+        if default_tip and not tip_is_displayed:
+            display_tip(default_tip, is_default=True)
 
         user_input = string.capwords(input(colorize(Style.BRIGHT, clear_line() + LARGE_INDENT + prompt)))
         check = True
@@ -192,9 +205,7 @@ def supervised_input(prompt, conditions, options=None):
             check = check and condition_satisfied
 
             if not condition_satisfied:
-                print(colorize(TIP, clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}'),
-                      end='\r' + Cursor.UP())
-                tip_is_displayed = True
+                display_tip(input_tips.get(condition))
                 break
 
         if check:
@@ -393,8 +404,7 @@ def segment_enter_entry_fee():
 
 def segment_enter_duelists():
     """Print duelist sign-up prompt."""
-    text = "Finally, enter the names of the duelists."
-    print(wrap(text))
+    print(wrap("Finally, enter the names of the duelists."))
 
 
 def segment_enter_unique_duelists(duplicate_names_string):
@@ -453,12 +463,12 @@ def segment_display_standings(standings, round_):
 def segment_ending(variant, entry_fee):
     """Ask user if a tournament report should be saved and do it (or not)."""
 
-    text = "The tournament has concluded, congratulations to all duelists!"
     simulate_loading('COVERAGE')
-    print(wrap(text))
+    print(wrap("The tournament has concluded, congratulations to all duelists!"))
 
-    save_report = supervised_input('Would you like to save a tournament report, yes or no? ',
-                                   'choose_from', options=['Yes', 'No'])
+    save_report = supervised_input('Would you like to save a tournament report? ',
+                                   'choose_from', options=['Yes', 'No'],
+                                   default_tip="Enter yes or no.")
     if save_report == 'Yes':
         save_tournament_report(variant, entry_fee)
     else:

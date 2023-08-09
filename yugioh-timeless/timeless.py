@@ -147,7 +147,8 @@ def enter_tournament_information():
     interface.segment_enter_variant()
     variant = interface.supervised_input('Choose a deck set: ', 'choose_from', options=VARIANTS)
     interface.segment_enter_entry_fee()
-    entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10', 'max_1000']))
+    entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10', 'max_1000'],
+                                               default_tip="Set to 0 for no entry fee."))
     interface.segment_enter_duelists()
     duelists = np.random.permutation(enter_unique_duelists())
     interface.segment_enter_tournament_information_end()
