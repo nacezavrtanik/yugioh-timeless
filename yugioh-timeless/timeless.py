@@ -1,4 +1,4 @@
-"""Module containing the main functions for the `yugioh-timeless` package.
+"""Module containing the main functionality of the `yugioh-timeless` package.
 
 Variables
 ---------
@@ -145,7 +145,7 @@ def enter_tournament_information():
     """
 
     interface.segment_enter_variant()
-    variant = interface.supervised_input('Choose variant: ', 'choose_from', options=VARIANTS)
+    variant = interface.supervised_input('Choose a deck set: ', 'choose_from', options=VARIANTS)
     interface.segment_enter_entry_fee()
     entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10', 'max_1000']))
     interface.segment_enter_duelists()

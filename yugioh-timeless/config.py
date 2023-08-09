@@ -1,14 +1,10 @@
 """Module containing constants for the `yugioh-timeless` package.
 
-Some constants are techincally redundant, but they improve readability.
+Some constants are technically redundant, but they improve readability.
 
 """
 
 import shutil
-
-
-# Temporary
-LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Mauris cursus mattis molestie a iaculis. Habitant morbi tristique senectus et. Sit amet luctus venenatis lectus magna fringilla urna.'
 
 
 # Used in `interface` module
@@ -40,13 +36,13 @@ TIMELESS = NEWLINE.join([  # based on `pyfiglet` output
     r'                    / /___/ /___ ___/ /__/ /  ',
     r'                   /_____/_____//____/____/   '
 ])
-GIT = 'git-url'
-YOUTUBE = 'youtube-url'
+HOMEPAGE = 'yugioh-timeless.github.io'
+YOUTUBE = 'youtube.com/@Yu-Gi-OhTIMELESS'
 
 
 # Used in `timeless` module
 VARIANTS = ['Basic', 'Extra']
-DECK_SETS = {
+DECK_SETS = {  # also used in `interface`
     'Basic': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
     'Extra': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']
 }

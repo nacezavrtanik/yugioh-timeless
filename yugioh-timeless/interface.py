@@ -19,13 +19,13 @@ Variables
 `TODAY`
     Constant containing today's date as a `datetime.date` instance.
 `tournament_report`
-    Instance of `io.StringIO` for documentting the course of the tournament.
+    Instance of `io.StringIO` for documenting the course of the tournament.
 
 Functions
 ---------
 `wrap`
     Wrap text to fit inside margins, with empty lines before and after.
-`colorise`
+`colorize`
     Apply color to text using ANSI codes.
 `supervised_input`
     Require user input to satisfy specified conditions.
@@ -77,11 +77,10 @@ from colorama import just_fix_windows_console
 from colorama.ansi import Fore, Style, Cursor, clear_line
 from tabulate import tabulate
 
-from config import TERMINAL_WIDTH, TERMINAL_WIDTH_DEFAULT , LINE_WIDTH, LINE_WIDTH_DEFAULT
+from config import TERMINAL_WIDTH, TERMINAL_WIDTH_DEFAULT, LINE_WIDTH, LINE_WIDTH_DEFAULT
 from config import RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
-from config import LINE, LINE_DEFAULT, BOLDLINE, BOLDLINE_DEFAULT, NEWLINE, TIMELESS, GIT, YOUTUBE
-from config import PRELIMINARY_ROUNDS
-from config import LOREM
+from config import LINE, LINE_DEFAULT, BOLDLINE, BOLDLINE_DEFAULT, NEWLINE, TIMELESS, HOMEPAGE, YOUTUBE
+from config import PRELIMINARY_ROUNDS, DECK_SETS
 
 
 just_fix_windows_console()  # enable ANSI escape sequences on Windows
@@ -101,7 +100,7 @@ def wrap(text):
     return NEWLINE + text_wrapper.fill(text) + NEWLINE
 
 
-def colorise(color, text):
+def colorize(color, text):
     """Apply color to text using ANSI codes."""
     return color + text + CLEAR
 
@@ -145,7 +144,7 @@ def supervised_input(prompt, conditions, options=None):
     capitalises words, strips leading and trailing whitespaces, and replaces
     consecutive whitespaces by a single space. There are two reasons for this.
 
-    (1) It is more convenient for the user. As all the checks will aplly to
+    (1) It is more convenient for the user. As all the checks will apply to
     the modified string, user input will not be sensitive to choice of case
     nor to consecutive whitespaces.
     (2) It looks cleaner.
@@ -184,7 +183,7 @@ def supervised_input(prompt, conditions, options=None):
 
     while True:
 
-        user_input = string.capwords(input(colorise(Style.BRIGHT, clear_line() + LARGE_INDENT + prompt)))
+        user_input = string.capwords(input(colorize(Style.BRIGHT, clear_line() + LARGE_INDENT + prompt)))
         check = True
 
         for condition in conditions:
@@ -193,7 +192,7 @@ def supervised_input(prompt, conditions, options=None):
             check = check and condition_satisfied
 
             if not condition_satisfied:
-                print(colorise(TIP, clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}'),
+                print(colorize(TIP, clear_line() + LARGE_INDENT + f'TIP: {input_tips.get(condition)}'),
                       end='\r' + Cursor.UP())
                 tip_is_displayed = True
                 break
@@ -236,7 +235,7 @@ def simulate_loading(label, report=False):
         lag_is_long = random.choices([True, False], weights=[2, LINE_WIDTH])[0]
         lag_range = (lag_base, 4*lag_base) if lag_is_long else (0, lag_base)
 
-        print(colorise(SECONDARY, labeled_bar), end='\r', flush=True)
+        print(colorize(SECONDARY, labeled_bar), end='\r', flush=True)
         time.sleep(random.uniform(*lag_range))
 
     print()
@@ -248,7 +247,7 @@ def simulate_loading(label, report=False):
 def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=False):
     """Center a multiline string, with trailing whitespaces removed.
 
-    This function preserves the original alignment of the mulitiline string,
+    This function preserves the original alignment of the multiline string,
     rather than simply centering each line to the provided width.
 
     Parameters
@@ -260,7 +259,7 @@ def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=Fa
         (defaults to `config.TERMINAL_WIDTH`)
     leftstrip : bool, optional
         If True, lines have leading whitespaces removed before centering.
-        This is particularly useful when re-centering centerd tables to
+        This is particularly useful when re-centering centered tables to
         a different width.
         (defaults to False)
 
@@ -339,10 +338,10 @@ def save_tournament_report(variant, entry_fee):
             print(report_text, file=report_file)
 
     except OSError:
-        print(wrap('Sorry, a system-related error occured. Unable to save report.'))
+        print(wrap('Sorry, a system-related error occurred. Unable to save report.'))
 
     except Exception:
-        print(wrap('Sorry, an unexpected error occured. Unable to save report.'))
+        print(wrap('Sorry, an unexpected error occurred. Unable to save report.'))
 
     else:
         print(wrap(f'Report saved to {filename}!'))
@@ -350,54 +349,72 @@ def save_tournament_report(variant, entry_fee):
 
 def segment_initial():
     """Print general information on the TIMELESS format."""
+    text = (
+        "Welcome to TIMELESS, a custom 4-player tournament format for the Yu-Gi-Oh! Trading Card Game. Created out of "
+        "a desire for high-level gameplay, TIMELESS is designed to facilitate long, strategic games, while staying "
+        "true to the core concepts of classic Yu-Gi-Oh!"
+    )
+    links = center_multiline_string(tabulate([
+        ["home:", HOMEPAGE],
+        ["youtube:", YOUTUBE]
+    ],
+        tablefmt="plain",
+        colalign=("right", "left")
+    ))
 
-    text = LOREM
+    component_1 = colorize(PRIMARY, 3*NEWLINE + center_multiline_string(TIMELESS) + 2*NEWLINE)
+    component_2 = colorize(SECONDARY, links)
+    component_3 = NEWLINE + wrap(text)
 
-    component_1 = colorise(PRIMARY, 3*NEWLINE + center_multiline_string(TIMELESS) + 2*NEWLINE)
-    component_2 = colorise(SECONDARY, f'git: {GIT}'.center(TERMINAL_WIDTH).rstrip())
-    component_3 = colorise(SECONDARY, f'youtube: {YOUTUBE}'.center(TERMINAL_WIDTH).rstrip())
-    component_4 = NEWLINE + wrap(text)
-
-    print(component_1, component_2, component_3, component_4, sep=NEWLINE)
+    print(component_1, component_2, component_3, sep=NEWLINE)
 
 
 def segment_enter_variant():
     """Print deck choice description."""
-    text = LOREM
+    text = (
+        "A TIMELESS tournament consists of four rounds. The three preliminary rounds, in which each duelist faces off "
+        "against every other duelist, are followed up by a final play-off round. In each round, decks from a carefully "
+        "assembled deck set of four are randomly assigned to the duelists. This is done in such a way that during the "
+        "course of the tournament each duelist pilots each of the decks exactly once. There are two TIMELESS deck sets:"
+    )
+    variants = center_multiline_string(tabulate(DECK_SETS, headers="keys", tablefmt="simple_outline")) + NEWLINE
     simulate_loading('SIGN-UP')
-    print(wrap(text))
+    print(wrap(text), variants, sep=NEWLINE)
 
 
 def segment_enter_entry_fee():
     """Print entry fee description."""
-    text = LOREM
+    text = (
+        "In order to create a prize pool, the duelists may agree on an entry fee. The prize pool is redistributed "
+        "among the duelists based on their performance in the tournament."
+    )
     print(wrap(text))
 
 
 def segment_enter_duelists():
     """Print duelist sign-up prompt."""
-    text = LOREM
+    text = "Finally, enter the names of the duelists."
     print(wrap(text))
 
 
 def segment_enter_unique_duelists(duplicate_names_string):
     """Print tip to avoid duplicate names, clear previous duelist entries."""
-    tip = colorise(TIP, LARGE_INDENT + f'TIP: Enter unique names only. (Duplicate names: {duplicate_names_string}.)')
+    tip = colorize(TIP, LARGE_INDENT + f'TIP: Enter unique names only. (Duplicate names: {duplicate_names_string}.)')
     print('', clear_line(), clear_line(), clear_line() + tip, clear_line(), sep='\r'+Cursor.UP(), end='\r')
 
 
 def segment_enter_tournament_information_end():
     """Print line."""
-    print(colorise(SECONDARY, NEWLINE + LINE))
+    print(colorize(SECONDARY, NEWLINE + LINE))
 
 
 def segment_starting(variant, entry_fee):
     """Print information on the TIMELESS tournament about to start."""
 
-    component_1 = colorise(PRIMARY, 2*NEWLINE + 'T I M E L E S S'.center(TERMINAL_WIDTH).rstrip())
-    component_2 = colorise(PRIMARY, f'{variant}, ¤{entry_fee}'.center(TERMINAL_WIDTH).rstrip())
-    component_3 = colorise(PRIMARY, str(TODAY).center(TERMINAL_WIDTH).rstrip())
-    component_4 = colorise(PRIMARY, NEWLINE + BOLDLINE + NEWLINE)
+    component_1 = colorize(PRIMARY, 2*NEWLINE + 'T I M E L E S S'.center(TERMINAL_WIDTH).rstrip())
+    component_2 = colorize(PRIMARY, f'{variant}, ¤{entry_fee}'.center(TERMINAL_WIDTH).rstrip())
+    component_3 = colorize(PRIMARY, str(TODAY).center(TERMINAL_WIDTH).rstrip())
+    component_4 = colorize(PRIMARY, NEWLINE + BOLDLINE + NEWLINE)
 
     print(component_1, component_2, component_3, component_4, sep=2*NEWLINE)
     print(component_1, component_2, component_3, component_4, sep=NEWLINE, file=tournament_report)
@@ -426,8 +443,8 @@ def segment_display_standings(standings, round_):
     if round_ in PRELIMINARY_ROUNDS:
         component_2 = ''
     else:
-        component_2 =  colorise(SECONDARY, 2*NEWLINE + LINE + 2*NEWLINE) + \
-                       colorise(PRIMARY, NEWLINE + BOLDLINE + NEWLINE)
+        component_2 = colorize(SECONDARY, 2*NEWLINE + LINE + 2*NEWLINE) + \
+                      colorize(PRIMARY, NEWLINE + BOLDLINE + NEWLINE)
 
     print(component_1, component_2, sep=NEWLINE)
     print(component_1, component_2, sep=NEWLINE, file=tournament_report)
@@ -436,8 +453,9 @@ def segment_display_standings(standings, round_):
 def segment_ending(variant, entry_fee):
     """Ask user if a tournament report should be saved and do it (or not)."""
 
+    text = "The tournament has concluded, congratulations to all duelists!"
     simulate_loading('COVERAGE')
-    print(wrap(LOREM))
+    print(wrap(text))
 
     save_report = supervised_input('Would you like to save a tournament report, yes or no? ',
                                    'choose_from', options=['Yes', 'No'])
@@ -446,9 +464,9 @@ def segment_ending(variant, entry_fee):
     else:
         print(wrap('Report not saved.'))
 
-    print(colorise(SECONDARY, LINE))
+    print(colorize(SECONDARY, LINE))
 
 
 def segment_final():
     """Print exit instructions."""
-    input(colorise(SECONDARY, SMALL_INDENT + '(Press ENTER to exit.)'))
+    input(colorize(SECONDARY, SMALL_INDENT + '(Press ENTER to exit.)'))
