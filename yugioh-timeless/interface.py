@@ -77,9 +77,10 @@ from colorama import just_fix_windows_console
 from colorama.ansi import Fore, Style, Cursor, clear_line
 from tabulate import tabulate
 
+from config import Deck, URLS
 from config import TERMINAL_WIDTH, TERMINAL_WIDTH_DEFAULT, LINE_WIDTH, LINE_WIDTH_DEFAULT
 from config import RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
-from config import LINE, LINE_DEFAULT, BOLDLINE, BOLDLINE_DEFAULT, NEWLINE, TIMELESS, HOMEPAGE, YOUTUBE
+from config import LINE, LINE_DEFAULT, BOLDLINE, BOLDLINE_DEFAULT, NEWLINE, TIMELESS_LOGO
 from config import PRELIMINARY_ROUNDS, DECK_SETS
 
 
@@ -103,6 +104,11 @@ def wrap(text):
 def colorize(color, text):
     """Apply color to text using ANSI codes."""
     return color + text + CLEAR
+
+
+def hyperlink(text, url):
+    """Add url to text as hyperlink."""
+    return f"\x1b]8;;{url}\x1b\\{text}\x1b]8;;\x1b\\"
 
 
 def supervised_input(prompt, conditions, options=None, default_tip=None):
@@ -255,7 +261,7 @@ def simulate_loading(label, report=False):
         print(NEWLINE + labeled_bar, file=tournament_report)
 
 
-def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=False):
+def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=False, hyperlinks=None):
     """Center a multiline string, with trailing whitespaces removed.
 
     This function preserves the original alignment of the multiline string,
@@ -273,6 +279,8 @@ def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=Fa
         This is particularly useful when re-centering centered tables to
         a different width.
         (defaults to False)
+    hyperlinks : list of tuple, optional
+        TODO Add description
 
     Returns
     -------
@@ -285,6 +293,10 @@ def center_multiline_string(multiline_string, width=TERMINAL_WIDTH, leftstrip=Fa
     max_length = max(map(len, lines))
     centered_lines = [line.ljust(max_length).center(width).rstrip() for line in lines]
     centered_multiline_string = NEWLINE.join(centered_lines)
+
+    if hyperlinks:
+        for text, url in hyperlinks:
+            centered_multiline_string = centered_multiline_string.replace(text, hyperlink(text, url))
 
     return centered_multiline_string
 
@@ -365,15 +377,24 @@ def segment_initial():
         "a desire for high-level gameplay, TIMELESS is designed to facilitate long, strategic games, while staying "
         "true to the core concepts of classic Yu-Gi-Oh!"
     )
-    links = center_multiline_string(tabulate([
-        ["home:", HOMEPAGE],
-        ["youtube:", YOUTUBE]
-    ],
-        tablefmt="plain",
-        colalign=("right", "left")
-    ))
 
-    component_1 = colorize(PRIMARY, 3*NEWLINE + center_multiline_string(TIMELESS) + 2*NEWLINE)
+    homepage = URLS.get("homepage").removeprefix("https://")
+    youtube = URLS.get("youtube").removeprefix("https://")
+    links = center_multiline_string(
+        tabulate([
+            ["HOME", "|", homepage],
+            ["YOUTUBE", "|", youtube],
+        ],
+            tablefmt="plain",
+            colalign=("right", "center", "left")
+        ),
+        hyperlinks=[
+            (homepage, URLS.get("homepage")),
+            (youtube, URLS.get("youtube")),
+        ]
+    )
+
+    component_1 = colorize(PRIMARY, 3*NEWLINE + center_multiline_string(TIMELESS_LOGO) + 2*NEWLINE)
     component_2 = colorize(SECONDARY, links)
     component_3 = NEWLINE + wrap(text)
 
@@ -388,7 +409,10 @@ def segment_enter_variant():
         "assembled deck set of four are randomly assigned to the duelists. This is done in such a way that during the "
         "course of the tournament each duelist pilots each of the decks exactly once. There are two TIMELESS deck sets:"
     )
-    variants = center_multiline_string(tabulate(DECK_SETS, headers="keys", tablefmt="simple_outline")) + NEWLINE
+    variants = center_multiline_string(
+        tabulate(DECK_SETS, headers="keys", tablefmt="simple_outline"),
+        hyperlinks=[(deck, URLS.get(deck)) for deck in Deck]
+    ) + NEWLINE
     simulate_loading('SIGN-UP')
     print(wrap(text), variants, sep=NEWLINE)
 

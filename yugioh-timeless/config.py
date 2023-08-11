@@ -5,6 +5,7 @@ Some constants are technically redundant, but they improve readability.
 """
 
 import shutil
+from enum import StrEnum
 
 
 # Used in `interface` module
@@ -27,7 +28,7 @@ BOLDLINE_DEFAULT = SMALL_INDENT + '='*LINE_WIDTH_DEFAULT
 BOLDLINE = SMALL_INDENT + '='*LINE_WIDTH
 NEWLINE = '\n'
 
-TIMELESS = NEWLINE.join([  # based on `pyfiglet` output
+TIMELESS_LOGO = NEWLINE.join([  # based on `pyfiglet` output
     r'  ____________  ___________                   ',
     r' /_  __/  _/  |/  / ____/ /                   ',
     r'  / /  / // /|_/ / __/ / /   ________________ ',
@@ -36,15 +37,37 @@ TIMELESS = NEWLINE.join([  # based on `pyfiglet` output
     r'                    / /___/ /___ ___/ /__/ /  ',
     r'                   /_____/_____//____/____/   '
 ])
-HOMEPAGE = 'yugioh-timeless.github.io'
-YOUTUBE = 'youtube.com/@Yu-Gi-OhTIMELESS'
+
+
+class Deck(StrEnum):
+    BEAST = "Beast"
+    CHAOS = "Chaos"
+    DRAGON = "Dragon"
+    SPELLCASTER = "Spellcaster"
+    DINOSAUR = "Dinosaur"
+    FLIP = "Flip"
+    WARRIOR = "Warrior"
+    ZOMBIE = "Zombie"
 
 
 # Used in `timeless` module
 VARIANTS = ['Basic', 'Extra']
 DECK_SETS = {  # also used in `interface`
-    'Basic': ['Beast', 'Chaos', 'Dragon', 'Spellcaster'],
-    'Extra': ['Dinosaur', 'Flip', 'Warrior', 'Zombie']
+    'Basic': [Deck.BEAST, Deck.CHAOS, Deck.DRAGON, Deck.SPELLCASTER],
+    'Extra': [Deck.DINOSAUR, Deck.FLIP, Deck.WARRIOR, Deck.ZOMBIE],
+}
+
+URLS = {
+    "homepage": "https://yugioh-timeless.github.io",
+    "youtube": "https://youtube.com/@Yu-Gi-OhTIMELESS",
+    Deck.BEAST: "https://www.duelingbook.com/deck?id=13661138",
+    Deck.CHAOS: "https://www.duelingbook.com/deck?id=13661140",
+    Deck.DRAGON: "https://www.duelingbook.com/deck?id=13661141",
+    Deck.SPELLCASTER: "https://www.duelingbook.com/deck?id=13661142",
+    Deck.DINOSAUR: "https://www.duelingbook.com/deck?id=13661143",
+    Deck.FLIP: "https://www.duelingbook.com/deck?id=13661145",
+    Deck.WARRIOR: "https://www.duelingbook.com/deck?id=13661146",
+    Deck.ZOMBIE: "https://www.duelingbook.com/deck?id=13661147",
 }
 
 ROUNDS = (0, 1, 2, 3)
