@@ -8,3 +8,6 @@ venv/
 
 # Images
 img/
+
+# Personal notes
+todo.md
