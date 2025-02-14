@@ -77,10 +77,12 @@ from colorama import just_fix_windows_console
 from colorama.ansi import Fore, Style, Cursor, clear_line
 from tabulate import tabulate
 
-from config import TERMINAL_WIDTH, TERMINAL_WIDTH_DEFAULT, LINE_WIDTH, LINE_WIDTH_DEFAULT
-from config import RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT
-from config import LINE, LINE_DEFAULT, BOLDLINE, BOLDLINE_DEFAULT, NEWLINE, TIMELESS, HOMEPAGE, YOUTUBE
-from config import PRELIMINARY_ROUNDS, DECK_SETS
+from .config import (
+    TERMINAL_WIDTH, TERMINAL_WIDTH_DEFAULT, LINE_WIDTH, LINE_WIDTH_DEFAULT,
+    RIGHT_MARGIN, INDENT, SMALL_INDENT, LARGE_INDENT,
+    LINE, LINE_DEFAULT, BOLDLINE, BOLDLINE_DEFAULT, NEWLINE, TIMELESS, HOMEPAGE,
+    YOUTUBE, PRELIMINARY_ROUNDS, DECK_SETS,
+)
 
 
 just_fix_windows_console()  # enable ANSI escape sequences on Windows

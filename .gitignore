@@ -11,3 +11,6 @@ img/
 
 # Personal notes
 todo.md
+
+# Packaging
+*.egg-info

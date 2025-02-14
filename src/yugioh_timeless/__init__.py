@@ -12,7 +12,7 @@ __maintainer__ = 'Nace Zavrtanik'
 __email__ = 'yugioh.timeless@gmail.com'
 
 
-from timeless import run_yugioh_timeless
+from .timeless import run_yugioh_timeless
 
 
 __all__ = ['run_yugioh_timeless']
