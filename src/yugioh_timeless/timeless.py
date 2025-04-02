@@ -1,37 +1,7 @@
-"""Module containing the main functionality of the `yugioh-timeless` package.
+"""Module containing the main functionality of the `yugioh-timeless` package."""
 
-Variables
----------
-`IS_TIED_AFTER_PRELIMINARIES`
-    None. After preliminary rounds set to boolean value.
-
-Classes
--------
-`Duelist`
-    Handle duelist scores in the Yugioh TIMELESS tournament format.
-
-Functions
----------
-`enter_unique_duelists`
-    Return list of `Duelist` instances with unique `name` attributes.
-`random_timeless_square`
-    Randomly generate a Timeless square.
-`check_if_tied_after_preliminaries`
-    Set global constant `IS_TIED_AFTER_PRELIMINARIES`.
-`generate_pairings`
-    Generate and display pairings for given round.
-`register_wins`
-    Register wins and return tuple of winners and losers.
-`display_standings`
-    Display standings after given round.
-`timeless`
-    Run the TIMELESS tournament.
-`run_yugioh_timeless`
-    Run the TIMELESS tournament in the standard, intended way.
-
-"""
-
-import numpy as np
+import random
+import itertools
 
 import yugioh_timeless.interface as interface
 from yugioh_timeless.config import (
@@ -42,6 +12,11 @@ from yugioh_timeless.config import (
 
 
 IS_TIED_AFTER_PRELIMINARIES = None
+
+
+def random_permutation(collection):
+    """Return a random permutation of `collection`."""
+    return random.choice(list(itertools.permutations(collection)))
 
 
 class Duelist:
@@ -153,7 +128,7 @@ def enter_tournament_information():
     entry_fee = int(interface.supervised_input('Set entry fee: ', ['integer', 'multiple_of_10', 'max_1000'],
                                                default_tip="Set to 0 for no entry fee."))
     interface.segment_enter_duelists()
-    duelists = np.random.permutation(enter_unique_duelists())
+    duelists = random_permutation(enter_unique_duelists())
     interface.segment_enter_tournament_information_end()
 
     tournament_information = {'variant': variant, 'entry_fee': entry_fee, 'duelists': duelists}
@@ -168,7 +143,7 @@ def random_timeless_square():
 
     Returns
     -------
-    numpy.ndarray
+    list of list of int
         Timeless square.
 
     Notes
@@ -182,20 +157,16 @@ def random_timeless_square():
     Examples
     --------
     >>> random_timeless_square()
-    array([[2, 0, 1, 3],
-           [3, 1, 2, 0],
-           [2, 0, 3, 1],
-           [1, 3, 2, 0]])
+    [(2, 0, 3, 1), (1, 0, 3, 2), (1, 0, 3, 2), (2, 0, 3, 1)]
     """
 
     while True:
 
-        random_square = np.array([np.random.permutation(4) for _ in range(4)])
+        random_square = [random_permutation(range(4)) for _ in range(4)]
 
-        unique_diagonal = len(set(random_square.diagonal())) == 4
-        unique_antidiagonal = len(set(np.fliplr(random_square).diagonal())) == 4
-        unique_offdiagonal = len({random_square[0, 1], random_square[1, 0],
-                                  random_square[2, 3], random_square[3, 2]}) == 4
+        unique_diagonal = len({random_square[i][i] for i in range(4)}) == 4
+        unique_antidiagonal = len({random_square[i][3-i] for i in range(4)}) == 4
+        unique_offdiagonal = len({random_square[i][j] for (i, j) in [(0, 1), (1, 0), (2, 3), (3, 2)]}) == 4
 
         is_timeless = unique_diagonal and unique_antidiagonal and unique_offdiagonal
 
@@ -222,7 +193,7 @@ def generate_pairings(duelists, decks, matchup, round_):
     decks : list of str
         Deck names. The order of the list matters and should not be changed
         over multiple calls of this function.
-    matchup : numpy.ndarray
+    matchup : list of list of int
         A Timeless square.
     round_ : {0, 1, 2, 3}
         Number of the round to generate pairings for.
@@ -248,16 +219,16 @@ def generate_pairings(duelists, decks, matchup, round_):
 
     if round_ in PRELIMINARY_ROUNDS:
         x, y, z, w = PAIRING_CONFIGURATIONS[round_]
-        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, y]], decks[matchup[y, x]],
-                                          decks[matchup[z, w]], decks[matchup[w, z]]]
+        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x][y]], decks[matchup[y][x]],
+                                          decks[matchup[z][w]], decks[matchup[w][z]]]
     elif round_ == FINAL_ROUND and IS_TIED_AFTER_PRELIMINARIES:
-        x, y, z, w = PAIRING_CONFIGURATIONS[np.random.choice(PRELIMINARY_ROUNDS)]
-        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
-                                          decks[matchup[z, z]], decks[matchup[w, w]]]
+        x, y, z, w = PAIRING_CONFIGURATIONS[random.choice(PRELIMINARY_ROUNDS)]
+        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x][x]], decks[matchup[y][y]],
+                                          decks[matchup[z][z]], decks[matchup[w][w]]]
     else:
-        x, y, z, w = np.flip(np.argsort(duelists))
-        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x, x]], decks[matchup[y, y]],
-                                          decks[matchup[z, z]], decks[matchup[w, w]]]
+        x, y, z, w = tuple(duelists.index(duelist) for duelist in reversed(sorted(duelists, key=lambda x: x.wins)))
+        deck_x, deck_y, deck_z, deck_w = [decks[matchup[x][x]], decks[matchup[y][y]],
+                                          decks[matchup[z][z]], decks[matchup[w][w]]]
 
     duelist_x, duelist_y, duelist_z, duelist_w = [duelists[i] for i in [x, y, z, w]]
 
