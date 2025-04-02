@@ -16,8 +16,8 @@ import string
 import textwrap
 import time
 import datetime
+import platform
 
-from colorama import just_fix_windows_console
 from tabulate import tabulate
 
 from .config import (
@@ -27,8 +27,10 @@ from .config import (
     YOUTUBE, PRELIMINARY_ROUNDS, DECK_SETS,
 )
 
-
-just_fix_windows_console()  # enable ANSI escape sequences on Windows
+UNSUPPORTED_WINDOWS_RELEASES = {"XP", "Vista", "7"}
+WINDOWS_RELEASES_WITHOUT_ANSI_TERMINAL = {"8", "8.1"}
+assert platform.system() != "Windows" or platform.release() not in UNSUPPORTED_WINDOWS_RELEASES
+TERMINAL_SUPPORTS_ANSI = platform.system() != "Windows" or platform.release() not in WINDOWS_RELEASES_WITHOUT_ANSI_TERMINAL
 
 PRIMARY = "\033[96m"
 SECONDARY = "\033[36m"
@@ -51,6 +53,8 @@ def wrap(text):
 
 def colorize(color, text):
     """Apply color to text using ANSI codes."""
+    if not TERMINAL_SUPPORTS_ANSI:
+        return text
     return color + text + CLEAR
 
 
