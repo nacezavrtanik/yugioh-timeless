@@ -6,62 +6,6 @@ functions, this module contains so-called "segment" functions, which are mostly
 used to print chunks (segments) of text to give the terminal interface its
 intended look and feel.
 
-Variables
----------
-`PRIMARY`
-    ANSI code for the primary interface color.
-`SECONDARY`
-    ANSI code for the secondary interface color.
-`TIP`
-    ANSI code for the color in which to display user input tips.
-`CLEAR`
-    ANSI code for clearing all colors and styles.
-`TODAY`
-    Constant containing today's date as a `datetime.date` instance.
-`tournament_report`
-    Instance of `io.StringIO` for documenting the course of the tournament.
-
-Functions
----------
-`wrap`
-    Wrap text to fit inside margins, with empty lines before and after.
-`colorize`
-    Apply color to text using ANSI codes.
-`supervised_input`
-    Require user input to satisfy specified conditions.
-`simulate_loading`
-    Create a labeled loading bar.
-`center_multiline_string`
-    Center a multiline string, with trailing whitespaces removed.
-`convert_to_default_width`
-    Resize a chunk of the `tournament_report` variable to default width.
-`save_tournament_report`
-    Save contents of the global variable `tournament_report` to a file.
-`segment_initial`
-    Print general information on the TIMELESS format.
-`segment_enter_variant`
-    Print deck choice description.
-`segment_enter_entry_fee`
-    Print entry fee description.
-`segment_enter_duelists`
-    Print duelist sign-up prompt.
-`segment_enter_unique_duelists`
-    Print tip to avoid duplicate names, clear previous duelist entries.
-`segment_enter_tournament_information_end`
-    Print line.
-`segment_starting`
-    Print information on the TIMELESS tournament about to start.
-`segment_generate_pairings`
-    Print pairings.
-`segment_register_wins`
-    Print empty line.
-`segment_display_standings`
-    Print standings.
-`segment_ending`
-    Ask user if a tournament report should be saved and do it (or not).
-`segment_final`
-    Print exit instructions.
-
 """
 
 import io
@@ -74,7 +18,6 @@ import time
 import datetime
 
 from colorama import just_fix_windows_console
-from colorama.ansi import Fore, Style, Cursor, clear_line
 from tabulate import tabulate
 
 from .config import (
@@ -87,10 +30,14 @@ from .config import (
 
 just_fix_windows_console()  # enable ANSI escape sequences on Windows
 
-PRIMARY = Fore.CYAN + Style.BRIGHT
-SECONDARY = Fore.CYAN
-TIP = Fore.BLACK + Style.BRIGHT
-CLEAR = Style.RESET_ALL
+PRIMARY = "\033[96m"
+SECONDARY = "\033[36m"
+TIP = "\033[90m"
+BRIGHT_WHITE_BOLD = "\033[97;1m"
+CLEAR = "\033[0m"
+CLEAR_LINE = "\033[2K"
+CURSOR_UP = "\033[A"
+
 TODAY = datetime.datetime.today().date()
 
 tournament_report = io.StringIO()
@@ -189,7 +136,7 @@ def supervised_input(prompt, conditions, options=None, default_tip=None):
     def display_tip(tip, is_default=False):
         """Print the tip and move cursor up again."""
         prefix = NEWLINE if is_default else ""  # to appear below the prompt, the default tip has to be moved down
-        print(colorize(TIP, clear_line() + prefix + LARGE_INDENT + f'TIP: {tip}'), end='\r' + Cursor.UP())
+        print(colorize(TIP, CLEAR_LINE + prefix + LARGE_INDENT + f'TIP: {tip}'), end='\r' + CURSOR_UP)
         nonlocal tip_is_displayed
         tip_is_displayed = True
 
@@ -198,7 +145,7 @@ def supervised_input(prompt, conditions, options=None, default_tip=None):
         if default_tip and not tip_is_displayed:
             display_tip(default_tip, is_default=True)
 
-        user_input = string.capwords(input(colorize(Style.BRIGHT, clear_line() + LARGE_INDENT + prompt)))
+        user_input = string.capwords(input(colorize(BRIGHT_WHITE_BOLD, CLEAR_LINE + LARGE_INDENT + prompt)))
         check = True
 
         for condition in conditions:
@@ -212,7 +159,7 @@ def supervised_input(prompt, conditions, options=None, default_tip=None):
 
         if check:
             if tip_is_displayed:
-                print(clear_line(), end='')
+                print(CLEAR_LINE, end='')
             return user_input
 
 
@@ -412,7 +359,7 @@ def segment_enter_duelists():
 def segment_enter_unique_duelists(duplicate_names_string):
     """Print tip to avoid duplicate names, clear previous duelist entries."""
     tip = colorize(TIP, LARGE_INDENT + f'TIP: Enter unique names only. (Duplicate names: {duplicate_names_string}.)')
-    print('', clear_line(), clear_line(), clear_line() + tip, clear_line(), sep='\r'+Cursor.UP(), end='\r')
+    print('', CLEAR_LINE, CLEAR_LINE, CLEAR_LINE + tip, CLEAR_LINE, sep='\r'+CURSOR_UP, end='\r')
 
 
 def segment_enter_tournament_information_end():
