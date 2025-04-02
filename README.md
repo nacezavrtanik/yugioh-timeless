@@ -13,7 +13,7 @@ pairings for a TIMELESS tournament.
 
 
 ## Installation
-(Requires Python 3.11 or newer.)
+(Requires Python 3.13 or newer.)
 1. Clone repository.
 2. Install repository as a package (virtual environment recommended):
 ~~~bash
