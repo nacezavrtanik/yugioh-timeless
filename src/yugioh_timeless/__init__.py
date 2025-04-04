@@ -2,14 +2,7 @@
 """Package for running the Yugioh TIMELESS tournament format."""
 
 
-__author__ = 'Nace Zavrtanik'
-__copyright__ = 'Copyright (C) 2023 Nace Zavrtanik'
-__credits__ = []
-
-__license__ = 'GNU AGPLv3'
-__version__ = '1.0'
-__maintainer__ = 'Nace Zavrtanik'
-__email__ = 'yugioh.timeless@gmail.com'
+__version__ = '0.1.0-beta'
 
 
 from .timeless import run_yugioh_timeless
