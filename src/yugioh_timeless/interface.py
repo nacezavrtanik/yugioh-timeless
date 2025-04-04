@@ -338,7 +338,7 @@ def segment_enter_variant():
     text = (
         "A TIMELESS tournament consists of four rounds. The three preliminary rounds, in which each duelist faces off "
         "against every other duelist, are followed up by a final play-off round. In each round, decks from a carefully "
-        "assembled deck set of four are randomly assigned to the duelists. This is done in such a way that during the "
+        "constructed deck set of four are randomly assigned to the duelists. This is done in such a way that during the "
         "course of the tournament each duelist pilots each of the decks exactly once. There are two TIMELESS deck sets:"
     )
     variants = center_multiline_string(tabulate(DECK_SETS, headers="keys", tablefmt="simple_outline")) + NEWLINE
