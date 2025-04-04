@@ -1,6 +1,6 @@
 # Yu-Gi-Oh! TIMELESS
 
-This repostiry provides a beginner-friendly command line tool for creating
+This repository provides a beginner-friendly command line tool for creating
 pairings for a TIMELESS tournament.
 
 > TIMELESS is a custom 4-player tournament format for the Yu-Gi-Oh! Trading
@@ -12,13 +12,11 @@ pairings for a TIMELESS tournament.
 > each duelist pilots each of the decks exactly once.
 
 
-## Installation
+## Setup
 (Requires Python 3.13 or newer.)
-1. Clone repository.
-2. Install repository as a package (virtual environment recommended):
+1. Install the *Yu-Gi-Oh! TIMELESS* package from PyPI:
 ~~~bash
-cd yugioh-timeless
-pip install .
+pip install yugioh-timeless
 ~~~
-3. The `timeless` command is now available in your shell -- run it.
-
+2. The `timeless` command is now available in your shell. To create pairings,
+   run it.
