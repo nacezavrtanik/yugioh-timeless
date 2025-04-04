@@ -2,7 +2,7 @@
 """Package for running the Yugioh TIMELESS tournament format."""
 
 
-__version__ = '0.1.0-beta'
+__version__ = '0.1.1-beta'
 
 
 from .timeless import run_yugioh_timeless
