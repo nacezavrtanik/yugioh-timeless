@@ -5,10 +5,18 @@
 __version__ = '0.1.1-beta'
 
 
+from .entities import Duelist, Deck
+from .tournament import Tournament
+
 from .timeless import run_yugioh_timeless
 
 
-__all__ = ['run_yugioh_timeless']
+__all__ = [
+    "Duelist",
+    "Deck",
+    "Tournament",
+    "run_yugioh_timeless",
+]
 
 
 if __name__ == '__main__':
