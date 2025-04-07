@@ -40,7 +40,7 @@ GitHub = "https://github.com/nacezavrtanik/yugioh-timeless"
 YouTube = "https://www.youtube.com/@Yu-Gi-OhTIMELESS"
 
 [project.scripts]
-timeless = "yugioh_timeless:run_yugioh_timeless"
+timeless = "timeless:run_yugioh_timeless"
 
 [tool.setuptools.dynamic]
-version = {attr = "yugioh_timeless.__version__"}
+version = {attr = "timeless.__version__"}

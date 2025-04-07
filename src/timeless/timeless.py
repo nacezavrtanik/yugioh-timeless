@@ -3,8 +3,8 @@
 import random
 import itertools
 
-import yugioh_timeless.interface as interface
-from yugioh_timeless.config import (
+import timeless.interface as interface
+from .config import (
     VARIANTS, DECK_SETS, ROUNDS, PRELIMINARY_ROUNDS, FINAL_ROUND,
     PAIRING_CONFIGURATIONS, TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES,
     STANDING_CONFIGURATIONS,
