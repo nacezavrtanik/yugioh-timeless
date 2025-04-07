@@ -31,16 +31,18 @@ class Tournament:
         return self.standing_configuration in self.TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
     def generate_pairings(self):
-        decks = self.decks.copy()
-        random.shuffle(decks)
-        for duelist, deck in zip(self.duelists, decks):
-            duelist.update_deck(deck)
-            print(f"assigning deck {deck} to {duelist}")
+        picked_decks = []
+        for duelist in self.duelists:
+            invalid_choices = picked_decks + duelist.deck_record
+            new_deck = random.choice([
+                deck for deck in self.decks if deck not in invalid_choices
+            ])
+            picked_decks.append(new_deck)
+            duelist.update_deck(new_deck)
 
     def update_records(self, winners):
         assert len(winners) == self.TOTAL_DUELISTS / 2
         for duelist in self.duelists:
-            print(f"updating records for {duelist}")
             duelist.update_wins(duelist in winners)
 
     def advance_round(self):

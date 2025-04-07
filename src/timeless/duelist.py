@@ -32,7 +32,9 @@ class Duelist:
 
     def update_wins(self, won: bool):
         self.win_record.append(self.wins + int(won))
+        print(f"updating records for {self}")
 
     def update_deck(self, deck: str):
         self.deck_record.append(deck)
+        print(f"assigning deck {deck} to {self}")
 
