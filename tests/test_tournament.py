@@ -6,10 +6,7 @@ import timeless
 
 def test_tournament_round():
     try:
-        decks = [
-            timeless.Deck(name, "")
-            for name in ["plant", "goat", "chaos", "ritual"]
-        ]
+        decks = ["plant", "goat", "chaos", "ritual"]
 
         nace = timeless.Duelist("nace")
         lucija = timeless.Duelist("lucija")

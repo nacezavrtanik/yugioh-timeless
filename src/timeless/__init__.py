@@ -5,7 +5,7 @@
 __version__ = '0.1.1-beta'
 
 
-from .entities import Duelist, Deck
+from .duelist import Duelist
 from .tournament import Tournament
 
 from .timeless import run_yugioh_timeless
@@ -13,7 +13,6 @@ from .timeless import run_yugioh_timeless
 
 __all__ = [
     "Duelist",
-    "Deck",
     "Tournament",
     "run_yugioh_timeless",
 ]
