@@ -10,6 +10,14 @@ class Duelist:
         self.win_record = win_record or []
         self.deck_record = deck_record or []
 
+    def __repr__(self):
+        return (
+            f"{self.__class__.__qualname__}("
+            f"name={self.name!r}, "
+            f"win_record={self.win_record!r}, "
+            f"deck_record={self.deck_record!r})"
+        )
+
     @property
     def wins(self):
         if not self.win_record:
