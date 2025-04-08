@@ -30,7 +30,7 @@ class Tournament:
             return None
         return self.standing_configuration in self.TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
-    def generate_pairings(self):
+    def assign_decks(self):
         picked_decks = []
         for duelist in self.duelists:
             invalid_choices = picked_decks + duelist.deck_record
@@ -40,10 +40,23 @@ class Tournament:
             picked_decks.append(new_deck)
             duelist.update_deck(new_deck)
 
+    def generate_pairings(self):
+        paired_duelists = []
+        for duelist in self.duelists:
+            if duelist.name in paired_duelists:
+                continue
+            invalid_choices = [duelist.name] + paired_duelists + duelist.opponent_record
+            new_opponent = random.choice([
+                duelist for duelist in self.duelists if duelist.name not in invalid_choices
+            ])
+            paired_duelists.extend([duelist.name, new_opponent.name])
+            duelist.update_opponent(new_opponent.name)
+            new_opponent.update_opponent(duelist.name)
+
     def update_records(self, winners):
         assert len(winners) == self.TOTAL_DUELISTS / 2
         for duelist in self.duelists:
-            duelist.update_wins(duelist in winners)
+            duelist.update_wins(duelist.name in winners)
 
     def advance_round(self):
         self.round += 1
