@@ -46,7 +46,9 @@ class Duelist:
     def update_deck(self, deck: str):
         self.deck_record.append(deck)
         print(f"assigning deck {deck} to {self}")
+        assert len(self.deck_record) == len(set(self.deck_record))
 
     def update_opponent(self, name):
         self.opponent_record.append(name)
         print(f"assigning opponent {name} to {self}")
+        assert len(self.opponent_record) == len(set(self.opponent_record))
