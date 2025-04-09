@@ -23,12 +23,14 @@ class CLI:
         self.tournament = Tournament(duelists, decks)
 
     def run_tournament(self):
-        for _ in range(3):
+        for _ in range(4):
             self.tournament.generate_pairings()
             print("PAIRINGS")
-            print(*self.tournament.duelists, sep="\n")
+            print(*[(duelist.name, duelist.deck, duelist.opponent) for duelist in self.tournament.duelists], sep="\n")
+
             winners = []
             winners.append(input("winner 1: "))
             winners.append(input("winner 2: "))
             self.tournament.update_records(winners)
             print("STANDINGS")
+            print(*[(duelist.name, duelist.wins) for duelist in self.tournament.duelists], sep="\n")

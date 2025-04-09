@@ -55,7 +55,7 @@ class Tournament:
             return None
         return self.standing_configuration in self.TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
-    def generate_pairings(self):
+    def _generate_pairings_for_preliminary_round(self):
         paired_duelists = []
         for duelist in self.duelists:
             if duelist.name in paired_duelists:
@@ -70,6 +70,40 @@ class Tournament:
             x, y = self.duelists.index(duelist), self.duelists.index(opponent)
             duelist.update_deck(self.decks[self.matchups[x][y]])
             opponent.update_deck(self.decks[self.matchups[y][x]])
+
+    def _generate_pairings_for_final_round(self):
+        if self.is_tied_after_preliminaries:
+            paired_duelists = []
+            for duelist in self.duelists:
+                if duelist.name in paired_duelists:
+                    continue
+                invalid_choices = [duelist.name] + paired_duelists
+                opponent = random.choice([
+                    duelist for duelist in self.duelists if duelist.name not in invalid_choices
+                ])
+                paired_duelists.extend([duelist.name, opponent.name])
+                duelist.update_opponent(opponent.name)
+                opponent.update_opponent(duelist.name)
+                x, y = self.duelists.index(duelist), self.duelists.index(opponent)
+                duelist.update_deck(self.decks[self.matchups[x][x]])
+                opponent.update_deck(self.decks[self.matchups[y][y]])
+        else:
+            duelists_by_wins = sorted(self.duelists, key=lambda x: x.wins)
+            for duelist, opponent in [
+                (duelists_by_wins[i], duelists_by_wins[i+1])
+                for i in [0, 2]
+            ]:
+                duelist.update_opponent(opponent.name)
+                opponent.update_opponent(duelist.name)
+                x, y = self.duelists.index(duelist), self.duelists.index(opponent)
+                duelist.update_deck(self.decks[self.matchups[x][x]])
+                opponent.update_deck(self.decks[self.matchups[y][y]])
+
+    def generate_pairings(self):
+        if self.round == self.FINAL_ROUND:
+            self._generate_pairings_for_final_round()
+        else:
+            self._generate_pairings_for_preliminary_round()
 
     def update_records(self, winners):
         assert len(winners) == self.TOTAL_DUELISTS / 2

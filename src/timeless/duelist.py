@@ -41,14 +41,11 @@ class Duelist:
 
     def update_wins(self, won: bool):
         self.win_record.append(self.wins + int(won))
-        print(f"updating records for {self}")
 
     def update_deck(self, deck: str):
         self.deck_record.append(deck)
-        print(f"assigning deck {deck} to {self}")
-        assert len(self.deck_record) == len(set(self.deck_record))
+        assert len(self.deck_record) == len(set(self.deck_record)) or len(self.deck_record) == 4
 
     def update_opponent(self, name):
         self.opponent_record.append(name)
-        print(f"assigning opponent {name} to {self}")
-        assert len(self.opponent_record) == len(set(self.opponent_record))
+        assert len(self.opponent_record) == len(set(self.opponent_record)) or len(self.opponent_record) == 4
