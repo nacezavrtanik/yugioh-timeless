@@ -12,15 +12,38 @@ class Tournament:
         self,
         duelists: list[Duelist],
         decks: list[str],
-        round: int = 1,
     ):
         assert len(duelists) == 4
         self.duelists = duelists
         assert len(decks) == 4
         self.decks = decks
-        assert 1 <= round <= self.FINAL_ROUND
-        self.round = round
         self.matchups = random.choice(TIMELESS_SQUARES)
+
+    @property
+    def round(self):
+        win_record_lengths = [
+            len(duelist.win_record) for duelist in self.duelists
+        ]
+        deck_record_lengths = [
+            len(duelist.deck_record) for duelist in self.duelists
+        ]
+        opponent_record_lengths = [
+            len(duelist.opponent_record) for duelist in self.duelists
+        ]
+
+        duelist_records_have_same_length_between_duelists = all([
+            len(set(records)) == 1 for records in [
+                win_record_lengths, deck_record_lengths, opponent_record_lengths
+            ]
+        ])
+
+        assert duelist_records_have_same_length_between_duelists
+        win_record_length = list(win_record_lengths)[0]
+        deck_record_length = list(deck_record_lengths)[0]
+        opponent_record_length = list(opponent_record_lengths)[0]
+        assert deck_record_length == opponent_record_length
+        assert win_record_length in {deck_record_length, deck_record_length - 1}
+        return deck_record_length + 1
 
     @property
     def standing_configuration(self) -> tuple[int, int, int, int]:
@@ -52,6 +75,3 @@ class Tournament:
         assert len(winners) == self.TOTAL_DUELISTS / 2
         for duelist in self.duelists:
             duelist.update_wins(duelist.name in winners)
-
-    def advance_round(self):
-        self.round += 1
