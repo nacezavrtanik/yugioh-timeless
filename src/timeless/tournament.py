@@ -1,5 +1,6 @@
 import random
 from .duelist import Duelist
+from .config import TIMELESS_SQUARES
 
 
 class Tournament:
@@ -19,6 +20,7 @@ class Tournament:
         self.decks = decks
         assert 1 <= round <= self.FINAL_ROUND
         self.round = round
+        self.matchups = random.choice(TIMELESS_SQUARES)
 
     @property
     def standing_configuration(self) -> tuple[int, int, int, int]:
@@ -30,28 +32,21 @@ class Tournament:
             return None
         return self.standing_configuration in self.TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
-    def assign_decks(self):
-        picked_decks = []
-        for duelist in self.duelists:
-            invalid_choices = picked_decks + duelist.deck_record
-            new_deck = random.choice([
-                deck for deck in self.decks if deck not in invalid_choices
-            ])
-            picked_decks.append(new_deck)
-            duelist.update_deck(new_deck)
-
     def generate_pairings(self):
         paired_duelists = []
         for duelist in self.duelists:
             if duelist.name in paired_duelists:
                 continue
             invalid_choices = [duelist.name] + paired_duelists + duelist.opponent_record
-            new_opponent = random.choice([
+            opponent = random.choice([
                 duelist for duelist in self.duelists if duelist.name not in invalid_choices
             ])
-            paired_duelists.extend([duelist.name, new_opponent.name])
-            duelist.update_opponent(new_opponent.name)
-            new_opponent.update_opponent(duelist.name)
+            paired_duelists.extend([duelist.name, opponent.name])
+            duelist.update_opponent(opponent.name)
+            opponent.update_opponent(duelist.name)
+            x, y = self.duelists.index(duelist), self.duelists.index(opponent)
+            duelist.update_deck(self.decks[self.matchups[x][y]])
+            opponent.update_deck(self.decks[self.matchups[y][x]])
 
     def update_records(self, winners):
         assert len(winners) == self.TOTAL_DUELISTS / 2

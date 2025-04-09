@@ -24,7 +24,6 @@ class CLI:
 
     def run_tournament(self):
         for _ in range(3):
-            self.tournament.assign_decks()
             self.tournament.generate_pairings()
             print("PAIRINGS")
             print(*self.tournament.duelists, sep="\n")
