@@ -24,26 +24,21 @@ class Tournament:
         win_record_lengths = [
             len(duelist.win_record) for duelist in self.duelists
         ]
-        deck_record_lengths = [
-            len(duelist.deck_record) for duelist in self.duelists
-        ]
-        opponent_record_lengths = [
-            len(duelist.opponent_record) for duelist in self.duelists
+        matchup_record_lengths = [
+            len(duelist.matchup_record) for duelist in self.duelists
         ]
 
         duelist_records_have_same_length_between_duelists = all([
             len(set(records)) == 1 for records in [
-                win_record_lengths, deck_record_lengths, opponent_record_lengths
+                win_record_lengths, matchup_record_lengths
             ]
         ])
 
         assert duelist_records_have_same_length_between_duelists
         win_record_length = list(win_record_lengths)[0]
-        deck_record_length = list(deck_record_lengths)[0]
-        opponent_record_length = list(opponent_record_lengths)[0]
-        assert deck_record_length == opponent_record_length
-        assert win_record_length in {deck_record_length, deck_record_length - 1}
-        return deck_record_length + 1
+        matchup_record_length = list(matchup_record_lengths)[0]
+        assert win_record_length in {matchup_record_length, matchup_record_length - 1}
+        return matchup_record_length + 1
 
     @property
     def standing_configuration(self) -> tuple[int, int, int, int]:
@@ -65,11 +60,9 @@ class Tournament:
                 duelist for duelist in self.duelists if duelist.name not in invalid_choices
             ])
             paired_duelists.extend([duelist.name, opponent.name])
-            duelist.update_opponent(opponent.name)
-            opponent.update_opponent(duelist.name)
             x, y = self.duelists.index(duelist), self.duelists.index(opponent)
-            duelist.update_deck(self.decks[self.matchups[x][y]])
-            opponent.update_deck(self.decks[self.matchups[y][x]])
+            duelist.update_matchup(self.decks[self.matchups[x][y]], opponent.name)
+            opponent.update_matchup(self.decks[self.matchups[y][x]], duelist.name)
 
     def _generate_pairings_for_final_round(self):
         if self.is_tied_after_preliminaries:
@@ -82,22 +75,18 @@ class Tournament:
                     duelist for duelist in self.duelists if duelist.name not in invalid_choices
                 ])
                 paired_duelists.extend([duelist.name, opponent.name])
-                duelist.update_opponent(opponent.name)
-                opponent.update_opponent(duelist.name)
                 x, y = self.duelists.index(duelist), self.duelists.index(opponent)
-                duelist.update_deck(self.decks[self.matchups[x][x]])
-                opponent.update_deck(self.decks[self.matchups[y][y]])
+                duelist.update_matchup(self.decks[self.matchups[x][x]], opponent.name)
+                opponent.update_matchup(self.decks[self.matchups[y][y]], duelist.name)
         else:
             duelists_by_wins = sorted(self.duelists, key=lambda x: x.wins)
             for duelist, opponent in [
                 (duelists_by_wins[i], duelists_by_wins[i+1])
                 for i in [0, 2]
             ]:
-                duelist.update_opponent(opponent.name)
-                opponent.update_opponent(duelist.name)
                 x, y = self.duelists.index(duelist), self.duelists.index(opponent)
-                duelist.update_deck(self.decks[self.matchups[x][x]])
-                opponent.update_deck(self.decks[self.matchups[y][y]])
+                duelist.update_matchup(self.decks[self.matchups[x][x]], opponent.name)
+                opponent.update_matchup(self.decks[self.matchups[y][y]], duelist.name)
 
     def generate_pairings(self):
         if self.round == self.FINAL_ROUND:

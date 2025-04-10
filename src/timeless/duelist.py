@@ -4,21 +4,18 @@ class Duelist:
         self,
         name: str,
         win_record: list[int] | None = None,
-        deck_record: list[str] | None = None,
-        opponent_record: list[str] | None = None,
+        matchup_record: list[tuple[str, str]] | None = None,
     ):
         self.name = name
         self.win_record = win_record or []
-        self.deck_record = deck_record or []
-        self.opponent_record = opponent_record or []
+        self.matchup_record = matchup_record or []
 
     def __repr__(self):
         return (
             f"{self.__class__.__qualname__}("
             f"name={self.name!r}, "
             f"win_record={self.win_record!r}, "
-            f"deck_record={self.deck_record!r}, "
-            f"opponent_record={self.opponent_record!r})"
+            f"matchup_record={self.matchup_record!r})"
         )
 
     @property
@@ -39,13 +36,17 @@ class Duelist:
             return None
         return self.opponent_record[-1]
 
+    @property
+    def deck_record(self):
+        return [matchup[0] for matchup in self.matchup_record]
+
+    @property
+    def opponent_record(self):
+        return [matchup[1] for matchup in self.matchup_record]
+
     def update_wins(self, won: bool):
         self.win_record.append(self.wins + int(won))
 
-    def update_deck(self, deck: str):
-        self.deck_record.append(deck)
-        assert len(self.deck_record) == len(set(self.deck_record)) or len(self.deck_record) == 4
-
-    def update_opponent(self, name):
-        self.opponent_record.append(name)
-        assert len(self.opponent_record) == len(set(self.opponent_record)) or len(self.opponent_record) == 4
+    def update_matchup(self, deck: str, opponent: str):
+        assert (deck, opponent) not in self.matchup_record
+        self.matchup_record.append((deck, opponent))
