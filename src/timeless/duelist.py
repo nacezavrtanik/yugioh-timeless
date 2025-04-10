@@ -18,6 +18,9 @@ class Duelist:
             f"matchup_record={self.matchup_record!r})"
         )
 
+    def __str__(self):
+        return self.name
+
     @property
     def wins(self):
         if not self.win_record:
