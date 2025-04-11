@@ -36,7 +36,8 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.3.5",
+    "pytest >= 8.3.5",
+    "hypothesis >= 6.130.9",
 ]
 
 [project.urls]
