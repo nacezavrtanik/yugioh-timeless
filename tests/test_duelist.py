@@ -44,15 +44,15 @@ def matchup_records(draw, min_size=0, max_size=4):
 
 
 @st.composite
-def duelists(draw, dueling=None):
+def duelists(draw, dueling=None, max_round=4):
     name = draw(st.text(min_size=1))
-    win_records_max_size = 3 if dueling is True else 4
+    win_records_max_size = max_round - 1 if dueling is True else max_round
     win_record = draw(win_records(max_size=win_records_max_size))
     win_record_length = len(win_record)
     if dueling is None:
         matchup_record_size = dict(
             min_size=win_record_length,
-            max_size=min([4, win_record_length + 1]),
+            max_size=min([max_round, win_record_length + 1]),
         )
     elif dueling is True:
         matchup_record_size = dict(
@@ -76,7 +76,7 @@ def test_update_wins(duelist, won):
 
 
 @given(
-    duelists(dueling=False),
+    duelists(dueling=False, max_round=3),
     st.lists(st.text(min_size=1), unique=True, min_size=4),
     st.lists(st.text(min_size=1), unique=True, min_size=3),
 )
