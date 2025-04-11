@@ -17,3 +17,6 @@ todo.md
 
 # Sandbox file for experimenting
 dev.py
+
+# hypothesis cache
+.hypothesis/
