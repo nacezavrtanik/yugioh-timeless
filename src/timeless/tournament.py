@@ -21,24 +21,9 @@ class Tournament:
 
     @property
     def round(self):
-        win_record_lengths = [
-            len(duelist.win_record) for duelist in self.duelists
-        ]
-        matchup_record_lengths = [
-            len(duelist.matchup_record) for duelist in self.duelists
-        ]
-
-        duelist_records_have_same_length_between_duelists = all([
-            len(set(records)) == 1 for records in [
-                win_record_lengths, matchup_record_lengths
-            ]
-        ])
-
-        assert duelist_records_have_same_length_between_duelists
-        win_record_length = list(win_record_lengths)[0]
-        matchup_record_length = list(matchup_record_lengths)[0]
-        assert win_record_length in {matchup_record_length, matchup_record_length - 1}
-        return matchup_record_length + 1
+        duelist_rounds = {duelist.round for duelist in self.duelists}
+        assert len(duelist_rounds) == 1
+        return list(duelist_rounds)[0]
 
     @property
     def standing_configuration(self) -> tuple[int, int, int, int]:
