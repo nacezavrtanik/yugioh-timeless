@@ -1,6 +1,6 @@
 import random
-from .duelist import Duelist
-from .config import TIMELESS_SQUARES
+from timeless.duelist import Duelist
+from timeless.config import TIMELESS_SQUARES
 
 
 class Tournament:
@@ -10,14 +10,39 @@ class Tournament:
 
     def __init__(
         self,
-        duelists: list[Duelist],
+        duelists: list[str | Duelist],
         decks: list[str],
+        matchups: list[
+            list[int, int, int, int],
+            list[int, int, int, int],
+            list[int, int, int, int],
+            list[int, int, int, int],
+        ] | None = None,
     ):
-        assert len(duelists) == 4
+        if all([isinstance(duelist, str) for duelist in duelists]):
+            duelists = [Duelist(name) for name in duelists]
+        assert all([isinstance(duelist, Duelist) for duelist in duelists])
         self.duelists = duelists
-        assert len(decks) == 4
+        assert all([isinstance(deck, str) for deck in decks])
         self.decks = decks
-        self.matchups = random.choice(TIMELESS_SQUARES)
+        self.matchups = matchups or random.choice(TIMELESS_SQUARES)
+        self._validate_state()
+
+    def _validate_state(self):
+        four_decks = len(self.decks) == 4
+        assert four_decks
+        four_duelists = len(self.duelists) == 4
+        assert four_duelists
+        unique_duelists = len({duelist.name for duelist in self.duelists}) == 4
+        assert unique_duelists
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__qualname__}("
+            f"duelists={self.duelists!r}, "
+            f"decks={self.decks!r}, "
+            f"matchups={self.matchups!r})"
+        )
 
     @property
     def round(self):

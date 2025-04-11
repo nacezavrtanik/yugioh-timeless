@@ -6,7 +6,7 @@ import timeless
 
 
 @st.composite
-def win_records(draw, start=0, step=1, min_size=0, max_size=4):
+def st_win_records(draw, start=0, step=1, min_size=0, max_size=4):
     assert max_size <= 4
     size = draw(st.integers(min_value=min_size, max_value=max_size))
     records = []
@@ -26,7 +26,7 @@ def win_records(draw, start=0, step=1, min_size=0, max_size=4):
 
 
 @st.composite
-def matchup_records(draw, min_size=0, max_size=4):
+def st_matchup_records(draw, min_size=0, max_size=4):
     assert max_size <= 4
     size = draw(st.integers(min_value=min_size, max_value=max_size))
     decks = draw(st.lists(
@@ -44,10 +44,10 @@ def matchup_records(draw, min_size=0, max_size=4):
 
 
 @st.composite
-def duelists(draw, dueling=None, max_round=4):
+def st_duelists(draw, dueling=None, max_round=4):
     name = draw(st.text(min_size=1))
     win_records_max_size = max_round - 1 if dueling is True else max_round
-    win_record = draw(win_records(max_size=win_records_max_size))
+    win_record = draw(st_win_records(max_size=win_records_max_size))
     win_record_length = len(win_record)
     if dueling is None:
         matchup_record_size = dict(
@@ -64,11 +64,11 @@ def duelists(draw, dueling=None, max_round=4):
             min_size=win_record_length,
             max_size=win_record_length,
         )
-    matchup_record = draw(matchup_records(**matchup_record_size))
+    matchup_record = draw(st_matchup_records(**matchup_record_size))
     return timeless.Duelist(name, win_record, matchup_record)
 
 
-@given(duelists(dueling=True), st.booleans())
+@given(st_duelists(dueling=True), st.booleans())
 def test_update_wins(duelist, won):
     wins = 0 if duelist.wins is None else duelist.wins
     duelist.update_wins(won)
@@ -76,7 +76,7 @@ def test_update_wins(duelist, won):
 
 
 @given(
-    duelists(dueling=False, max_round=3),
+    st_duelists(dueling=False, max_round=3),
     st.lists(st.text(min_size=1), unique=True, min_size=4),
     st.lists(st.text(min_size=1), unique=True, min_size=3),
 )

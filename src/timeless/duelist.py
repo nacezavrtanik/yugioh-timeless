@@ -11,11 +11,10 @@ class Duelist:
         self.matchup_record = matchup_record or []
         assert self.name
         assert len(self.matchup_record) <= 4
-        assert self._compatible_win_and_matchup_records
+        self._validate_state()
 
-    @property
-    def _compatible_win_and_matchup_records(self) -> bool:
-        return len(self.matchup_record) - len(self.win_record) in [0, 1]
+    def _validate_state(self) -> bool:
+        assert len(self.matchup_record) - len(self.win_record) in [0, 1]
 
 
     def __repr__(self):
@@ -63,7 +62,7 @@ class Duelist:
         assert self.is_dueling
         wins = 0 if self.wins is None else self.wins
         self.win_record.append(wins + int(won))
-        assert self._compatible_win_and_matchup_records
+        self._validate_state()
 
     def update_matchup(self, deck: str, opponent: str) -> None:
         assert self.round < 4
@@ -72,7 +71,7 @@ class Duelist:
         assert opponent not in self.opponent_record or self.round == 3
         assert (deck, opponent) not in self.matchup_record
         self.matchup_record.append((deck, opponent))
-        assert self._compatible_win_and_matchup_records
+        self._validate_state()
 
     @property
     def round(self) -> int:
