@@ -5,15 +5,17 @@
 __version__ = '0.1.1-beta'
 
 
-from .duelist import Duelist
-from .tournament import Tournament
+from timeless.entities import Duelist, Deck
+from timeless.square import Square
+from timeless.record import Round, Record
+from timeless.tournament import Tournament
 
 
 __all__ = [
     "Duelist",
+    "Deck",
+    "Square",
+    "Round",
+    "Record",
     "Tournament",
 ]
-
-
-if __name__ == '__main__':
-    run_yugioh_timeless()
