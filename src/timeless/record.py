@@ -4,11 +4,16 @@ from timeless.utils import generate_indented_repr
 
 
 class Round:
-    def __init__(self, pairs):
+    def __init__(self, number, pairs):
+        self.number = number
         self.pairs = pairs
 
     def __repr__(self):
-        return f"{self.__class__.__qualname__}({self.pairs!r})"
+        return (
+            f"{self.__class__.__qualname__}("
+            f"number={self.number!r}, pairs={self.pairs!r}"
+            f")"
+        )
 
     def __iter__(self):
         return iter(self.pairs)
@@ -37,7 +42,8 @@ class Record:
     def __len__(self):
         return len(self.rounds)
 
-    def update_round(self, new_round):
+    def add_new_round(self, pairs):
+        new_round = Round(len(self) + 1, list(pairs))
         self.rounds.append(new_round)
 
 

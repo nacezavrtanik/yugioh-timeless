@@ -50,7 +50,7 @@ class Square:
         third = IndexPair(third_duelist, third_deck)
         fourth = IndexPair(fourth_duelist, fourth_deck)
 
-        return [first, second, third, fourth]
+        return first, second, third, fourth
 
     def _draw_pairs_for_finals(self, tournament):
         assert tournament.tied_after_preliminaries is not None

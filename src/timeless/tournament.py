@@ -2,7 +2,7 @@
 from timeless.utils import generate_indented_repr
 from timeless.entities import Duelist, Deck
 from timeless.square import Square
-from timeless.record import Round, Record
+from timeless.record import Record
 
 
 class Tournament:
@@ -45,5 +45,4 @@ class Tournament:
 
     def advance_round(self):
         pairs = self.square.draw_pairs(self)
-        new_round = Round(pairs)
-        self.record.update_round(new_round)
+        self.record.add_new_round(pairs)
