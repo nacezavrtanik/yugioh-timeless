@@ -1,11 +1,15 @@
 
 import random
-import collections
+import dataclasses
 from timeless.utils import generate_indented_repr
 from timeless.config import TIMELESS_SQUARES
 
 
-IndexPair = collections.namedtuple("IndexPair", ["duelist", "deck"])
+@dataclasses.dataclass()
+class IndexPair:
+    duelist: int
+    deck: int
+    won: bool | None = None
 
 
 class Square:
@@ -60,6 +64,6 @@ class Square:
             ...
 
     def draw_pairs(self, tournament):
-        if tournament.round + 1 == 4:
+        if getattr(tournament.round, "number", 0) + 1 == 4:
             return self._draw_pairs_for_finals(tournament)
         return self._draw_pairs_for_preliminaries(tournament)

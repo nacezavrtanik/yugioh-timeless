@@ -1,8 +1,8 @@
 
-from timeless.utils import generate_indented_repr
 from timeless.entities import Duelist, Deck
 from timeless.square import Square
 from timeless.record import Record
+from timeless.utils import generate_indented_repr
 
 
 class Tournament:
@@ -36,7 +36,7 @@ class Tournament:
 
     @property
     def round(self):
-        return len(self.record)
+        return self.record.current_round
 
     @property
     def tied_after_preliminaries(self):

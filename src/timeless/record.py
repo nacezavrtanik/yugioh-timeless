@@ -9,14 +9,28 @@ class Round:
         self.pairs = pairs
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__qualname__}("
-            f"number={self.number!r}, pairs={self.pairs!r}"
-            f")"
+        pairs_repr = generate_indented_repr(
+            "[", ",\n".join(map(repr, self.pairs)), "]"
+        )
+        return generate_indented_repr(
+            f"{self.__class__.__qualname__}(",
+            ",\n".join([
+                f"number={self.number!r}",
+                f"pairs={pairs_repr}",
+            ]),
+            f")",
         )
 
     def __iter__(self):
         return iter(self.pairs)
+
+    @property
+    def has_concluded(self):
+        return all(pair.won is not None for pair in self.pairs)
+
+    @property
+    def is_final(self):
+        return self.number == 4
 
 
 class Record:
@@ -25,8 +39,7 @@ class Record:
         self.rounds = rounds or []
 
     def __repr__(self):
-        indent = 4 * " "
-        if len(self) <= 1:
+        if len(self) == 0:
             repr_string = f"{self.__class__.__qualname__}({self.rounds!r})"
         else:
             repr_string = generate_indented_repr(
@@ -41,6 +54,16 @@ class Record:
 
     def __len__(self):
         return len(self.rounds)
+
+    @property
+    def current_round(self):
+        if not self.rounds:
+            return None
+        return self.rounds[-1]
+
+    @property
+    def win_configuration(self):
+        ...
 
     def add_new_round(self, pairs):
         new_round = Round(len(self) + 1, list(pairs))
