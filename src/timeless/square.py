@@ -11,6 +11,11 @@ class IndexPair:
     deck: int
     won: bool | None = None
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (self.duelist, self.deck) == (other.duelist, other.deck)
+
 
 class Square:
     def __init__(self, rows=None):
