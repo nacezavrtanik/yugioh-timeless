@@ -1,4 +1,5 @@
 
+import collections
 import itertools
 from timeless.utils import generate_indented_repr
 
@@ -63,10 +64,23 @@ class Record:
 
     @property
     def win_configuration(self):
-        ...
+        win_count = collections.Counter(
+            pair.duelist for pair in itertools.chain.from_iterable(self.rounds)
+            if pair.won is True
+        )
+        win_count = list(reversed(sorted(win_count.values())))
+        return win_count
 
     def add_new_round(self, pairs):
         new_round = Round(len(self) + 1, list(pairs))
         self.rounds.append(new_round)
 
-
+    def update_won_attribute(self, winner):
+        for first, second in itertools.batched(self.current_round, 2):
+            if first.duelist == winner:
+                first.won, second.won = True, False
+            elif second.duelist == winner:
+                first.won, second.won = False, True
+            else:
+                continue
+            break
