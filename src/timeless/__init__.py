@@ -9,6 +9,8 @@ from timeless.square import Square
 from timeless.record import Round, Record
 from timeless.tournament import Tournament
 
+import timeless.api
+
 
 __all__ = [
     "Square",
