@@ -6,15 +6,11 @@ from timeless.utils import generate_indented_repr
 
 
 class Tournament:
-    def __init__(self, duelists, decks, square=None, record=None):
-        self.duelists = [
-            Duelist(i, duelist, self) for i, duelist in enumerate(duelists)
-        ]
-        self.decks = [
-            Deck(i, deck, self) for i, deck in enumerate(decks)
-        ]
-        self.square = Square(square)
-        self.record = Record(record)
+    def __init__(self, square, record, duelists, decks):
+        self.square = square
+        self.record = record
+        self.duelists = duelists
+        self.decks = decks
 
     def __repr__(self):
         duelists_repr = generate_indented_repr(
@@ -26,10 +22,10 @@ class Tournament:
         return generate_indented_repr(
             f"{self.__class__.__qualname__}(",
             ",\n".join([
-                f"duelists={duelists_repr}",
-                f"decks={decks_repr}",
                 f"square={self.square!r}",
                 f"record={self.record!r}",
+                f"duelists={duelists_repr}",
+                f"decks={decks_repr}",
             ]),
             f")",
         )
@@ -42,8 +38,5 @@ class Tournament:
         pairs = self.square.draw_pairs(self.record)
         self.record.add_new_round(pairs)
 
-    def update_record(self, winner):
-        for duelist in self.duelists:
-            if duelist.name == winner:
-                self.record.update_won_attribute(duelist.index)
-                break
+    def update_record(self, winner_index):
+        self.record.update_won_attribute(winner_index)

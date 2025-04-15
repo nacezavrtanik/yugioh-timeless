@@ -18,8 +18,12 @@ class IndexPair:
 
 
 class Square:
-    def __init__(self, rows=None):
-        self.rows = rows or random.choice(TIMELESS_SQUARES)
+    def __init__(self, rows):
+        self.rows = rows
+
+    @classmethod
+    def random(cls):
+        return cls(random.choice(TIMELESS_SQUARES))
 
     def __repr__(self):
         return generate_indented_repr(

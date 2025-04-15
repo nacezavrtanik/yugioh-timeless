@@ -1,16 +1,16 @@
 
 class Entity:
-    def __init__(self, index, name, tournament):
+    def __init__(self, index, name, record):
         self.index = index
         self.name = name
-        self.tournament = tournament
+        self.record = record
 
     def __repr__(self):
         return (
             f"{self.__class__.__qualname__}("
             f"index={self.index!r}, "
             f"name={self.name!r}, "
-            f"tournament=<{self.tournament.__class__.__qualname__}@id={id(self.tournament)}>)"
+            f"record=<{self.record.__class__.__qualname__}@id={id(self.record)}>)"
         )
 
 
