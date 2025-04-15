@@ -1,36 +1,45 @@
 
-from timeless.duelist import Duelist
 from timeless.tournament import Tournament
 from timeless.config import DECK_SETS
+
+import timeless.api
 
 
 class CLI:
 
     def __init__(self, args):
         self.args = args
-        self.tournament = None
 
         print("HEADER")
         self.perform_registration()
         self.run_tournament()
 
     def perform_registration(self):
-        variant = self.args.variant or input("enter variant: ")
-        decks = DECK_SETS.get(variant.capitalize())
+        if self.args.decks:
+            decks = self.args.decks
+        elif self.args.variant:
+            decks = DECK_SETS.get(self.args.variant.capitalize())
+        else:
+            decks = input("enter decks or variant: ")
+            decks = decks.split()
+            if len(decks) == 1:
+                variant = decks[0].capitalize()
+                decks = DECK_SETS.get(variant.capitalize())
+            elif len(decks) == 4:
+                pass
+        timeless.api.register_decks(decks)
+
         entry_fee = self.args.entry_fee or input("enter entry fee: ")
+
         duelists = self.args.duelists or input("enter duelists: ").split()
-        duelists = list(map(Duelist, duelists))
-        self.tournament = Tournament(duelists, decks)
+        timeless.api.register_duelists(duelists)
 
     def run_tournament(self):
         for _ in range(4):
-            self.tournament.generate_pairings()
             print("PAIRINGS")
-            print(*[(duelist.name, duelist.deck, duelist.opponent) for duelist in self.tournament.duelists], sep="\n")
+            print(*timeless.api.get_pairings(), sep="\n")
 
-            winners = []
-            winners.append(input("winner 1: "))
-            winners.append(input("winner 2: "))
-            self.tournament.update_records(winners)
+            timeless.api.submit_winners(input("winner 1: "), input("winner 2: "))
+
             print("STANDINGS")
-            print(*[(duelist.name, duelist.wins) for duelist in self.tournament.duelists], sep="\n")
+            print(*timeless.api.get_standings(), sep="\n")

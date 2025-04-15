@@ -33,11 +33,20 @@ class Parser(argparse.ArgumentParser):
             description="Pass these directly to skip interactive registration.",
             )
 
-        registration_group.add_argument(
+        deck_registration_group = registration_group.add_mutually_exclusive_group()
+        deck_registration_group.add_argument(
             "--variant",
             help="choose deck set",
             type=str,
             choices=["basic", "extra"],
+        )
+
+        deck_registration_group.add_argument(
+            "--decks",
+            help="enter decks",
+            type=str,
+            nargs=4,
+            metavar=("DECK_1", "DECK_2", "DECK_3", "DECK_4")
         )
 
         registration_group.add_argument(
