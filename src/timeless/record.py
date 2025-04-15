@@ -2,6 +2,7 @@
 import collections
 import itertools
 from timeless.utils import generate_indented_repr
+from timeless.config import TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
 
 class Round:
@@ -63,13 +64,23 @@ class Record:
         return self.rounds[-1]
 
     @property
-    def win_configuration(self):
-        win_count = collections.Counter(
+    def win_count(self):
+        default = dict.fromkeys(range(4), 0)
+        duelist_to_wins = collections.Counter(
             pair.duelist for pair in itertools.chain.from_iterable(self.rounds)
             if pair.won is True
         )
-        win_count = list(reversed(sorted(win_count.values())))
-        return win_count
+        return default | duelist_to_wins
+
+    @property
+    def tied_after_preliminaries(self):
+        if not any([
+            self.current_round.number == 3 and self.current_round.has_concluded,
+            self.current_round.number == 4,
+        ]):
+            return None
+        win_configuration = list(reversed(sorted(self.win_count.values())))
+        return win_configuration in TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
     def add_new_round(self, pairs):
         new_round = Round(len(self) + 1, list(pairs))

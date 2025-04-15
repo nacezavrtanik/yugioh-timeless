@@ -3,7 +3,6 @@ from timeless.entities import Duelist, Deck
 from timeless.square import Square
 from timeless.record import Record
 from timeless.utils import generate_indented_repr
-from timeless.config import TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
 
 class Tournament:
@@ -39,20 +38,11 @@ class Tournament:
     def round(self):
         return self.record.current_round
 
-    @property
-    def tied_after_preliminaries(self):
-        if not any([
-            self.round.number == 3 and self.round.has_concluded,
-            self.round.number == 4,
-        ]):
-            return None
-        return self.record.win_configuration in TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
-
     def advance_round(self):
-        pairs = self.square.draw_pairs(self)
+        pairs = self.square.draw_pairs(self.record)
         self.record.add_new_round(pairs)
 
-    def record_results(self, winner):
+    def update_record(self, winner):
         for duelist in self.duelists:
             if duelist.name == winner:
                 self.record.update_won_attribute(duelist.index)

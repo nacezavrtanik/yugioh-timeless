@@ -36,10 +36,10 @@ class Square:
     def __getitem__(self, key):
         return self.rows[key]
 
-    def _draw_pairs_for_preliminaries(self, tournament):
+    def _draw_pairs_for_preliminaries(self, record):
         valid_index_pairs = [
             pair for i in range(4) for j in range(4)
-            if i != j and (pair := IndexPair(i, j)) not in tournament.record
+            if i != j and (pair := IndexPair(i, j)) not in record
         ]
         first = random.choice(valid_index_pairs)
 
@@ -49,11 +49,11 @@ class Square:
         second_deck = self[second_duelist][first.duelist]
         second = IndexPair(second_duelist, second_deck)
 
-        # TODO: shuffle
-        third_duelist, fourth_duelist = [
+        remaining_duelists = [
             duelist for duelist in range(4)
             if duelist not in [first.duelist, second.duelist]
         ]
+        third_duelist, fourth_duelist = random.sample(remaining_duelists, 2)
         third_deck = self[third_duelist][fourth_duelist]
         fourth_deck = self[fourth_duelist][third_duelist]
         third = IndexPair(third_duelist, third_deck)
@@ -61,14 +61,21 @@ class Square:
 
         return first, second, third, fourth
 
-    def _draw_pairs_for_finals(self, tournament):
-        assert tournament.tied_after_preliminaries is not None
-        if tournament.tied_after_preliminaries:
-            ...
+    def _draw_pairs_for_finals(self, record):
+        assert record.tied_after_preliminaries is not None
+        if record.tied_after_preliminaries:
+            first, second, third, fourth = [
+                IndexPair(index, index) for index in random.sample(range(4), 4)
+            ]
         else:
-            ...
+            first, second, third, fourth = [
+                IndexPair(index, index) for index in reversed(sorted(
+                    record.win_count, key=lambda x: record.win_count.get(x)
+                ))
+            ]
+        return first, second, third, fourth
 
-    def draw_pairs(self, tournament):
-        if getattr(tournament.round, "number", 0) + 1 == 4:
-            return self._draw_pairs_for_finals(tournament)
-        return self._draw_pairs_for_preliminaries(tournament)
+    def draw_pairs(self, record):
+        if getattr(record.current_round, "number", 0) + 1 == 4:
+            return self._draw_pairs_for_finals(record)
+        return self._draw_pairs_for_preliminaries(record)
