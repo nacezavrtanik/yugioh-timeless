@@ -1,31 +1,24 @@
 
-from timeless.entities import Duelist, Deck
 from timeless.square import Square
 from timeless.record import Record
 from timeless.utils import generate_indented_repr
 
 
 class Tournament:
-    def __init__(self, square, record, duelists, decks):
-        self.square = square
-        self.record = record
+    def __init__(self, duelists, decks, square, record):
         self.duelists = duelists
         self.decks = decks
+        self.square = square
+        self.record = record
 
     def __repr__(self):
-        duelists_repr = generate_indented_repr(
-            "[", ",\n".join(map(repr, self.duelists)), "]"
-        )
-        decks_repr = generate_indented_repr(
-            "[", ",\n".join(map(repr, self.decks)), "]"
-        )
         return generate_indented_repr(
             f"{self.__class__.__qualname__}(",
             ",\n".join([
+                f"duelists={self.duelists!r}",
+                f"decks={self.decks!r}",
                 f"square={self.square!r}",
                 f"record={self.record!r}",
-                f"duelists={duelists_repr}",
-                f"decks={decks_repr}",
             ]),
             f")",
         )
