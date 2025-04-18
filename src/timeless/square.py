@@ -73,7 +73,7 @@ class Square:
     def _draw_pairs_for_preliminaries(self, tournament):
         valid_index_pairs = [
             pair for i in range(4) for j in range(4)
-            if i != j and (pair := IndexPair(i, j)) not in tournament.record
+            if i != j and (pair := IndexPair(i, j)) not in tournament.record.pairs
         ]
         first = random.choice(valid_index_pairs)
 
