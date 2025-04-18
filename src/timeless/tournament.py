@@ -43,7 +43,7 @@ class Tournament:
 
     @property
     def standings(self):
-        if not self.round.has_concluded:
+        if self.round.is_preround or not self.round.has_concluded:
             return None
         candidates = Standing.STANDING_CONFIGURATIONS.get(
             self.round.number + bool(self.tied_after_preliminaries)
