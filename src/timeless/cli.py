@@ -29,7 +29,8 @@ class CLI:
                 pass
         timeless.api.register_decks(decks)
 
-        entry_fee = self.args.entry_fee or input("enter entry fee: ")
+        entry_fee = self.args.entry_fee or int(input("enter entry fee: "))
+        timeless.api.register_entry_fee(entry_fee)
 
         duelists = self.args.duelists or input("enter duelists: ").split()
         timeless.api.register_duelists(duelists)

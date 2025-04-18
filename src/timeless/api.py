@@ -9,6 +9,7 @@ class API:
         self._tournament = None
         self._duelists = None
         self._decks = None
+        self._entry_fee = None
 
     def register_duelists(self, duelists):
         self._duelists = duelists
@@ -16,16 +17,22 @@ class API:
     def register_decks(self, decks):
         self._decks = decks
 
+    def register_entry_fee(self, entry_fee):
+        self._entry_fee = entry_fee
+
     @property
     def tournament(self):
         if self._tournament is None:
-            if any(arg is None for arg in [self._duelists, self._decks]):
+            if any(arg is None for arg in [
+                self._duelists, self._decks, self._entry_fee
+            ]):
                 return None
             duelists = dict(zip(range(4), random.sample(self._duelists, 4)))
             decks = dict(zip(range(4), random.sample(self._decks, 4)))
+            entry_fee = self._entry_fee
             square = Square.random()
             record = Record()
-            self._tournament = Tournament(duelists, decks, square, record)
+            self._tournament = Tournament(duelists, decks, entry_fee, square, record)
         return self._tournament
 
     @property
@@ -57,6 +64,10 @@ def register_duelists(duelists):
 
 def register_decks(decks):
     _api.register_decks(decks)
+
+
+def register_entry_fee(entry_fee):
+    _api.register_entry_fee(entry_fee)
 
 
 def get_pairings():

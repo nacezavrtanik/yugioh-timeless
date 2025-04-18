@@ -32,9 +32,10 @@ STANDING_CONFIGURATIONS = {
 
 
 class Tournament:
-    def __init__(self, duelists, decks, square, record):
+    def __init__(self, duelists, decks, entry_fee, square, record):
         self.duelists = duelists
         self.decks = decks
+        self.entry_fee = entry_fee
         self.square = square
         self.record = record
 
@@ -44,6 +45,7 @@ class Tournament:
             ",\n".join([
                 f"duelists={self.duelists!r}",
                 f"decks={self.decks!r}",
+                f"entry_fee={self.entry_fee!r}",
                 f"square={self.square!r}",
                 f"record={self.record!r}",
             ]),
@@ -82,6 +84,13 @@ class Tournament:
             }
             for duelist in range(4)
         }
+        if self.round.is_final and self.entry_fee:
+            standings = {
+                duelist: standings.get(duelist) | {
+                    "prize": f"¤{standings.get(duelist).get('points') * int(self.entry_fee / 5)}"
+                }
+                for duelist in standings
+            }
         return standings
 
     @property
