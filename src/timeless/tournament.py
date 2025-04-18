@@ -50,20 +50,21 @@ class Tournament:
         )
         index = candidates.get("wins").index(self.record.win_configuration)
         standings = {
-            duelist: {
+            self.duelists.get(duelist): {
                 label: candidates[label][index][list(self.record.win_count).index(duelist)]
                 for label in candidates
             }
-            for duelist in self.record.win_count
+            for duelist in range(4)
         }
-        standings = {duelist: Standing(**kwargs) for duelist, kwargs in standings.items()}
         return standings
 
     @property
     def pairings(self):
         first_pairing, second_pairing = (
-            tuple(pair.apply_names(self) for pair in pairing)
-            for pairing in self.round.pairings
+            tuple(
+                (self.duelists.get(pair.duelist), self.decks.get(pair.deck))
+                for pair in pairing
+            ) for pairing in self.round.pairings
         )
         return first_pairing, second_pairing
 
