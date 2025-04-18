@@ -36,11 +36,7 @@ class API:
 
     def get_pairings(self):
         self.tournament.advance_round()
-        first_pairing, second_pairing = (
-            tuple(pair.apply_names(self.tournament) for pair in pairing)
-            for pairing in self.tournament.pairings
-        )
-        return first_pairing, second_pairing
+        return self.tournament.pairings
 
     def submit_winners(self, winner_1, winner_2):
         self.tournament.update_record(self.duelists_to_indices.get(winner_1))

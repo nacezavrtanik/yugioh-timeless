@@ -32,6 +32,12 @@ class Round:
         return self.pairs[index]
 
     @property
+    def pairings(self):
+        if self.is_preround:
+            return None
+        return self[:2], self[2:]
+
+    @property
     def has_concluded(self):
         return all(pair.won is not None for pair in self)
 

@@ -61,9 +61,11 @@ class Tournament:
 
     @property
     def pairings(self):
-        if self.round.is_preround:
-            return None
-        return self.round[:2], self.round[2:]
+        first_pairing, second_pairing = (
+            tuple(pair.apply_names(self) for pair in pairing)
+            for pairing in self.round.pairings
+        )
+        return first_pairing, second_pairing
 
     def advance_round(self):
         pairs = self.square.draw_pairs(self)
