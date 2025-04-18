@@ -29,6 +29,10 @@ class Tournament:
         return self.record.current_round
 
     @property
+    def has_concluded(self):
+        return self.round.is_final and self.round.has_concluded
+
+    @property
     def tied_after_preliminaries(self):
         if not any([
             self.round.number == 3 and self.round.has_concluded,
@@ -54,7 +58,7 @@ class Tournament:
         return standings
 
     def advance_round(self):
-        pairs = self.square.draw_pairs(self.record)
+        pairs = self.square.draw_pairs(self)
         self.record.add_new_round(pairs)
 
     def update_record(self, winner_index):

@@ -35,7 +35,6 @@ class Round:
 
 
 class Record:
-    # TODO: add stack for back and fore
     def __init__(self, rounds=None):
         self.rounds = rounds or []
 
@@ -59,7 +58,7 @@ class Record:
     @property
     def current_round(self):
         if not self.rounds:
-            return None
+            return Round(number=0, pairs=[])
         return self.rounds[-1]
 
     @property
