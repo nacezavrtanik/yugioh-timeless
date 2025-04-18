@@ -50,9 +50,10 @@ class API:
         self.tournament.update_record(self.duelists_to_indices.get(winner_2))
 
     def get_standings(self):
-        return tuple(
-            (duelist, standing) for duelist, standing in self.tournament.standings.items()
-        )
+        return self.tournament.standings
+
+    def get_deck_standings(self):
+        return self.tournament.deck_standings
 
 
 _api = API()
@@ -80,3 +81,7 @@ def submit_winners(winner_1, winner_2):
 
 def get_standings():
     return _api.get_standings()
+
+
+def get_deck_standings():
+    return _api.get_deck_standings()

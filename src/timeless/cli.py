@@ -43,4 +43,7 @@ class CLI:
             timeless.api.submit_winners(input("winner 1: "), input("winner 2: "))
 
             print("STANDINGS")
-            print(*timeless.api.get_standings(), sep="\n")
+            print(*timeless.api.get_standings().items(), sep="\n")
+
+            print("DECK STANDINGS")
+            print(*timeless.api.get_deck_standings().items(), sep="\n")

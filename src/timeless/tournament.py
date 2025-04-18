@@ -94,6 +94,16 @@ class Tournament:
         return standings
 
     @property
+    def deck_standings(self):
+        if self.round.is_preround or not self.round.has_concluded:
+            return None
+        deck_standings = {
+            self.decks.get(deck): wins
+            for deck, wins in self.record.deck_win_count.items()
+        }
+        return deck_standings
+
+    @property
     def pairings(self):
         first_pairing, second_pairing = (
             tuple(

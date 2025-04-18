@@ -24,22 +24,29 @@ class Record:
     def current_round(self):
         return self.rounds[-1]
 
-    @property
-    def win_count(self):
+    def _get_win_count(self, which):
         default = dict.fromkeys(range(4), 0)
-        duelist_to_wins = collections.Counter(
-            pair.duelist for pair in itertools.chain.from_iterable(self.rounds)
+        index_to_wins = collections.Counter(
+            getattr(pair, which) for pair in itertools.chain.from_iterable(self.rounds)
             if pair.won is True
         )
-        duelist_to_wins = default | duelist_to_wins
+        index_to_wins = default | index_to_wins
         sorted_by_wins = {
-            duelist: duelist_to_wins.get(duelist) for duelist in sorted(
-                duelist_to_wins,
+            index: index_to_wins.get(index) for index in sorted(
+                index_to_wins,
                 reverse=True,
-                key=lambda x: duelist_to_wins.get(x),
+                key=lambda x: index_to_wins.get(x),
             )
         }
         return sorted_by_wins
+
+    @property
+    def win_count(self):
+        return self._get_win_count("duelist")
+
+    @property
+    def deck_win_count(self):
+        return self._get_win_count("deck")
 
     @property
     def win_configuration(self):
