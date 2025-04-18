@@ -35,8 +35,8 @@ class Tournament:
     @property
     def tied_after_preliminaries(self):
         if not any([
-            self.round.number == 3 and self.round.has_concluded,
-            self.round.number == 4,
+            self.round.is_last_before_finals and self.round.has_concluded,
+            self.round.is_final,
         ]):
             return None
         return self.record.win_configuration in Standing.TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES

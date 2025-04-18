@@ -112,6 +112,6 @@ class Square:
         return first, second, third, fourth
 
     def draw_pairs(self, tournament):
-        if tournament.round.number + 1 == 4:
+        if tournament.round.is_last_before_finals:
             return self._draw_pairs_for_finals(tournament)
         return self._draw_pairs_for_preliminaries(tournament)

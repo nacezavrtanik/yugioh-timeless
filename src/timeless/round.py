@@ -39,6 +39,10 @@ class Round:
         return self.number in {1, 2, 3}
 
     @property
+    def is_last_before_finals(self):
+        return self.number == 3
+
+    @property
     def is_final(self):
         return self.number == 4
 
