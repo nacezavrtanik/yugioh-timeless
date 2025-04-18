@@ -44,7 +44,7 @@ class IndexPair:
         return (self.duelist, self.deck) == (other.duelist, other.deck)
 
     def apply_names(self, tournament):
-        return tournament.duelists.get(self.duelist), torunament.decks.get(self.deck)
+        return tournament.duelists.get(self.duelist), tournament.decks.get(self.deck)
 
 
 class Square:

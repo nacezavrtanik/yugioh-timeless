@@ -26,6 +26,11 @@ class Round:
     def __iter__(self):
         return iter(self.pairs or ())
 
+    def __getitem__(self, index):
+        if self.pairs is None:
+            return None
+        return self.pairs[index]
+
     @property
     def has_concluded(self):
         return all(pair.won is not None for pair in self)

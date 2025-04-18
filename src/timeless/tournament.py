@@ -50,12 +50,20 @@ class Tournament:
         )
         index = candidates.get("wins").index(self.record.win_configuration)
         standings = {
-            duelist: {label: candidates[label][index][list(self.record.win_count).index(duelist)]
-                      for label in candidates}
+            duelist: {
+                label: candidates[label][index][list(self.record.win_count).index(duelist)]
+                for label in candidates
+            }
             for duelist in self.record.win_count
         }
         standings = {duelist: Standing(**kwargs) for duelist, kwargs in standings.items()}
         return standings
+
+    @property
+    def pairings(self):
+        if self.round.is_preround:
+            return None
+        return self.round[:2], self.round[2:]
 
     def advance_round(self):
         pairs = self.square.draw_pairs(self)
