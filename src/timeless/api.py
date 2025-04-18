@@ -44,8 +44,7 @@ class API:
 
     def get_standings(self):
         return tuple(
-            (self.tournament.duelists.get(index), wins)
-            for index, wins in self.tournament.record.win_count.items()
+            (duelist, standing) for duelist, standing in self.tournament.standings.items()
         )
 
 

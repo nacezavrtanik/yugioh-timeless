@@ -1,8 +1,34 @@
 
 from timeless.square import Square
 from timeless.record import Record
-from timeless.standing import Standing
 from timeless.utils import generate_indented_repr
+
+
+TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES = [3, 1, 1, 1], [2, 2, 2, 0]
+STANDING_CONFIGURATIONS = {
+    1: {
+        'wins': ([1, 1, 0, 0], ),
+        'place': ([1, 1, 3, 3], )
+    },
+    2: {
+        'wins': ([2, 2, 0, 0], [2, 1, 1, 0], [1, 1, 1, 1]),
+        'place': ([1, 1, 3, 3], [1, 2, 2, 4], [1, 1, 1, 1])
+    },
+    3: {
+        'wins': ([3, 2, 1, 0], [2, 2, 1, 1], [3, 1, 1, 1], [2, 2, 2, 0]),
+        'place': ([1, 2, 3, 4], [1, 1, 3, 3], [1, 2, 2, 2], [1, 1, 1, 4])
+    },
+    4: {  # final round if NO TIE after preliminaries
+        'wins': ([4, 2, 2, 0], [4, 2, 1, 1], [3, 3, 2, 0], [3, 3, 1, 1], [3, 2, 2, 1]),
+        'place': ([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]),
+        'points': ([10, 6, 4, 0], [10, 6, 3, 1], [9, 7, 4, 0], [9, 7, 3, 1], [9, 6, 4, 1])
+    },
+    4+1: {  # final round IF TIE after preliminaries
+        'wins': ([4, 2, 1, 1], [3, 3, 2, 0], [3, 2, 2, 1]),
+        'place': ([1, 2, 3, 3], [1, 1, 3, 4], [1, 2, 2, 4]),
+        'points': ([10, 6, 2, 2], [8, 8, 4, 0], [9, 5, 5, 1])
+    }
+}
 
 
 class Tournament:
@@ -39,13 +65,13 @@ class Tournament:
             self.round.is_final,
         ]):
             return None
-        return self.record.win_configuration in Standing.TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
+        return self.record.win_configuration in TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
 
     @property
     def standings(self):
         if self.round.is_preround or not self.round.has_concluded:
             return None
-        candidates = Standing.STANDING_CONFIGURATIONS.get(
+        candidates = STANDING_CONFIGURATIONS.get(
             self.round.number + bool(self.tied_after_preliminaries)
         )
         index = candidates.get("wins").index(self.record.win_configuration)
