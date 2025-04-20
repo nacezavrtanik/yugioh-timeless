@@ -42,8 +42,9 @@ class CLI:
 
             self.api.update_results(input("winner 1: "), input("winner 2: "))
 
+            standings = self.api.read_standings()
             print("STANDINGS")
-            print(*self.api.read_standings().items(), sep="\n")
+            print(*standings.get("duelists").items(), sep="\n")
 
             print("DECK STANDINGS")
-            print(*self.api.read_deck_standings().items(), sep="\n")
+            print(*standings.get("decks").items(), sep="\n")

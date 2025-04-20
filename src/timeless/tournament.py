@@ -45,24 +45,28 @@ class Tournament:
 
     @property
     def standings(self):
-        if not (standings := self.record.standings.current_standings):
+        duelist_standings = self.record.standings.current_standings
+        deck_standings = self.record.standings.current_deck_standings
+        assert duelist_standings and deck_standings
+        if duelist_standings is None:
             return None
-        named_standings = {}
-        for duelist, standing in standings.items():
+
+        standings = {}
+
+        named_duelist_standings = {}
+        for duelist, standing in duelist_standings.items():
             if (points := standing.get("points")) is not None:
                 standing["prize"] = f"¤{points * int(self.entry_fee / 5)}"
-            named_standings[self.duelists.get(duelist)] = standing
-        return named_standings
+            named_duelist_standings[self.duelists.get(duelist)] = standing
+        standings["duelists"] = named_duelist_standings
 
-    @property
-    def deck_standings(self):
-        if not (deck_standings := self.record.standings.current_deck_standings):
-            return None
-        deck_standings = {
+        named_deck_standings = {
             self.decks.get(deck): standing
             for deck, standing in deck_standings.items()
         }
-        return deck_standings
+        standings["decks"] = named_deck_standings
+
+        return standings
 
     def advance_round(self):
         pairings = self.square.draw_pairings(self.record)

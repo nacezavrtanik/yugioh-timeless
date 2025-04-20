@@ -23,10 +23,6 @@ class API(abc.ABC):
     def read_standings(self):
         pass
 
-    @abc.abstractmethod
-    def read_deck_standings(self):
-        pass
-
 
 class StatefulAPI(API):
     def __init__(self):
@@ -49,6 +45,3 @@ class StatefulAPI(API):
 
     def read_standings(self):
         return self.tournament.standings
-
-    def read_deck_standings(self):
-        return self.tournament.deck_standings
