@@ -3,43 +3,16 @@ from timeless.utils import generate_indented_repr
 
 
 class Round:
-    def __init__(self, number=0, pairs=None):
-        self.number = number
-        self.pairs = pairs
-        assert (self.number == 0 and self.pairs is None) or len(self.pairs) == 4
+    def __init__(self, record):
+        self.record = record
 
     def __repr__(self):
-        if self.number == 0:
-            return f"{self.__class__.__qualname__}(number={self.number!r}, pairs={self.pairs!r})"
-        pairs_repr = generate_indented_repr(
-            "[", ",\n".join(map(repr, self.pairs)), "]"
-        )
-        return generate_indented_repr(
-            f"{self.__class__.__qualname__}(",
-            ",\n".join([
-                f"number={self.number!r}",
-                f"pairs={pairs_repr}",
-            ]),
-            f")",
-        )
-
-    def __iter__(self):
-        return iter(self.pairs or ())
-
-    def __getitem__(self, index):
-        if self.pairs is None:
-            return None
-        return self.pairs[index]
+        # TODO
+        return f"{self.__class__.__qualname__}(number={self.number!r})"
 
     @property
-    def pairings(self):
-        if self.is_preround:
-            return None
-        return self[:2], self[2:]
-
-    @property
-    def has_concluded(self):
-        return all(pair.won is not None for pair in self)
+    def number(self):
+        return len(self.record.pairings)
 
     @property
     def is_preround(self):
@@ -57,4 +30,6 @@ class Round:
     def is_final(self):
         return self.number == 4
 
-
+    @property
+    def has_concluded(self):
+        return self.record.pairs == set(self.record.results)

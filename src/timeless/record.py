@@ -1,67 +1,53 @@
 
-import collections
 import itertools
 from timeless.round import Round
+from timeless.standings import Standings
 from timeless.utils import generate_indented_repr
 
 
 class Record:
-    def __init__(self, rounds=None):
-        self.rounds = rounds or [Round()]
+    def __init__(self, pairings=None, results=None):
+        self.pairings = pairings or []
+        self.results = results or {}
 
     def __repr__(self):
         return generate_indented_repr(
             f"{self.__class__.__qualname__}([",
-            ",\n".join(map(repr, self.rounds)),
+            ",\n".join(map(repr, self.pairings)),
             "])",
         )
 
     @property
+    def round(self):
+        return Round(self)
+
+    @property
+    def standings(self):
+        return Standings(self)
+
+    @property
+    def current_pairings(self):
+        if not self.pairings:
+            return tuple()
+        return self.pairings[-1]
+
+    @property
     def pairs(self):
-        return itertools.chain.from_iterable(self.rounds)
-
-    @property
-    def current_round(self):
-        return self.rounds[-1]
-
-    def _get_win_count(self, which):
-        default = dict.fromkeys(range(4), 0)
-        index_to_wins = collections.Counter(
-            getattr(pair, which) for pair in itertools.chain.from_iterable(self.rounds)
-            if pair.won is True
-        )
-        index_to_wins = default | index_to_wins
-        sorted_by_wins = {
-            index: index_to_wins.get(index) for index in sorted(
-                index_to_wins,
-                reverse=True,
-                key=lambda x: index_to_wins.get(x),
+        return set(
+            itertools.chain.from_iterable(
+                itertools.chain.from_iterable(self.pairings)
             )
-        }
-        return sorted_by_wins
+        )
 
-    @property
-    def win_count(self):
-        return self._get_win_count("duelist")
-
-    @property
-    def deck_win_count(self):
-        return self._get_win_count("deck")
-
-    @property
-    def win_configuration(self):
-        return list(self.win_count.values())
-
-    def add_new_round(self, pairs):
-        new_round = Round(self.current_round.number + 1, list(pairs))
-        self.rounds.append(new_round)
+    def add_new_pairings(self, pairings):
+        self.pairings.append(pairings)
 
     def update_won_attribute(self, winner):
-        for first, second in itertools.batched(self.current_round, 2):
+        for first, second in self.current_pairings:
             if first.duelist == winner:
-                first.won, second.won = True, False
+                self.results[first], self.results[second] = True, False
             elif second.duelist == winner:
-                first.won, second.won = False, True
+                self.results[first], self.results[second] = False, True
             else:
                 continue
             break

@@ -1,6 +1,6 @@
 
 import random
-import dataclasses
+import collections
 from timeless.utils import generate_indented_repr
 
 
@@ -32,16 +32,7 @@ TIMELESS_SQUARES = [
 ]
 
 
-@dataclasses.dataclass()
-class IndexPair:
-    duelist: int
-    deck: int
-    won: bool | None = None
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return NotImplemented
-        return (self.duelist, self.deck) == (other.duelist, other.deck)
+IndexPair = collections.namedtuple("IndexPair", ("duelist", "deck"))
 
 
 class Square:
@@ -67,10 +58,10 @@ class Square:
     def __getitem__(self, key):
         return self.rows[key]
 
-    def _draw_pairs_for_preliminaries(self, tournament):
+    def _draw_pairings_for_preliminaries(self, record):
         valid_index_pairs = [
             pair for i in range(4) for j in range(4)
-            if i != j and (pair := IndexPair(i, j)) not in tournament.record.pairs
+            if i != j and (pair := IndexPair(i, j)) not in record.pairs
         ]
         first = random.choice(valid_index_pairs)
 
@@ -90,25 +81,25 @@ class Square:
         third = IndexPair(third_duelist, third_deck)
         fourth = IndexPair(fourth_duelist, fourth_deck)
 
-        return first, second, third, fourth
+        return (first, second), (third, fourth)
 
-    def _draw_pairs_for_finals(self, tournament):
-        assert tournament.tied_after_preliminaries is not None
-        if tournament.tied_after_preliminaries:
+    def _draw_pairings_for_finals(self, record):
+        assert record.standings.tied_after_preliminaries is not None
+        if record.standings.tied_after_preliminaries:
             first, second, third, fourth = [
                 IndexPair(index, index) for index in random.sample(range(4), 4)
             ]
         else:
             first, second, third, fourth = [
                 IndexPair(index, index) for index in sorted(
-                    tournament.record.win_count,
-                    key=lambda x: tournament.record.win_count.get(x),
+                    record.standings.win_count,
+                    key=lambda x: record.standings.win_count.get(x),
                     reverse=True,
                 )
             ]
-        return first, second, third, fourth
+        return (first, second), (third, fourth)
 
-    def draw_pairs(self, tournament):
-        if tournament.round.is_last_before_finals:
-            return self._draw_pairs_for_finals(tournament)
-        return self._draw_pairs_for_preliminaries(tournament)
+    def draw_pairings(self, record):
+        if record.round.is_last_before_finals:
+            return self._draw_pairings_for_finals(record)
+        return self._draw_pairings_for_preliminaries(record)
