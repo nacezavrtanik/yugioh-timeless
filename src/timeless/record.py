@@ -42,12 +42,12 @@ class Record:
     def add_new_pairings(self, pairings):
         self.pairings.append(pairings)
 
-    def update_won_attribute(self, winner):
+    def update_results(self, winner_1, winner_2):
+        winners = [winner_1, winner_2]
         for first, second in self.current_pairings:
-            if first.duelist == winner:
+            if first.duelist in winners:
                 self.results[first], self.results[second] = True, False
-            elif second.duelist == winner:
+            elif second.duelist in winners:
                 self.results[first], self.results[second] = False, True
             else:
-                continue
-            break
+                raise RuntimeError("invalid winner input")

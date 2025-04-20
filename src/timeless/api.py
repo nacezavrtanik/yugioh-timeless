@@ -40,8 +40,7 @@ class StatefulAPI(API):
         return self.tournament.pairings
 
     def update_results(self, winner_1, winner_2):
-        self.tournament.update_results(winner_1)
-        self.tournament.update_results(winner_2)
+        self.tournament.update_results(winner_1, winner_2)
 
     def read_standings(self):
         return self.tournament.standings

@@ -72,6 +72,8 @@ class Tournament:
         pairings = self.square.draw_pairings(self.record)
         self.record.add_new_pairings(pairings)
 
-    def update_results(self, winner):
-        winner_index = self.duelists_to_indices.get(winner)
-        self.record.update_won_attribute(winner_index)
+    def update_results(self, winner_1, winner_2):
+        self.record.update_results(
+            self.duelists_to_indices.get(winner_1),
+            self.duelists_to_indices.get(winner_2),
+        )
