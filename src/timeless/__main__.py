@@ -1,12 +1,12 @@
 
-from .parser import Parser
-from .cli import CLI
+from timeless.cli import CLI
+from timeless.api import StatefulAPI
 
 
 def run_cli():
-    parser = Parser()
-    args = parser.parse_args()
-    cli = CLI(args)
+    api = StatefulAPI()
+    cli = CLI(api)
+    cli.run()
 
 
 if __name__ == "__main__":

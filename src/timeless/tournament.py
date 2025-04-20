@@ -53,6 +53,14 @@ class Tournament:
         )
 
     @property
+    def duelists_to_indices(self):
+        return {duelist: index for index, duelist in self.duelists.items()}
+
+    @property
+    def decks_to_indices(self):
+        return {deck: index for index, deck in self.decks.items()}
+
+    @property
     def round(self):
         return self.record.current_round
 
@@ -68,6 +76,16 @@ class Tournament:
         ]):
             return None
         return self.record.win_configuration in TIED_WIN_CONFIGURATIONS_AFTER_PRELIMINARIES
+
+    @property
+    def pairings(self):
+        first_pairing, second_pairing = (
+            tuple(
+                (self.duelists.get(pair.duelist), self.decks.get(pair.deck))
+                for pair in pairing
+            ) for pairing in self.round.pairings
+        )
+        return first_pairing, second_pairing
 
     @property
     def standings(self):
@@ -103,19 +121,10 @@ class Tournament:
         }
         return deck_standings
 
-    @property
-    def pairings(self):
-        first_pairing, second_pairing = (
-            tuple(
-                (self.duelists.get(pair.duelist), self.decks.get(pair.deck))
-                for pair in pairing
-            ) for pairing in self.round.pairings
-        )
-        return first_pairing, second_pairing
-
     def advance_round(self):
         pairs = self.square.draw_pairs(self)
         self.record.add_new_round(pairs)
 
-    def update_record(self, winner_index):
+    def update_results(self, winner):
+        winner_index = self.duelists_to_indices.get(winner)
         self.record.update_won_attribute(winner_index)
