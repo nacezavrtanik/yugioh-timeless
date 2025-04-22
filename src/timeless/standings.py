@@ -64,14 +64,25 @@ class Standings:
             if self.results.get(pair) is True
         )
         index_to_wins = default | index_to_wins
-        sorted_by_wins = {
+
+        def _winning_bonus(x): return 0
+        if self.round.has_concluded:
+            def _winning_bonus(x):
+                index_to_pair = {
+                    getattr(pair, which): pair for pair in self.round.pairs
+                }
+                won_in_current_round = self.round.results.get(index_to_pair.get(x))
+                bonus = won_in_current_round / 2
+                return bonus
+
+        index_to_wins_sorted = {
             index: index_to_wins.get(index) for index in sorted(
                 index_to_wins,
                 reverse=True,
-                key=lambda x: index_to_wins.get(x),
+                key=lambda x: index_to_wins.get(x) + _winning_bonus(x),
             )
         }
-        return sorted_by_wins
+        return index_to_wins_sorted
 
     @property
     def duelist_win_count(self):
