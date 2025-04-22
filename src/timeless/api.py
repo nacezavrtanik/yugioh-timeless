@@ -37,10 +37,11 @@ class StatefulAPI(API):
 
     def read_pairings(self):
         self.tournament.advance_round()
+        self.tournament.draw_pairings()
         return self.tournament.pairings
 
     def update_results(self, winner_1, winner_2):
-        self.tournament.update_results(winner_1, winner_2)
+        self.tournament.submit_results(winner_1, winner_2)
 
     def read_standings(self):
         return self.tournament.standings

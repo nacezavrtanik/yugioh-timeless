@@ -3,16 +3,28 @@ from timeless.utils import generate_indented_repr
 
 
 class Round:
-    def __init__(self, record):
-        self.record = record
+    def __init__(self, number, pairings=None, results=None):
+        self.number = number
+        self.pairings = pairings
+        self.results = results
 
     def __repr__(self):
-        # TODO
-        return f"{self.__class__.__qualname__}(number={self.number!r})"
-
-    @property
-    def number(self):
-        return len(self.record.pairings)
+        if self.pairings is self.results is None:
+            return (
+                f"{self.__class__.__qualname__}("
+                f"number={self.number}, "
+                f"pairings={self.pairings}, "
+                f"results={self.results})"
+            )
+        return generate_indented_repr(
+            f"{self.__class__.__qualname__}(",
+            ",\n".join([
+                f"number={self.number!r}",
+                f"pairings={self.pairings!r}",
+                f"results={self.results!r}",
+            ]),
+            f")",
+        )
 
     @property
     def is_preround(self):
@@ -23,13 +35,19 @@ class Round:
         return self.number in {1, 2, 3}
 
     @property
-    def is_last_before_finals(self):
-        return self.number == 3
-
-    @property
     def is_final(self):
         return self.number == 4
 
     @property
+    def pairs(self):
+        if self.pairings is None:
+            return None
+        return set(pair for pairing in self.pairings for pair in pairing)
+
+    @property
     def has_concluded(self):
-        return self.record.pairs == set(self.record.results)
+        if self.is_preround:
+            return True
+        if self.results is None:
+            return False
+        return self.pairs == set(self.results)

@@ -34,22 +34,27 @@ class Tournament:
         return {deck: index for index, deck in self.decks.items()}
 
     @property
+    def round(self):
+        return self.record.round
+
+    @property
     def pairings(self):
+        if self.record.pairings is None:
+            return None
         first_pairing, second_pairing = (
             tuple(
                 (self.duelists.get(pair.duelist), self.decks.get(pair.deck))
                 for pair in pairing
-            ) for pairing in self.record.current_pairings
+            ) for pairing in self.record.pairings
         )
         return first_pairing, second_pairing
 
     @property
     def standings(self):
-        duelist_standings = self.record.standings.current_standings
-        deck_standings = self.record.standings.current_deck_standings
-        assert duelist_standings and deck_standings
-        if duelist_standings is None:
+        if self.record.standings is None:
             return None
+        duelist_standings = self.record.standings.get("duelists")
+        deck_standings = self.record.standings.get("decks")
 
         standings = {}
 
@@ -69,11 +74,14 @@ class Tournament:
         return standings
 
     def advance_round(self):
-        pairings = self.square.draw_pairings(self.record)
-        self.record.add_new_pairings(pairings)
+        self.record.advance_round()
 
-    def update_results(self, winner_1, winner_2):
-        self.record.update_results(
+    def draw_pairings(self):
+        pairings = self.square.draw_pairings(self.record)
+        self.record.set_pairings(pairings)
+
+    def submit_results(self, winner_1, winner_2):
+        self.record.set_results(
             self.duelists_to_indices.get(winner_1),
             self.duelists_to_indices.get(winner_2),
         )

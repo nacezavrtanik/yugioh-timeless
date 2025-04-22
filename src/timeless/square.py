@@ -61,7 +61,7 @@ class Square:
     def _draw_pairings_for_preliminaries(self, record):
         valid_index_pairs = [
             pair for i in range(4) for j in range(4)
-            if i != j and (pair := IndexPair(i, j)) not in record.pairs
+            if i != j and (pair := IndexPair(i, j)) not in record.exhausted_pairs
         ]
         first = random.choice(valid_index_pairs)
 
@@ -84,22 +84,21 @@ class Square:
         return (first, second), (third, fourth)
 
     def _draw_pairings_for_finals(self, record):
-        assert record.standings.tied_after_preliminaries is not None
-        if record.standings.tied_after_preliminaries:
+        if record.is_tied:
             first, second, third, fourth = [
                 IndexPair(index, index) for index in random.sample(range(4), 4)
             ]
         else:
             first, second, third, fourth = [
                 IndexPair(index, index) for index in sorted(
-                    record.standings.win_count,
-                    key=lambda x: record.standings.win_count.get(x),
+                    record.duelist_win_count,
+                    key=lambda x: record.duelist_win_count.get(x),
                     reverse=True,
                 )
             ]
         return (first, second), (third, fourth)
 
     def draw_pairings(self, record):
-        if record.round.is_last_before_finals:
+        if record.round.is_final:
             return self._draw_pairings_for_finals(record)
         return self._draw_pairings_for_preliminaries(record)
